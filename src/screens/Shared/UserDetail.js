@@ -547,12 +547,12 @@ class UserDetail extends Component {
         userIllusts.items.length
           ? this.renderIllustCollection(userIllustsItems, detail.profile)
           : null}
-        {userMangas &&
+        {/* {userMangas &&
         !userMangas.loading &&
         userMangas.items &&
         userMangas.items.length
           ? this.renderMangaCollection(userMangasItems, detail.profile)
-          : null}
+          : null} */}
         {userNovels &&
         !userNovels.loading &&
         userNovels.items &&

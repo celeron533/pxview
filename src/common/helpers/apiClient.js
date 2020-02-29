@@ -1,4 +1,4 @@
-import PixivApi from 'pixiv-api-client';
+import WildDreamApi from './wdClient';
 
-const pixiv = new PixivApi();
+const pixiv = new WildDreamApi();
 export default pixiv;
