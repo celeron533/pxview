@@ -1,4 +1,4 @@
-package com.utopia.pxview.UgoiraView;
+package com.furcoder.wilddream.UgoiraView;
 
 import android.content.Context;
 import android.graphics.Bitmap;

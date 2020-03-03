@@ -173,6 +173,7 @@ class WildDreamApi {
       },
       data,
     };
+    console.log(data);
     return axios(
       'https://accounts.pixiv.net/api/provisional-accounts/create',
       options

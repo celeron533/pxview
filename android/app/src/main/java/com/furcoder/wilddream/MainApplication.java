@@ -1,4 +1,4 @@
-package com.utopia.pxview;
+package com.furcoder.wilddream;
 
 import android.app.Application;
 import android.content.Context;
@@ -38,7 +38,7 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
-import com.utopia.pxview.UgoiraView.UgoiraViewPackage;
+import com.furcoder.wilddream.UgoiraView.UgoiraViewPackage;
 
 import java.util.Arrays;
 import java.util.List;
