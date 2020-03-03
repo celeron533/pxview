@@ -10,7 +10,7 @@ import { globalStyles } from '../../styles';
 const appStoreUrl = '';
 const googlePlayUrl =
   'https://play.google.com/store/apps/details?id=com.utopia.pxview';
-const sourceUrl = 'https://github.com/alphasp/pxview';
+const sourceUrl = 'https://github.com/FurCoder/pxview';
 
 const styles = StyleSheet.create({
   logoContainer: {
@@ -33,6 +33,13 @@ const styles = StyleSheet.create({
 });
 
 const list = [
+  {
+    id: 'forkPxView',
+    title: 'forkPxView',
+    icon: 'heart',
+    type: 'font-awesome',
+    size: 21,
+  },
   {
     id: 'contactUs',
     title: 'contactUs',
@@ -59,8 +66,12 @@ const list = [
 class About extends Component {
   handleOnPressListItem = item => {
     switch (item.id) {
+      case 'forkPxView': {
+        this.openUrl('https://github.com/alphasp/pxview');
+        break;
+      }
       case 'contactUs': {
-        this.openUrl('mailto:gmerudotcom@gmail.com?subject=About PxView');
+        this.openUrl('mailto:admin@wilddream.net');
         break;
       }
       case 'rateApp': {
@@ -105,7 +116,7 @@ class About extends Component {
             style={styles.logo}
           />
           <View style={styles.nameContainer}>
-            <Text style={styles.name}>PxView v{DeviceInfo.getVersion()}</Text>
+            <Text style={styles.name}>WildDream v{DeviceInfo.getVersion()}</Text>
           </View>
         </View>
         <View style={styles.listContainer}>

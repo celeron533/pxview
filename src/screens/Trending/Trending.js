@@ -120,7 +120,8 @@ class Trending extends Component {
       case 0:
         return <TrendingIllustTags navigation={navigation} />;
       case 1:
-        return <TrendingNovelTags navigation={navigation} />;
+        // return <TrendingNovelTags navigation={navigation} />;
+        return null;
       case 2:
         return <RecommendedUsers navigation={navigation} />;
       default:

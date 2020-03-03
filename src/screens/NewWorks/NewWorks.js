@@ -15,7 +15,7 @@ class NewWorks extends Component {
       routes: [
         { key: '1', title: i18n.following },
         { key: '2', title: i18n.newest },
-        { key: '3', title: i18n.myPixiv },
+        // { key: '3', title: i18n.myPixiv },
       ],
     };
   }
@@ -28,7 +28,7 @@ class NewWorks extends Component {
         routes: [
           { key: '1', title: i18n.follow },
           { key: '2', title: i18n.illustration },
-          { key: '3', title: i18n.myPixiv },
+          // { key: '3', title: i18n.myPixiv },
         ],
       });
     }
@@ -45,8 +45,8 @@ class NewWorks extends Component {
         return <FollowingUserNewWorks navigation={navigation} />;
       case '2':
         return <UserNewWorks navigation={navigation} />;
-      case '3':
-        return <MyPixivNewWorks navigation={navigation} />;
+      // case '3':
+      //   return <MyPixivNewWorks navigation={navigation} />;
       default:
         return null;
     }

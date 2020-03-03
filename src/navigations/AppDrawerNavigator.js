@@ -10,17 +10,17 @@ import { SCREENS } from '../common/constants';
 const createAppDrawerNavigator = ({ initialRouteName }) =>
   createDrawerNavigator(
     {
-      [SCREENS.Recommended]: {
-        screen: RecommendedNavigator,
+      // [SCREENS.Recommended]: {
+      //   screen: RecommendedNavigator,
+      // },
+      [SCREENS.NewWorks]: {
+        screen: NewWorksNavigator,
       },
       [SCREENS.Ranking]: {
         screen: RankingNavigator,
       },
       [SCREENS.Trending]: {
         screen: TrendingNavigator,
-      },
-      [SCREENS.NewWorks]: {
-        screen: NewWorksNavigator,
       },
     },
     {

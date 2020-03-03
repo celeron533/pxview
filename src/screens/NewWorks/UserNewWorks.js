@@ -34,9 +34,9 @@ class UserNewWorks extends Component {
           {
             title: i18n.illust,
           },
-          {
-            title: i18n.manga,
-          },
+          // {
+          //   title: i18n.manga,
+          // },
           {
             title: i18n.novel,
           },
@@ -59,11 +59,11 @@ class UserNewWorks extends Component {
             renderHeader={this.renderHeader}
           />
         );
+      // case 1:
+      //   return (
+      //     <NewMangas navigation={navigation} renderHeader={this.renderHeader} />
+      //   );
       case 1:
-        return (
-          <NewMangas navigation={navigation} renderHeader={this.renderHeader} />
-        );
-      case 2:
         return (
           <NewNovels navigation={navigation} renderHeader={this.renderHeader} />
         );

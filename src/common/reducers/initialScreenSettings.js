@@ -2,7 +2,7 @@ import { INITIAL_SCREEN_SETTINGS } from '../constants/actionTypes';
 import { SCREENS } from '../constants';
 
 const initState = {
-  routeName: SCREENS.Recommended,
+  routeName: SCREENS.NewWorks,
 };
 
 export default function initialScreenSettings(state = initState, action) {

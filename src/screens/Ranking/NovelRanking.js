@@ -32,32 +32,16 @@ class NovelRanking extends Component {
     return [
       {
         key: '1',
-        title: i18n.rankingDay,
-        rankingMode: RANKING_FOR_UI.DAILY_NOVEL,
-        reload: false,
+        title: i18n.rankingYear,
+        rankingMode: RANKING_FOR_UI.YEARLY_NOVEL,
       },
       {
         key: '2',
-        title: i18n.rankingDayMale,
-        rankingMode: RANKING_FOR_UI.DAILY_MALE_NOVEL,
+        title: i18n.rankingAll,
+        rankingMode: RANKING_FOR_UI.ALL_NOVEL,
       },
       {
         key: '3',
-        title: i18n.rankingDayFemale,
-        rankingMode: RANKING_FOR_UI.DAILY_FEMALE_NOVEL,
-      },
-      {
-        key: '4',
-        title: i18n.rankingWeekRookie,
-        rankingMode: RANKING_FOR_UI.WEEKLY_ROOKIE_NOVEL,
-      },
-      {
-        key: '5',
-        title: i18n.rankingWeek,
-        rankingMode: RANKING_FOR_UI.WEEKLY_NOVEL,
-      },
-      {
-        key: '6',
         title: i18n.rankingPast,
         rankingMode: RANKING_FOR_UI.PAST_NOVEL,
       },

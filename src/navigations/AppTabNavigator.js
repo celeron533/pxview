@@ -39,12 +39,20 @@ const tabBarComponent = props => {
 const createAppTabNavigator = ({ initialRouteName }) =>
   createBottomTabNavigator(
     {
-      [SCREENS.RecommendedTab]: {
-        screen: Platform.OS === 'android' ? Recommended : RecommendedNavigator,
+      // [SCREENS.RecommendedTab]: {
+      //   screen: Platform.OS === 'android' ? Recommended : RecommendedNavigator,
+      //   navigationOptions: ({ screenProps: { i18n } }) => ({
+      //     tabBarLabel: i18n.recommended,
+      //     tabBarIcon: ({ tintColor, focused }) =>
+      //       renderTabBarIcon(tintColor, focused, 'thumbs-up'),
+      //   }),
+      // },
+      [SCREENS.NewWorksTab]: {
+        screen: Platform.OS === 'android' ? NewWorks : NewWorksNavigator,
         navigationOptions: ({ screenProps: { i18n } }) => ({
-          tabBarLabel: i18n.recommended,
+          tabBarLabel: i18n.newest,
           tabBarIcon: ({ tintColor, focused }) =>
-            renderTabBarIcon(tintColor, focused, 'thumbs-up'),
+            renderTabBarIcon(tintColor, focused, 'fiber-new', 'material'),
         }),
       },
       [SCREENS.RankingTab]: {
@@ -61,14 +69,6 @@ const createAppTabNavigator = ({ initialRouteName }) =>
           tabBarLabel: i18n.search,
           tabBarIcon: ({ tintColor, focused }) =>
             renderTabBarIcon(tintColor, focused, 'search'),
-        }),
-      },
-      [SCREENS.NewWorksTab]: {
-        screen: Platform.OS === 'android' ? NewWorks : NewWorksNavigator,
-        navigationOptions: ({ screenProps: { i18n } }) => ({
-          tabBarLabel: i18n.newest,
-          tabBarIcon: ({ tintColor, focused }) =>
-            renderTabBarIcon(tintColor, focused, 'fiber-new', 'material'),
         }),
       },
       [SCREENS.MyPageTab]: {

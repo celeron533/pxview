@@ -24,6 +24,10 @@ function mapRankingMode(rankingMode) {
       return 'week';
     case RANKING_FOR_UI.MONTHLY_ILLUST:
       return 'month';
+    case RANKING_FOR_UI.YEARLY_ILLUST:
+      return 'year';
+    case RANKING_FOR_UI.ALL_ILLUST:
+      return 'all';
     // Manga
     case RANKING_FOR_UI.DAILY_MANGA:
       return 'day_manga';
@@ -44,6 +48,10 @@ function mapRankingMode(rankingMode) {
       return 'week_rookie';
     case RANKING_FOR_UI.WEEKLY_NOVEL:
       return 'week';
+    case RANKING_FOR_UI.YEARLY_NOVEL:
+      return 'year';
+    case RANKING_FOR_UI.ALL_NOVEL:
+      return 'all';
     default:
       return null;
   }
@@ -74,6 +82,9 @@ function getRankingType(rankingMode) {
     case RANKING_FOR_UI.DAILY_FEMALE_NOVEL:
     case RANKING_FOR_UI.WEEKLY_ROOKIE_NOVEL:
     case RANKING_FOR_UI.WEEKLY_NOVEL:
+    case RANKING_FOR_UI.MONTHLY_NOVEL:
+    case RANKING_FOR_UI.YEARLY_NOVEL:
+    case RANKING_FOR_UI.ALL_NOVEL:
     case RANKING_FOR_UI.PAST_NOVEL:
       return RANKING_TYPES.NOVEL;
     default:

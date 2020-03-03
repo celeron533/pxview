@@ -13,7 +13,7 @@ class MyWorks extends Component {
       index: 0,
       routes: [
         { key: '1', title: i18n.illustration },
-        { key: '2', title: i18n.manga },
+        // { key: '2', title: i18n.manga },
         { key: '3', title: i18n.novel },
       ],
     };
@@ -26,7 +26,7 @@ class MyWorks extends Component {
       this.setState({
         routes: [
           { key: '1', title: i18n.illustration },
-          { key: '2', title: i18n.manga },
+          // { key: '2', title: i18n.manga },
           { key: '3', title: i18n.novel },
         ],
       });
@@ -43,8 +43,8 @@ class MyWorks extends Component {
     switch (route.key) {
       case '1':
         return <UserIllusts userId={userId} navigation={navigation} />;
-      case '2':
-        return <UserMangas userId={userId} navigation={navigation} />;
+      // case '2':
+      //   return <UserMangas userId={userId} navigation={navigation} />;
       case '3':
         return <UserNovels userId={userId} navigation={navigation} />;
       default:

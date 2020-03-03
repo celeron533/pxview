@@ -62,4 +62,4 @@ class Root extends Component {
   }
 }
 
-AppRegistry.registerComponent('PxView', () => Root);
+AppRegistry.registerComponent('WildDream', () => Root);

@@ -61,3 +61,5 @@ flow-typed
 
 # CocoaPods
 /ios/Pods/
+
+android/gradle.properties

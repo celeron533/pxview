@@ -2,7 +2,7 @@ import React from 'react';
 import PXWebView from '../../components/PXWebView';
 
 const ppUrl =
-  'https://github.com/alphasp/pxview/blob/master/privacy-policy/en.md';
+  'https://github.com/FurCoder/pxview/blob/master/privacy-policy/en.md';
 
 const PrivacyPolicy = () => (
   <PXWebView

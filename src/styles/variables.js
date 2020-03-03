@@ -11,10 +11,10 @@ function getStatusBarHeight() {
   return StatusBar.currentHeight;
 }
 
-export const HEADER_BACKGROUND_COLOR = '#2e97d8';
+export const HEADER_BACKGROUND_COLOR = '#4e5d6c';
 export const HEADER_TINT_COLOR = '#fff';
 export const CARD_BACKGROUND_COLOR = '#fff';
-export const PRIMARY_COLOR = '#2e97d8';
+export const PRIMARY_COLOR = '#4e5d6c';
 export const SECONDARY_COLOR = 'red';
 export const BACKGROUND_COLOR = '#E9EBEE';
 export const HIGHLIGHT_COLOR = 'green';

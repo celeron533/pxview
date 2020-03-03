@@ -161,31 +161,33 @@ class Search extends Component {
     switch (index) {
       case 0:
         return (
-          <SearchAutoCompleteResult
-            searchAutoComplete={searchAutoComplete}
-            searchHistory={searchHistory}
-            onPressItem={this.handleOnPressAutoCompleteItem}
-            onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
-            onPressRemoveSearchHistoryItem={
-              this.handleOnPressRemoveSearchHistoryItem
-            }
-            onPressClearSearchHistory={this.handleOnPressClearSearchHistory}
-            word={word}
-          />
+          null
+          // <SearchAutoCompleteResult
+          //   searchAutoComplete={searchAutoComplete}
+          //   searchHistory={searchHistory}
+          //   onPressItem={this.handleOnPressAutoCompleteItem}
+          //   onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
+          //   onPressRemoveSearchHistoryItem={
+          //     this.handleOnPressRemoveSearchHistoryItem
+          //   }
+          //   onPressClearSearchHistory={this.handleOnPressClearSearchHistory}
+          //   word={word}
+          // />
         );
       case 1:
         return (
-          <SearchAutoCompleteResult
-            searchAutoComplete={searchAutoComplete}
-            searchHistory={searchHistory}
-            onPressItem={this.handleOnPressAutoCompleteItem}
-            onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
-            onPressRemoveSearchHistoryItem={
-              this.handleOnPressRemoveSearchHistoryItem
-            }
-            onPressClearSearchHistory={this.handleOnPressClearSearchHistory}
-            word={word}
-          />
+          null
+          // <SearchAutoCompleteResult
+          //   searchAutoComplete={searchAutoComplete}
+          //   searchHistory={searchHistory}
+          //   onPressItem={this.handleOnPressAutoCompleteItem}
+          //   onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
+          //   onPressRemoveSearchHistoryItem={
+          //     this.handleOnPressRemoveSearchHistoryItem
+          //   }
+          //   onPressClearSearchHistory={this.handleOnPressClearSearchHistory}
+          //   word={word}
+          // />
         );
       case 2:
         return (

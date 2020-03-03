@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
   pageLink: {
     fontWeight: '500',
     color: '#007AFF',
-  },
+  },  
 });
 
 class NovelViewer extends Component {
@@ -104,25 +104,26 @@ class NovelViewer extends Component {
     }
     const { novelId, fontSize, lineHeight, items } = this.props;
     const item = items[index];
+    console.log(item);
     // render text by chunks to prevent over text limit https://github.com/facebook/react-native/issues/15663
     return (
       <View style={styles.container}>
         <ScrollView>
-          {item.match(/(.|[\r\n]){1,3000}/g).map((t, i) => (
-            <HtmlView
-              key={`${novelId}-${index}-${i}`} // eslint-disable-line react/no-array-index-key
-              value={t}
-              renderNode={this.handleRenderNode}
-              textComponentProps={{
-                style: {
-                  fontSize,
-                  lineHeight: fontSize * lineHeight,
-                },
-                selectable: true,
-              }}
-              TextComponent={Text}
-            />
-          ))}
+          <HtmlView
+            // key={`${novelId}-${index}-${i}`} // eslint-disable-line react/no-array-index-key
+            value={item}
+            addLineBreaks={false}
+            stylesheet={StyleSheet.create({
+              p: {
+                marginTop: 0,
+                marginBottom: 0,
+                fontSize: fontSize,
+                lineHeight: fontSize * lineHeight
+              },
+              fontSize,
+              lineHeight: fontSize * lineHeight,
+            })}
+          />
         </ScrollView>
       </View>
     );

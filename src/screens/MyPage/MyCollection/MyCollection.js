@@ -35,10 +35,10 @@ class MyCollection extends Component {
     this.state = {
       index: 0,
       routes: [
-        { key: '1', title: i18n.illustrationPublic },
-        { key: '2', title: i18n.illustrationPrivate },
-        { key: '3', title: i18n.novelPublic },
-        { key: '4', title: i18n.novelPrivate },
+        { key: '1', title: i18n.illustration },
+        // { key: '2', title: i18n.illustrationPrivate },
+        { key: '3', title: i18n.novel },
+        // { key: '4', title: i18n.novelPrivate },
       ],
       selectedPublicIllustTag: '',
       selectedPrivateIllustTag: '',
@@ -53,10 +53,10 @@ class MyCollection extends Component {
     if (lang !== prevLang) {
       this.setState({
         routes: [
-          { key: '1', title: i18n.illustrationPublic },
-          { key: '2', title: i18n.illustrationPrivate },
-          { key: '3', title: i18n.novelPublic },
-          { key: '4', title: i18n.novelPrivate },
+          { key: '1', title: i18n.illustration },
+          // { key: '2', title: i18n.illustrationPrivate },
+          { key: '3', title: i18n.novel },
+          // { key: '4', title: i18n.novelPrivate },
         ],
       });
     }
@@ -85,14 +85,14 @@ class MyCollection extends Component {
             navigation={navigation}
           />
         );
-      case '2':
-        return (
-          <MyPrivateBookmarkIllusts
-            userId={userId}
-            tag={selectedPrivateIllustTag}
-            navigation={navigation}
-          />
-        );
+      // case '2':
+      //   return (
+      //     <MyPrivateBookmarkIllusts
+      //       userId={userId}
+      //       tag={selectedPrivateIllustTag}
+      //       navigation={navigation}
+      //     />
+      //   );
       case '3':
         return (
           <UserBookmarkNovels
@@ -102,14 +102,14 @@ class MyCollection extends Component {
             navigation={navigation}
           />
         );
-      case '4':
-        return (
-          <MyPrivateBookmarkNovels
-            userId={userId}
-            tag={selectedPrivateNovelTag}
-            navigation={navigation}
-          />
-        );
+      // case '4':
+      //   return (
+      //     <MyPrivateBookmarkNovels
+      //       userId={userId}
+      //       tag={selectedPrivateNovelTag}
+      //       navigation={navigation}
+      //     />
+      //   );
       default:
         return null;
     }
@@ -168,45 +168,49 @@ class MyCollection extends Component {
           navigationState={this.state}
           renderScene={this.renderScene}
           onIndexChange={this.handleChangeTab}
-          tabBarProps={{
-            scrollEnabled: true,
-          }}
+          // tabBarProps={{
+          //   scrollEnabled: true,
+          // }}
         />
         {index === 0 && (
-          <IllustTagsFilterModal
-            tagType={TAG_TYPES.PUBLIC}
-            isOpen={isOpenFilterModal}
-            onPressCloseButton={this.handleOnPressCloseFilterButton}
-            onSelectTag={this.handleOnSelectTag}
-            tag={selectedPublicIllustTag}
-          />
+          // <IllustTagsFilterModal
+          //   tagType={TAG_TYPES.PUBLIC}
+          //   isOpen={isOpenFilterModal}
+          //   onPressCloseButton={this.handleOnPressCloseFilterButton}
+          //   onSelectTag={this.handleOnSelectTag}
+          //   tag={selectedPublicIllustTag}
+          // />
+          null
         )}
         {index === 1 && (
-          <IllustTagsFilterModal
-            tagType={TAG_TYPES.PRIVATE}
-            isOpen={isOpenFilterModal}
-            onPressCloseButton={this.handleOnPressCloseFilterButton}
-            onSelectTag={this.handleOnSelectTag}
-            tag={selectedPrivateIllustTag}
-          />
+          // <IllustTagsFilterModal
+          //   tagType={TAG_TYPES.PRIVATE}
+          //   isOpen={isOpenFilterModal}
+          //   onPressCloseButton={this.handleOnPressCloseFilterButton}
+          //   onSelectTag={this.handleOnSelectTag}
+          //   tag={selectedPrivateIllustTag}
+          // />
+          null
         )}
         {index === 2 && (
-          <NovelTagsFilterModal
-            tagType={TAG_TYPES.PUBLIC}
-            isOpen={isOpenFilterModal}
-            onPressCloseButton={this.handleOnPressCloseFilterButton}
-            onSelectTag={this.handleOnSelectTag}
-            tag={selectedPublicNovelTag}
-          />
+          // <NovelTagsFilterModal
+          //   tagType={TAG_TYPES.PUBLIC}
+          //   isOpen={isOpenFilterModal}
+          //   onPressCloseButton={this.handleOnPressCloseFilterButton}
+          //   onSelectTag={this.handleOnSelectTag}
+          //   tag={selectedPublicNovelTag}
+          // />
+          null
         )}
         {index === 3 && (
-          <NovelTagsFilterModal
-            tagType={TAG_TYPES.PRIVATE}
-            isOpen={isOpenFilterModal}
-            onPressCloseButton={this.handleOnPressCloseFilterButton}
-            onSelectTag={this.handleOnSelectTag}
-            tag={selectedPrivateNovelTag}
-          />
+          // <NovelTagsFilterModal
+          //   tagType={TAG_TYPES.PRIVATE}
+          //   isOpen={isOpenFilterModal}
+          //   onPressCloseButton={this.handleOnPressCloseFilterButton}
+          //   onSelectTag={this.handleOnSelectTag}
+          //   tag={selectedPrivateNovelTag}
+          // />
+          null
         )}
       </View>
     );

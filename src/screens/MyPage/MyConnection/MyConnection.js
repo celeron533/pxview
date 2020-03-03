@@ -13,10 +13,10 @@ class MyConnection extends Component {
     this.state = {
       index: 0,
       routes: [
-        { key: '1', title: i18n.followingPublic },
-        { key: '2', title: i18n.followingPrivate },
+        { key: '1', title: i18n.following },
+        // { key: '2', title: i18n.followingPrivate },
         { key: '3', title: i18n.follower },
-        { key: '4', title: i18n.myPixiv },
+        // { key: '4', title: i18n.myPixiv },
       ],
     };
   }
@@ -27,10 +27,10 @@ class MyConnection extends Component {
     if (lang !== prevLang) {
       this.setState({
         routes: [
-          { key: '1', title: i18n.followingPublic },
-          { key: '2', title: i18n.followingPrivate },
+          { key: '1', title: i18n.following },
+          // { key: '2', title: i18n.followingPrivate },
           { key: '3', title: i18n.follower },
-          { key: '4', title: i18n.myPixiv },
+          // { key: '4', title: i18n.myPixiv },
         ],
       });
     }
@@ -52,18 +52,18 @@ class MyConnection extends Component {
             navigation={navigation}
           />
         );
-      case '2':
-        return (
-          <UserFollowing
-            userId={userId}
-            followingType={FOLLOWING_TYPES.PRIVATE}
-            navigation={navigation}
-          />
-        );
+      // case '2':
+      //   return (
+      //     <UserFollowing
+      //       userId={userId}
+      //       followingType={FOLLOWING_TYPES.PRIVATE}
+      //       navigation={navigation}
+      //     />
+      //   );
       case '3':
         return <UserFollowers userId={userId} navigation={navigation} />;
-      case '4':
-        return <UserMyPixiv userId={userId} navigation={navigation} />;
+      // case '4':
+      //   return <UserMyPixiv userId={userId} navigation={navigation} />;
       default:
         return null;
     }
@@ -75,9 +75,9 @@ class MyConnection extends Component {
         navigationState={this.state}
         renderScene={this.renderScene}
         onIndexChange={this.handleChangeTab}
-        tabBarProps={{
-          scrollEnabled: true,
-        }}
+        // tabBarProps={{
+        //   scrollEnabled: true,
+        // }}
       />
     );
   }

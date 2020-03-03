@@ -36,40 +36,30 @@ class Ranking extends Component {
             key: '1',
             title: i18n.rankingDay,
             rankingMode: RANKING_FOR_UI.DAILY_ILLUST,
-            reload: false,
+            // reload: false,
           },
           {
             key: '2',
-            title: i18n.rankingDayMale,
-            rankingMode: RANKING_FOR_UI.DAILY_MALE_ILLUST,
-          },
-          {
-            key: '3',
-            title: i18n.rankingDayFemale,
-            rankingMode: RANKING_FOR_UI.DAILY_FEMALE_ILLUST,
-          },
-          {
-            key: '4',
-            title: i18n.rankingWeekOriginal,
-            rankingMode: RANKING_FOR_UI.WEEKLY_ORIGINAL_ILLUST,
-          },
-          {
-            key: '5',
-            title: i18n.rankingWeekRookie,
-            rankingMode: RANKING_FOR_UI.WEEKLY_ROOKIE_ILLUST,
-          },
-          {
-            key: '6',
             title: i18n.rankingWeek,
             rankingMode: RANKING_FOR_UI.WEEKLY_ILLUST,
           },
           {
-            key: '7',
+            key: '3',
             title: i18n.rankingMonth,
             rankingMode: RANKING_FOR_UI.MONTHLY_ILLUST,
           },
           {
-            key: '8',
+            key: '4',
+            title: i18n.rankingYear,
+            rankingMode: RANKING_FOR_UI.YEARLY_ILLUST,
+          },
+          {
+            key: '5',
+            title: i18n.rankingAll,
+            rankingMode: RANKING_FOR_UI.ALL_ILLUST,
+          },
+          {
+            key: '6',
             title: i18n.rankingPast,
             rankingMode: RANKING_FOR_UI.PAST_ILLUST,
           },

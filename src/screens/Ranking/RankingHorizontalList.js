@@ -10,7 +10,7 @@ import Loader from '../../components/Loader';
 import { connectLocalization } from '../../components/Localization';
 import * as rankingActionCreators from '../../common/actions/ranking';
 import { makeGetIllustRankingItems } from '../../common/selectors';
-import { SCREENS, RANKING_TYPES } from '../../common/constants';
+import { SCREENS, RANKING_TYPES, RANKING_FOR_UI } from '../../common/constants';
 import { globalStyleVariables } from '../../styles';
 
 const SLIDER_WIDTH = globalStyleVariables.WINDOW_WIDTH;
@@ -109,6 +109,18 @@ class RankingHorizontalList extends Component {
     }
   };
 
+  mapRankingModeString = rankingMode => {
+    const { i18n } = this.props;
+    switch (rankingMode) {
+      case RANKING_FOR_UI.MONTHLY_ILLUST:
+        return i18n.rankingMonth;
+      case RANKING_FOR_UI.ALL_ILLUST:
+        return i18n.rankingAll;
+      default:
+        return '';
+    }
+  };
+
   renderItem = ({ item, index }) => (
     <View style={styles.sliderContainer}>
       <IllustItem
@@ -126,6 +138,7 @@ class RankingHorizontalList extends Component {
       ranking: { loading, loaded },
       items,
       rankingType,
+      rankingMode,
       i18n,
       theme,
     } = this.props;
@@ -133,7 +146,7 @@ class RankingHorizontalList extends Component {
       <View style={styles.container}>
         <View style={styles.titleContainer}>
           <Text style={styles.title}>
-            {this.mapRankingTypeString(rankingType)}
+            {this.mapRankingTypeString(rankingType) + " " + this.mapRankingModeString(rankingMode)}
           </Text>
           <PXTouchable
             hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}

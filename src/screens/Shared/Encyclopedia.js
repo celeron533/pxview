@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PXWebView from '../../components/PXWebView';
 
-const ENCYCLOPEDIA_URL = 'https://dic.pixiv.net/a';
+const ENCYCLOPEDIA_URL = 'https://zh.moegirl.org';
 
 class Encyclopedia extends Component {
   static navigationOptions = ({ navigation }) => {

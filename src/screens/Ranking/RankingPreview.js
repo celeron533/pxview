@@ -54,7 +54,7 @@ class RankingPreview extends Component {
           }
         >
           <RankingHorizontalList
-            rankingMode={RANKING_FOR_UI.DAILY_ILLUST}
+            rankingMode={RANKING_FOR_UI.MONTHLY_ILLUST}
             rankingType={RANKING_TYPES.ILLUST}
             navigation={navigation}
             refreshing={refreshing}
@@ -62,14 +62,14 @@ class RankingPreview extends Component {
             onRefreshSuccess={this.handleOnRefreshSuccess}
           />
           <RankingHorizontalList
-            rankingMode={RANKING_FOR_UI.DAILY_MANGA}
-            rankingType={RANKING_TYPES.MANGA}
+            rankingMode={RANKING_FOR_UI.ALL_ILLUST}
+            rankingType={RANKING_TYPES.ILLUST}
             navigation={navigation}
             refreshing={refreshing}
             theme={theme}
           />
           <NovelRankingPreview
-            rankingMode={RANKING_FOR_UI.DAILY_NOVEL}
+            rankingMode={RANKING_FOR_UI.YEARLY_NOVEL}
             navigation={navigation}
             refreshing={refreshing}
             theme={theme}
