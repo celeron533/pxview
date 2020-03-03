@@ -1,6 +1,8 @@
 {
   "visitWebsite": "wilddream.net",
   "forkPxView": "This project is a fork to the open-source pixiv APP \"PxView\"",
+  "rankingYear": "毎年",
+  "rankingAll": "すべて",
   "about": "このアプリについて",
   "accountSettings": "アカウント設定",
   "accountSettingsAdvancedSettings": "詳細設定",

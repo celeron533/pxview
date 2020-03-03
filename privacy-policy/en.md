@@ -1,11 +1,11 @@
 # Privacy Policy
 
-This privacy policy governs your use of the software application PxView ("Application", "App")
+This privacy policy governs your use of the software application WildDream ("Application", "App")
 "we", "us", "our" refers to the creator(s) of the app.
 
-### How is login to Pixiv done?
+### How is login to WildDream Art done?
 
-Login to Pixiv is done with api. The password is sent directly to Pixiv servers for authentication and is never seen by us. Pixiv then returns token which is used to access Pixiv on your behalf.  
+Login to WildDream Art is done with api. The password is sent directly to WildDream Art servers for authentication and is never seen by us. WildDream Art then returns token which is used to access WildDream Art on your behalf.  
 
 The token is stored locally on your device. 
 
@@ -83,4 +83,4 @@ By using the Application , you also agree to our Terms of Service.
 
 ### Contact us 
 
-If you have any questions regarding privacy while using the Application, or have questions about our practices, please contact us via email: gmerudotcom@gmail.com
+If you have any questions regarding privacy while using the Application, or have questions about our practices, please contact us via email: admin@wilddream.net

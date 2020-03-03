@@ -1,6 +1,8 @@
 {
   "visitWebsite": "WildDream Website",
   "forkPxView": "This project is a fork to the open-source pixiv APP \"PxView\"",
+  "rankingYear": "Yearly",
+  "rankingAll": "All",
   "about": "About",
   "accountSettings": "Account Settings",
   "accountSettingsAdvancedSettings": "Advanced Settings",
@@ -12,7 +14,7 @@
   "accountSettingsPasswordCurrent": "Current Password",
   "accountSettingsPasswordNew": "New Password",
   "accountSettingsPixivId": "WildDream ID",
-  "accountSettingsPixivIdAlphanumeric": "WildDream ID(alphanumeric)",
+  "accountSettingsPixivIdAlphanumeric": "WildDream ID (alphanumeric)",
   "accountSettingsUpdateAccount": "Update Account",
   "accountSettingsValidateEmail": "Please enter your email address",
   "accountSettingsValidatePassword": "Please enter your password",
