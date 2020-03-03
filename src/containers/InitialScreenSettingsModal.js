@@ -7,8 +7,11 @@ import * as initialScreenSettingsActionCreators from '../common/actions/initialS
 import { SCREENS } from '../common/constants';
 
 const screenList = [
+  // {
+  //   id: SCREENS.Recommended,
+  // },
   {
-    id: SCREENS.Recommended,
+    id: SCREENS.NewWorks,
   },
   {
     id: SCREENS.Ranking,
@@ -16,9 +19,7 @@ const screenList = [
   {
     id: SCREENS.Trending,
   },
-  {
-    id: SCREENS.NewWorks,
-  },
+
 ];
 
 class InitialScreenSettingsModal extends Component {

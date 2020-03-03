@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Alert } from 'react-native';
+import { View, ScrollView, Alert, Linking } from 'react-native';
 import { connect } from 'react-redux';
 import { withNavigation } from 'react-navigation';
 import { DrawerNavigatorItems, DrawerActions } from 'react-navigation-drawer';
@@ -53,10 +53,16 @@ const menuList2 = [
     icon: 'cog',
     type: 'font-awesome',
   },
+  // {
+  //   id: 'feedback',
+  //   title: 'feedback',
+  //   icon: 'comment-o',
+  //   type: 'font-awesome',
+  // },
   {
-    id: 'feedback',
-    title: 'feedback',
-    icon: 'comment-o',
+    id: 'visitWebsite',
+    title: 'visitWebsite',
+    icon: 'external-link',
     type: 'font-awesome',
   },
   {
@@ -112,6 +118,12 @@ class DrawerContent extends Component {
         }
         case 'feedback': {
           navigate(SCREENS.Feedback);
+          break;
+        }
+        case 'visitWebsite': {
+          Linking.openURL(
+            `https://www.wilddream.net`,
+          );
           break;
         }
         case 'logout': {

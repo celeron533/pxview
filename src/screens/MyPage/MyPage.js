@@ -57,12 +57,12 @@ const menuList2 = [
     icon: 'cog',
     type: 'font-awesome',
   },
-  {
-    id: 'feedback',
-    title: 'feedback',
-    icon: 'comment-o',
-    type: 'font-awesome',
-  },
+  // {
+  //   id: 'feedback',
+  //   title: 'feedback',
+  //   icon: 'comment-o',
+  //   type: 'font-awesome',
+  // }, 
   {
     id: 'logout',
     title: 'logout',

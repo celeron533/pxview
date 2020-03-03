@@ -1,4 +1,6 @@
 {
+  "visitWebsite": "访问WildDream网页版",
+  "forkPxView": "本项目基于开源的第三方Pixiv客户端“PxView”",
   "about": "關於PxView",
   "accountSettings": "帳號設置",
   "accountSettingsAdvancedSettings": "详细设定",

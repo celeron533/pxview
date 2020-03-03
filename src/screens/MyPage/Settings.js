@@ -22,10 +22,10 @@ const styles = StyleSheet.create({
 });
 
 const settingsList = [
-  {
-    id: 'accountSettings',
-    title: 'accountSettings',
-  },
+  // {
+  //   id: 'accountSettings',
+  //   title: 'accountSettings',
+  // },
   {
     id: 'saveImageSettings',
     title: 'saveImageSettings',
@@ -34,14 +34,14 @@ const settingsList = [
     id: 'initialScreenSettings',
     title: 'initialScreenSettings',
   },
-  {
-    id: 'likeButtonSettings',
-    title: 'likeButtonSettings',
-  },
-  {
-    id: 'tagHighlightSettings',
-    title: 'tagHighlightSettings',
-  },
+  // {
+  //   id: 'likeButtonSettings',
+  //   title: 'likeButtonSettings',
+  // },
+  // {
+  //   id: 'tagHighlightSettings',
+  //   title: 'tagHighlightSettings',
+  // },
   {
     id: 'muteSettings',
     title: 'muteSettings',
@@ -57,10 +57,10 @@ const settingsList = [
 ];
 
 const otherList = [
-  {
-    id: 'donations',
-    title: 'donations',
-  },
+  // {
+  //   id: 'donations',
+  //   title: 'donations',
+  // },
   {
     id: 'privacyPolicy',
     title: 'privacyPolicy',
@@ -170,6 +170,12 @@ class Settings extends Component {
       }
       case 'about': {
         navigate(SCREENS.About);
+        break;
+      }
+      case 'visitWebsite': {
+        Linking.openURL(
+          `https://www.wilddream.net`,
+        );
         break;
       }
       case 'donations': {

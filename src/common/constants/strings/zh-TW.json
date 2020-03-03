@@ -1,5 +1,7 @@
 {
-  "about": "關於PxView",
+  "visitWebsite": "訪問WildDream網頁版",
+  "forkPxView": "本項目基於開源的第三方Pixiv客戶端“PxView”",
+  "about": "關於WildDream",
   "accountSettings": "帳號設置",
   "accountSettingsAdvancedSettings": "详细设定",
   "accountSettingsChange": "{0}變更",
