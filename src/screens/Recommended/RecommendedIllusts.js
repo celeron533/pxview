@@ -1,64 +1,53 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigationState, useScrollToTop } from '@react-navigation/native';
 import IllustList from '../../components/IllustList';
-import * as recommendedIllustsActionCreators from '../../common/actions/recommendedIllusts';
+import {
+  fetchRecommendedIllusts,
+  clearRecommendedIllusts,
+} from '../../common/actions/recommendedIllusts';
 import { getRecommendedIllustsItems } from '../../common/selectors';
 
-class RecommendedIllusts extends Component {
-  componentDidMount() {
-    const { fetchRecommendedIllusts, clearRecommendedIllusts } = this.props;
-    clearRecommendedIllusts();
-    fetchRecommendedIllusts();
-  }
+const RecommendedIllusts = (props) => {
+  const { active } = props;
+  const scrollableRef = useRef(null);
+  const dummyRef = useRef(null);
+  const dispatch = useDispatch();
+  const allState = useSelector((state) => state);
+  const recommendedIllusts = useSelector((state) => state.recommendedIllusts);
+  const navigationState = useNavigationState((state) => state);
+  const items = getRecommendedIllustsItems(allState, props);
+  const listKey = `${navigationState.key}-recommendedIllusts`;
 
-  componentWillReceiveProps(nextProps) {
-    const { user: prevUser } = this.props;
-    const { user } = nextProps;
-    if ((!user && prevUser) || (user && !prevUser)) {
-      const { fetchRecommendedIllusts, clearRecommendedIllusts } = this.props;
-      clearRecommendedIllusts();
-      fetchRecommendedIllusts();
-    }
-  }
+  // only apply scroll to top when current tab is active
+  useScrollToTop(active ? scrollableRef : dummyRef);
 
-  loadMoreItems = () => {
-    const {
-      recommendedIllusts: { nextUrl, loading },
-      fetchRecommendedIllusts,
-    } = this.props;
+  useEffect(() => {
+    dispatch(clearRecommendedIllusts());
+    dispatch(fetchRecommendedIllusts());
+  }, [dispatch]);
+
+  const loadMoreItems = () => {
+    const { nextUrl, loading } = recommendedIllusts;
     if (!loading && nextUrl) {
-      fetchRecommendedIllusts(null, nextUrl);
+      dispatch(fetchRecommendedIllusts(null, nextUrl));
     }
   };
 
-  handleOnRefresh = () => {
-    const { clearRecommendedIllusts, fetchRecommendedIllusts } = this.props;
-    clearRecommendedIllusts();
-    fetchRecommendedIllusts(null, null, true);
+  const handleOnRefresh = () => {
+    dispatch(clearRecommendedIllusts());
+    dispatch(fetchRecommendedIllusts(null, null, true));
   };
 
-  render() {
-    const { recommendedIllusts, items, listKey } = this.props;
-    return (
-      <IllustList
-        data={{ ...recommendedIllusts, items }}
-        listKey={listKey}
-        loadMoreItems={this.loadMoreItems}
-        onRefresh={this.handleOnRefresh}
-      />
-    );
-  }
-}
+  return (
+    <IllustList
+      ref={scrollableRef}
+      data={{ ...recommendedIllusts, items }}
+      listKey={listKey}
+      loadMoreItems={loadMoreItems}
+      onRefresh={handleOnRefresh}
+    />
+  );
+};
 
-export default connect(
-  (state, props) => {
-    const { recommendedIllusts, user } = state;
-    return {
-      recommendedIllusts,
-      items: getRecommendedIllustsItems(state, props),
-      user,
-      listKey: `${props.navigation.state.key}-recommendedIllusts`,
-    };
-  },
-  recommendedIllustsActionCreators,
-)(RecommendedIllusts);
+export default RecommendedIllusts;

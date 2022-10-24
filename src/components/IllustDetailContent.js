@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, FlatList, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  InteractionManager,
+} from 'react-native';
 import { connect } from 'react-redux';
 import { withTheme } from 'react-native-paper';
 import DetailFooter from './DetailFooter';
@@ -51,13 +57,40 @@ const styles = StyleSheet.create({
 class IllustDetailContent extends Component {
   constructor(props) {
     super(props);
+    const { itemIndex, currentIndex } = props;
     this.state = {
+      isVisible: currentIndex === undefined || itemIndex === currentIndex, // currentIndex will be undefined if open from deep link
       isInitState: true,
       isScrolling: false,
       imagePageNumber: null,
       isOpenTagBottomSheet: false,
       selectedTag: null,
+      isMounted: false,
     };
+  }
+
+  componentDidMount() {
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({
+        isMounted: true,
+      });
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    const { itemIndex, currentIndex } = this.props;
+    const { currentIndex: prevCurrentIndex } = prevProps;
+    const { isVisible } = this.state;
+    if (
+      !isVisible &&
+      currentIndex !== prevCurrentIndex &&
+      currentIndex - 1 <= itemIndex <= currentIndex + 1
+    ) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({
+        isVisible: true,
+      });
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -65,14 +98,19 @@ class IllustDetailContent extends Component {
       item: prevItem,
       tags: prevTags,
       isMuteUser: prevIsMuteUser,
+      route: prevRoute,
+      isVisible,
+      isMounted,
     } = this.props;
-    const { item, tags, isMuteUser } = nextProps;
+    const { item, tags, isMuteUser, route } = nextProps;
     const {
       isInitState: prevIsInitState,
       isScrolling: prevIsScrolling,
       imagePageNumber: prevImagePageNumber,
       isOpenTagBottomSheet: prevIsOpenTagBottomSheet,
       selectedTag: prevSelectedTag,
+      isVisible: prevIsVisible,
+      isMounted: prevIsMounted,
     } = this.state;
     const {
       isInitState,
@@ -91,7 +129,10 @@ class IllustDetailContent extends Component {
       isOpenTagBottomSheet !== prevIsOpenTagBottomSheet ||
       selectedTag !== prevSelectedTag ||
       tags !== prevTags ||
-      isMuteUser !== prevIsMuteUser
+      isMuteUser !== prevIsMuteUser ||
+      route !== prevRoute ||
+      isVisible !== prevIsVisible ||
+      isMounted !== prevIsMounted
     ) {
       return true;
     }
@@ -102,7 +143,7 @@ class IllustDetailContent extends Component {
     clearTimeout(this.timer);
   }
 
-  handleOnPressTag = tag => {
+  handleOnPressTag = (tag) => {
     const {
       addSearchHistory,
       navigation: { push },
@@ -114,7 +155,7 @@ class IllustDetailContent extends Component {
     });
   };
 
-  handleOnLongPressTag = tag => {
+  handleOnLongPressTag = (tag) => {
     this.setState({
       isOpenTagBottomSheet: true,
       selectedTag: tag,
@@ -127,8 +168,10 @@ class IllustDetailContent extends Component {
     });
   };
 
-  handleOnPressAvatar = userId => {
-    const { push } = this.props.navigation;
+  handleOnPressAvatar = (userId) => {
+    const {
+      navigation: { push },
+    } = this.props;
     push(SCREENS.UserDetail, { userId });
   };
 
@@ -150,21 +193,22 @@ class IllustDetailContent extends Component {
     }, 2000);
   };
 
-  handleOnScroll = e => {
+  handleOnScroll = (e) => {
     const { item, onScroll } = this.props;
     if (item.page_count > 1) {
       this.handleOnScrollMultiImagesList();
+      const { imagePageNumber } = this.state;
+      // Check if the user is scrolling up or down by confronting the new scroll position with your own one
+      const currentOffset = e.nativeEvent.contentOffset.y;
+      const contentHeight = e.nativeEvent.contentSize.height;
+      const offsetToHideImagePageNumber = contentHeight - this.footerViewHeight;
+      if (currentOffset > offsetToHideImagePageNumber && imagePageNumber) {
+        this.setState({
+          imagePageNumber: null,
+        });
+      }
     }
-    const { imagePageNumber } = this.state;
-    // Check if the user is scrolling up or down by confronting the new scroll position with your own one
-    const currentOffset = e.nativeEvent.contentOffset.y;
-    const contentHeight = e.nativeEvent.contentSize.height;
-    const offsetToHideImagePageNumber = contentHeight - this.footerViewHeight;
-    if (currentOffset > offsetToHideImagePageNumber && imagePageNumber) {
-      this.setState({
-        imagePageNumber: null,
-      });
-    }
+
     if (onScroll) {
       onScroll(e);
     }
@@ -186,30 +230,21 @@ class IllustDetailContent extends Component {
     }
   };
 
-  handleOnLayoutFooter = e => {
+  handleOnLayoutFooter = (e) => {
     this.footerViewHeight = e.nativeEvent.layout.height;
   };
 
   renderItem = ({ item, index }) => {
-    const { onPressImage, onLongPressImage } = this.props;
-    return (
-      <PXCacheImageTouchable
-        key={item.image_urls.medium}
-        uri={item.image_urls.medium}
-        initWidth={globalStyleVariables.WINDOW_HEIGHT}
-        initHeight={200}
-        style={styles.multiImageContainer}
-        imageStyle={styles.image}
-        pageNumber={index + 1}
-        index={index}
-        onPress={onPressImage}
-        onLongPress={onLongPressImage}
-      />
-    );
-  };
-
-  renderImageOrUgoira = isMute => {
-    const { item, onPressImage, onLongPressImage, theme } = this.props;
+    const {
+      item: illustItem,
+      tags,
+      isMuteUser,
+      theme,
+      onPressImage,
+      onLongPressImage,
+    } = this.props;
+    const isMultiImages = illustItem.page_count > 1;
+    const isMute = tags.some((t) => t.isMute) || isMuteUser;
     if (isMute) {
       return (
         <View
@@ -227,89 +262,71 @@ class IllustDetailContent extends Component {
     }
     return (
       <PXCacheImageTouchable
+        key={item.image_urls.medium}
         uri={item.image_urls.medium}
-        initWidth={
-          item.width > globalStyleVariables.WINDOW_WIDTH
-            ? globalStyleVariables.WINDOW_WIDTH
-            : item.width
-        }
-        initHeight={
-          (globalStyleVariables.WINDOW_WIDTH * item.height) / item.width
-        }
-        style={styles.imageContainer}
+        initWidth={globalStyleVariables.WINDOW_HEIGHT}
+        initHeight={200}
+        style={styles.multiImageContainer}
         imageStyle={styles.image}
+        pageNumber={isMultiImages ? index + 1 : null}
+        index={index}
         onPress={onPressImage}
         onLongPress={onLongPressImage}
-        index={0}
       />
     );
   };
 
   renderFooter = () => {
-    const { item, navigation, authUser, tags } = this.props;
+    const { item, navigation, authUser, tags, route } = this.props;
+    const { isVisible } = this.state;
     return (
       <DetailFooter
         onLayoutView={this.handleOnLayoutFooter}
         item={item}
         tags={tags}
         navigation={navigation}
+        route={route}
         authUser={authUser}
         onPressAvatar={this.handleOnPressAvatar}
         onPressTag={this.handleOnPressTag}
         onLongPressTag={this.handleOnLongPressTag}
+        isDetailPageReady={isVisible}
       />
     );
   };
 
   render() {
-    const {
-      item,
-      onScroll,
-      navigation,
-      tags,
-      highlightTags,
-      muteTags,
-      isMuteUser,
-    } = this.props;
+    const { item, navigation, highlightTags, muteTags } = this.props;
     const {
       imagePageNumber,
       isScrolling,
       isInitState,
       isOpenTagBottomSheet,
       selectedTag,
+      isMounted,
     } = this.state;
-    const isMute = tags.some(t => t.isMute) || isMuteUser;
+    if (!isMounted) {
+      return null;
+    }
     return (
       <View key={item.id} style={styles.container}>
-        {!isMute && item.page_count > 1 ? (
-          <View>
-            <FlatList
-              data={item.meta_pages}
-              keyExtractor={page => page.image_urls.large}
-              renderItem={this.renderItem}
-              removeClippedSubviews={false}
-              ListFooterComponent={this.renderFooter}
-              onScroll={this.handleOnScroll}
-              onViewableItemsChanged={this.handleOnViewableItemsChanged}
-              scrollEventThrottle={16}
-              bounces={false}
-            />
-            {(isInitState || isScrolling) && imagePageNumber && (
-              <View style={styles.imagePageNumberContainer}>
-                <Text style={styles.imagePageNumber}>{imagePageNumber}</Text>
-              </View>
-            )}
+        <FlatList
+          data={item.page_count > 1 ? item.meta_pages : [item]}
+          keyExtractor={(page) => page.image_urls.large}
+          renderItem={this.renderItem}
+          removeClippedSubviews={false}
+          ListFooterComponent={this.renderFooter}
+          onScroll={this.handleOnScroll}
+          onViewableItemsChanged={this.handleOnViewableItemsChanged}
+          scrollEventThrottle={16}
+          bounces={false}
+        />
+        {(isInitState || isScrolling) && imagePageNumber && (
+          <View style={styles.imagePageNumberContainer}>
+            <Text style={styles.imagePageNumber}>{imagePageNumber}</Text>
           </View>
-        ) : (
-          <ScrollView
-            onScroll={onScroll}
-            scrollEventThrottle={16}
-            bounces={false}
-          >
-            {this.renderImageOrUgoira(isMute)}
-            {this.renderFooter()}
-          </ScrollView>
         )}
+
         <TagBottomSheet
           visible={isOpenTagBottomSheet}
           selectedTag={selectedTag}
@@ -324,16 +341,15 @@ class IllustDetailContent extends Component {
 }
 
 export default withTheme(
-  connect(
-    () => {
-      const getTagsWithStatus = makeGetTagsWithStatus();
-      return (state, props) => ({
-        highlightTags: state.highlightTags.items,
-        muteTags: state.muteTags.items,
-        isMuteUser: state.muteUsers.items.some(m => m === props.item.user.id),
-        tags: getTagsWithStatus(state, props),
-      });
-    },
-    searchHistoryActionCreators,
-  )(IllustDetailContent),
+  connect(() => {
+    const getTagsWithStatus = makeGetTagsWithStatus();
+    return (state, props) => ({
+      highlightTags: state.highlightTags.items,
+      muteTags: state.muteTags.items,
+      isMuteUser: state.muteUsers.items.some(
+        (m) => m.id === props.item.user.id,
+      ),
+      tags: getTagsWithStatus(state, props),
+    });
+  }, searchHistoryActionCreators)(IllustDetailContent),
 );

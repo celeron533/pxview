@@ -2,7 +2,7 @@ import { NOVEL_SETTINGS } from '../constants/actionTypes';
 
 const initState = {
   fontSize: 14,
-  lineHeight: 1,
+  lineHeight: 1.2,
 };
 
 export default function novelSettings(state = initState, action) {
@@ -18,6 +18,11 @@ export default function novelSettings(state = initState, action) {
           action.payload.lineHeight !== undefined
             ? action.payload.lineHeight
             : state.lineHeight,
+      };
+    case NOVEL_SETTINGS.RESTORE:
+      return {
+        ...state,
+        ...action.payload.state,
       };
     default:
       return state;

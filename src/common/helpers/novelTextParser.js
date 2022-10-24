@@ -1,22 +1,21 @@
 import { Parser as NovelParser } from 'pixiv-novel-parser';
 
-const parseNovelText = novelText => {
+const parseNovelText = (novelText) => {
   // const parsedNovelText = NovelParser.parse(
-  //   `${novelText
-  //     .text}[jump:2]blabla[[jumpuri:とある[[rb: 魔術 > まじゅつ]]の[[rb:禁書目録>インデックス]] > http://www.project-index.net/]]`,
+  //   `${novelText}[jump:2]blabla[[jumpuri:とある[[rb: 魔術 > まじゅつ]]の[[rb:禁書目録>インデックス]] > http://www.project-index.net/]]`,
   // );
   const parsedNovelText = NovelParser.parse(novelText);
   const items = [];
   let text = '';
   parsedNovelText.forEach((p, index) => {
     if (p.type === 'text') {
-      text += p.val;
+      text += p.val.replace(/</g, '＜');
     } else if (p.type === 'tag') {
       if (p.name === 'chapter') {
         text += '<chapter>';
-        p.title.forEach(pp => {
-          if (pp.name === 'text') {
-            text += pp.val;
+        p.title.forEach((pp) => {
+          if (pp.type === 'text') {
+            text += pp.val.replace(/</g, '＜');
           } else if (pp.name === 'rb') {
             text += `${pp.rubyBase}(${pp.rubyText})`;
           }
@@ -28,9 +27,9 @@ const parseNovelText = novelText => {
         text += `<jump page=${p.pageNumber}>${p.pageNumber}ページへ</jump>`;
       } else if (p.name === 'jumpuri') {
         text += `<a href='${p.uri}'>`;
-        p.title.forEach(pp => {
+        p.title.forEach((pp) => {
           if (pp.type === 'text') {
-            text += pp.val;
+            text += pp.val.replace(/</g, '＜');
           } else if (pp.type === 'rb') {
             text += `${pp.rubyBase}(${pp.rubyText})`;
           }

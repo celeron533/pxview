@@ -4,36 +4,90 @@
 import { createSelector, createSelectorCreator } from 'reselect';
 import equals from 'shallow-equals';
 import { denormalize } from 'normalizr';
+import remoteConfig from '@react-native-firebase/remote-config';
 import parseNovelText from '../helpers/novelTextParser';
 import Schemas from '../constants/schemas';
+import { READING_DIRECTION_TYPES } from '../constants';
 
 const defaultArray = [];
 const defaultObject = {};
 
-function getNonMutedTagsAndUsersItems(items, muteTags, muteUsers) {
+function getNonMutedTagsAndUsersItems(isHideMute, items, muteTags, muteUsers) {
   if (!items || !items.length) {
     return defaultArray;
   }
-  const filteredItems = items.filter(item => {
-    const hasMutedTag = item.tags.some(tag => {
-      return (
-        muteTags.includes(tag.name) || muteTags.includes(tag.translated_name)
-      );
+  let filteredItems = items;
+
+  const enableServerFiltering = remoteConfig()
+    .getValue('enableServerFiltering')
+    .asBoolean();
+  if (enableServerFiltering) {
+    const tagBlackListRaw = remoteConfig().getValue('tagBlackList').asString();
+    if (tagBlackListRaw) {
+      const tagBlackList = tagBlackListRaw.split(',');
+      filteredItems = items.filter((item) => {
+        const hasMutedTag = item.tags.some((tag) => {
+          return (
+            tagBlackList.includes(tag.name) ||
+            tagBlackList.includes(tag.translated_name)
+          );
+        });
+        return !hasMutedTag;
+      });
+    }
+  }
+
+  if (isHideMute) {
+    filteredItems = filteredItems.filter((item) => {
+      const hasMutedTag = item.tags.some((tag) => {
+        return (
+          muteTags.includes(tag.name) || muteTags.includes(tag.translated_name)
+        );
+      });
+      const isMutedUser = muteUsers.some((m) => m.id === item.user.id);
+      return !hasMutedTag && !isMutedUser;
     });
-    const isMutedUser = muteUsers.includes(item.user.id);
-    return !hasMutedTag && !isMutedUser;
-  });
+  }
   return filteredItems;
 }
 
-function getNonMutedUsersItems(items, muteUsers) {
+function getNonMutedUsersItems(isHideMute, items, muteUsers) {
   if (!items || !items.length) {
     return defaultArray;
   }
-  const filteredItems = items.filter(item => {
-    const isMutedUser = muteUsers.includes(item.user.id);
-    return !isMutedUser;
-  });
+  let filteredItems = items;
+
+  if (isHideMute) {
+    filteredItems = items.filter((item) => {
+      const isMutedUser = muteUsers.some((m) => m.id === item.user.id);
+      return !isMutedUser;
+    });
+    return filteredItems;
+  }
+  const enableServerFiltering = remoteConfig()
+    .getValue('enableServerFiltering')
+    .asBoolean();
+  if (enableServerFiltering) {
+    const tagBlackListRaw = remoteConfig().getValue('tagBlackList').asString();
+    if (tagBlackListRaw) {
+      const tagBlackList = tagBlackListRaw.split(',');
+
+      filteredItems = filteredItems.map((item) => {
+        return {
+          ...item,
+          illusts: item.illusts.filter((illust) => {
+            const hasMutedTag = illust.tags.some((tag) => {
+              return (
+                tagBlackList.includes(tag.name) ||
+                tagBlackList.includes(tag.translated_name)
+              );
+            });
+            return !hasMutedTag;
+          }),
+        };
+      });
+    }
+  }
   return filteredItems;
 }
 
@@ -41,7 +95,7 @@ function getNonMutedTagsItems(items, muteTags) {
   if (!items || !items.length) {
     return defaultArray;
   }
-  const filteredItems = items.filter(item => {
+  const filteredItems = items.filter((item) => {
     const hasMutedTag =
       muteTags.includes(item.tag) || muteTags.includes(item.translated_name);
     return !hasMutedTag;
@@ -79,61 +133,64 @@ function specialMemoize(
 }
 
 const getProps = (state, props) => props;
-const selectEntities = state => state.entities;
-const selectRanking = state => state.ranking;
-const selectWalkthroughIllusts = state => state.walkthroughIllusts;
-const selectRecommendedIllusts = state => state.recommendedIllusts;
-const selectRecommendedMangas = state => state.recommendedMangas;
-const selectRecommendedNovels = state => state.recommendedNovels;
-const selectTrendingIllustTags = state => state.trendingIllustTags;
-const selectTrendingNovelTags = state => state.trendingNovelTags;
-const selectSearchIllusts = state => state.searchIllusts;
-const selectSearchNovels = state => state.searchNovels;
-const selectRelatedIllusts = state => state.relatedIllusts;
-const selectFollowingUserIllusts = state => state.followingUserIllusts;
-const selectFollowingUserNovels = state => state.followingUserNovels;
-const selectNewIllusts = state => state.newIllusts;
-const selectNewMangas = state => state.newMangas;
-const selectNewNovels = state => state.newNovels;
-const selectMyPixivIllusts = state => state.myPixivIllusts;
-const selectMyPixivNovels = state => state.myPixivNovels;
-const selectUserBookmarkIllusts = state => state.userBookmarkIllusts;
-const selectMyPrivateBookmarkIllusts = state => state.myPrivateBookmarkIllusts;
-const selectUserBookmarkNovels = state => state.userBookmarkNovels;
-const selectMyPrivateBookmarkNovels = state => state.myPrivateBookmarkNovels;
-const selectUserIllusts = state => state.userIllusts;
-const selectUserMangas = state => state.userMangas;
-const selectUserNovels = state => state.userNovels;
+const selectEntities = (state) => state.entities;
+const selectRanking = (state) => state.ranking;
+const selectWalkthroughIllusts = (state) => state.walkthroughIllusts;
+const selectRecommendedIllusts = (state) => state.recommendedIllusts;
+const selectRecommendedMangas = (state) => state.recommendedMangas;
+const selectRecommendedNovels = (state) => state.recommendedNovels;
+const selectTrendingIllustTags = (state) => state.trendingIllustTags;
+const selectTrendingNovelTags = (state) => state.trendingNovelTags;
+const selectSearchIllusts = (state) => state.searchIllusts;
+const selectSearchNovels = (state) => state.searchNovels;
+const selectRelatedIllusts = (state) => state.relatedIllusts;
+const selectFollowingUserIllusts = (state) => state.followingUserIllusts;
+const selectFollowingUserNovels = (state) => state.followingUserNovels;
+const selectNewIllusts = (state) => state.newIllusts;
+const selectNewMangas = (state) => state.newMangas;
+const selectNewNovels = (state) => state.newNovels;
+const selectMyPixivIllusts = (state) => state.myPixivIllusts;
+const selectMyPixivNovels = (state) => state.myPixivNovels;
+const selectUserBookmarkIllusts = (state) => state.userBookmarkIllusts;
+const selectMyPrivateBookmarkIllusts = (state) =>
+  state.myPrivateBookmarkIllusts;
+const selectUserBookmarkNovels = (state) => state.userBookmarkNovels;
+const selectMyPrivateBookmarkNovels = (state) => state.myPrivateBookmarkNovels;
+const selectUserIllusts = (state) => state.userIllusts;
+const selectUserMangas = (state) => state.userMangas;
+const selectUserNovels = (state) => state.userNovels;
 
-const selectRecommendedUsers = state => state.recommendedUsers;
-const selectSearchUsersAutoComplete = state => state.searchUsersAutoComplete;
-const selectUserFollowing = state => state.userFollowing;
-const selectUserFollowers = state => state.userFollowers;
-const selectUserMyPixiv = state => state.userMyPixiv;
-const selectSearchUsers = state => state.searchUsers;
+const selectRecommendedUsers = (state) => state.recommendedUsers;
+const selectSearchUsersAutoComplete = (state) => state.searchUsersAutoComplete;
+const selectUserFollowing = (state) => state.userFollowing;
+const selectUserFollowers = (state) => state.userFollowers;
+const selectUserMyPixiv = (state) => state.userMyPixiv;
+const selectSearchUsers = (state) => state.searchUsers;
 
-const selectUserDetail = state => state.userDetail;
+const selectUserDetail = (state) => state.userDetail;
 
-const selectIllustComments = state => state.illustComments;
-const selectNovelComments = state => state.novelComments;
-const selectIllustCommentReplies = state => state.illustCommentReplies;
-const selectNovelCommentReplies = state => state.novelCommentReplies;
+const selectIllustComments = (state) => state.illustComments;
+const selectNovelComments = (state) => state.novelComments;
+const selectIllustCommentReplies = (state) => state.illustCommentReplies;
+const selectNovelCommentReplies = (state) => state.novelCommentReplies;
 
-const selectNovelSeries = state => state.novelSeries;
-const selectNovelText = state => state.novelText;
+const selectNovelSeries = (state) => state.novelSeries;
+const selectNovelText = (state) => state.novelText;
 
-const selectBrowsingHistoryIllusts = state => state.browsingHistoryIllusts;
-const selectBrowsingHistoryNovels = state => state.browsingHistoryNovels;
+const selectBrowsingHistoryIllusts = (state) => state.browsingHistoryIllusts;
+const selectBrowsingHistoryNovels = (state) => state.browsingHistoryNovels;
 
-const selectHighlightTags = state => state.highlightTags.items;
+const selectHighlightTags = (state) => state.highlightTags.items;
 
-const selectMuteSettings = state => state.muteSettings;
-const selectMuteTags = state => state.muteTags.items;
-const selectMuteUsers = state => state.muteUsers.items;
+const selectMuteSettings = (state) => state.muteSettings;
+const selectMuteTags = (state) => state.muteTags.items;
+const selectMuteUsers = (state) => state.muteUsers.items;
 
-export const getAuth = state => state.auth;
-export const getAuthUser = state => state.auth.user;
-export const getLang = state => state.i18n.lang;
+const selectReadingSettings = (state) => state.readingSettings;
+
+export const getAuth = (state) => state.auth;
+export const getAuthUser = (state) => state.auth.user;
+export const getLang = (state) => state.i18n.lang;
 
 const createIllustItemsSelector = createSelectorCreator(
   specialMemoize,
@@ -308,10 +365,13 @@ export const makeGetIllustRankingItems = () =>
         Schemas.ILLUST_ARRAY,
         entities,
       );
-      if (muteSettings.isHideMute) {
-        return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-      }
-      return items;
+
+      return getNonMutedTagsAndUsersItems(
+        muteSettings.isHideMute,
+        items,
+        muteTags,
+        muteUsers,
+      );
     },
   );
 
@@ -332,10 +392,12 @@ export const makeGetSearchIllustsItems = () =>
           Schemas.ILLUST_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-        }
-        return items;
+        return getNonMutedTagsAndUsersItems(
+          muteSettings.isHideMute,
+          items,
+          muteTags,
+          muteUsers,
+        );
       }
       return defaultArray;
     },
@@ -358,10 +420,12 @@ export const makeGetSearchNovelsItems = () =>
           Schemas.NOVEL_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-        }
-        return items;
+        return getNonMutedTagsAndUsersItems(
+          muteSettings.isHideMute,
+          items,
+          muteTags,
+          muteUsers,
+        );
       }
       return defaultArray;
     },
@@ -378,17 +442,19 @@ export const makeGetRelatedIllustsItems = () =>
       getProps,
     ],
     (relatedIllusts, muteSettings, muteTags, muteUsers, entities, props) => {
-      const illustId = props.illustId || props.navigation.state.params.illustId;
+      const illustId = props.illustId || props.route.params.illustId;
       if (relatedIllusts[illustId]) {
         const items = denormalize(
           relatedIllusts[illustId].items,
           Schemas.ILLUST_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-        }
-        return items;
+        return getNonMutedTagsAndUsersItems(
+          muteSettings.isHideMute,
+          items,
+          muteTags,
+          muteUsers,
+        );
       }
       return defaultArray;
     },
@@ -414,19 +480,21 @@ export const makeGetUserBookmarkIllustsItems = () =>
     ) => {
       const userId =
         props.userId ||
-        props.navigation.state.params.userId ||
-        parseInt(props.navigation.state.params.id, 10) ||
-        parseInt(props.navigation.state.params.uid, 10);
+        props.route.params.userId ||
+        parseInt(props.route.params.id, 10) ||
+        parseInt(props.route.params.uid, 10);
       if (userBookmarkIllusts[userId]) {
         const items = denormalize(
           userBookmarkIllusts[userId].items,
           Schemas.ILLUST_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-        }
-        return items;
+        return getNonMutedTagsAndUsersItems(
+          muteSettings.isHideMute,
+          items,
+          muteTags,
+          muteUsers,
+        );
       }
       return defaultArray;
     },
@@ -445,19 +513,21 @@ export const makeGetUserIllustsItems = () =>
     (userIllusts, muteSettings, muteTags, muteUsers, entities, props) => {
       const userId =
         props.userId ||
-        props.navigation.state.params.userId ||
-        parseInt(props.navigation.state.params.id, 10) ||
-        parseInt(props.navigation.state.params.uid, 10);
+        props.route.params.userId ||
+        parseInt(props.route.params.id, 10) ||
+        parseInt(props.route.params.uid, 10);
       if (userIllusts[userId]) {
         const items = denormalize(
           userIllusts[userId].items,
           Schemas.ILLUST_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-        }
-        return items;
+        return getNonMutedTagsAndUsersItems(
+          muteSettings.isHideMute,
+          items,
+          muteTags,
+          muteUsers,
+        );
       }
       return defaultArray;
     },
@@ -476,19 +546,21 @@ export const makeGetUserMangasItems = () =>
     (userMangas, muteSettings, muteTags, muteUsers, entities, props) => {
       const userId =
         props.userId ||
-        props.navigation.state.params.userId ||
-        parseInt(props.navigation.state.params.id, 10) ||
-        parseInt(props.navigation.state.params.uid, 10);
+        props.route.params.userId ||
+        parseInt(props.route.params.id, 10) ||
+        parseInt(props.route.params.uid, 10);
       if (userMangas[userId]) {
         const items = denormalize(
           userMangas[userId].items,
           Schemas.ILLUST_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-        }
-        return items;
+        return getNonMutedTagsAndUsersItems(
+          muteSettings.isHideMute,
+          items,
+          muteTags,
+          muteUsers,
+        );
       }
       return defaultArray;
     },
@@ -507,19 +579,21 @@ export const makeGetUserNovelsItems = () =>
     (userNovels, muteSettings, muteTags, muteUsers, entities, props) => {
       const userId =
         props.userId ||
-        props.navigation.state.params.userId ||
-        parseInt(props.navigation.state.params.id, 10) ||
-        parseInt(props.navigation.state.params.uid, 10);
+        props.route.params.userId ||
+        parseInt(props.route.params.id, 10) ||
+        parseInt(props.route.params.uid, 10);
       if (userNovels[userId]) {
         const items = denormalize(
           userNovels[userId].items,
           Schemas.NOVEL_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-        }
-        return items;
+        return getNonMutedTagsAndUsersItems(
+          muteSettings.isHideMute,
+          items,
+          muteTags,
+          muteUsers,
+        );
       }
       return defaultArray;
     },
@@ -535,19 +609,16 @@ export const makeGetUserFollowingItems = () =>
       getProps,
     ],
     (userFollowing, muteSettings, muteUsers, entities, props) => {
-      const userId = props.userId || props.navigation.state.params.userId;
+      const userId = props.userId || props.route.params.userId;
       const followingType =
-        props.followingType || props.navigation.state.params.followingType;
+        props.followingType || props.route.params.followingType;
       if (userFollowing[followingType][userId]) {
         const items = denormalize(
           userFollowing[followingType][userId].items,
           Schemas.USER_PREVIEW_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedUsersItems(items, muteUsers);
-        }
-        return items;
+        return getNonMutedUsersItems(muteSettings.isHideMute, items, muteUsers);
       }
       return defaultArray;
     },
@@ -563,17 +634,14 @@ export const makeGetUserFollowersItems = () =>
       getProps,
     ],
     (userFollowers, muteSettings, muteUsers, entities, props) => {
-      const userId = props.userId || props.navigation.state.params.userId;
+      const userId = props.userId || props.route.params.userId;
       if (userFollowers[userId]) {
         const items = denormalize(
           userFollowers[userId].items,
           Schemas.USER_PREVIEW_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedUsersItems(items, muteUsers);
-        }
-        return items;
+        return getNonMutedUsersItems(muteSettings.isHideMute, items, muteUsers);
       }
       return defaultArray;
     },
@@ -589,17 +657,14 @@ export const makeGetUserMyPixivItems = () =>
       getProps,
     ],
     (userMyPixiv, muteSettings, muteUsers, entities, props) => {
-      const userId = props.userId || props.navigation.state.params.userId;
+      const userId = props.userId || props.route.params.userId;
       if (userMyPixiv[userId]) {
         const items = denormalize(
           userMyPixiv[userId].items,
           Schemas.USER_PREVIEW_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedUsersItems(items, muteUsers);
-        }
-        return items;
+        return getNonMutedUsersItems(muteSettings.isHideMute, items, muteUsers);
       }
       return defaultArray;
     },
@@ -621,10 +686,7 @@ export const makeGetSearchUsersItems = () =>
           Schemas.USER_PREVIEW_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedUsersItems(items, muteUsers);
-        }
-        return items;
+        return getNonMutedUsersItems(muteSettings.isHideMute, items, muteUsers);
       }
       return defaultArray;
     },
@@ -634,7 +696,7 @@ export const makeGetIllustCommentsItems = () =>
   createUserItemsSelector(
     [selectIllustComments, selectEntities, getProps],
     (illustComments, entities, props) => {
-      const illustId = props.illustId || props.navigation.state.params.illustId;
+      const illustId = props.illustId || props.route.params.illustId;
       return illustComments[illustId]
         ? denormalize(
             illustComments[illustId].items,
@@ -661,10 +723,12 @@ export const makeGetNovelRankingItems = () =>
         Schemas.NOVEL_ARRAY,
         entities,
       );
-      if (muteSettings.isHideMute) {
-        return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-      }
-      return items;
+      return getNonMutedTagsAndUsersItems(
+        muteSettings.isHideMute,
+        items,
+        muteTags,
+        muteUsers,
+      );
     },
   );
 
@@ -703,19 +767,21 @@ export const makeGetUserBookmarkNovelsItems = () =>
     ) => {
       const userId =
         props.userId ||
-        props.navigation.state.params.userId ||
-        parseInt(props.navigation.state.params.id, 10) ||
-        parseInt(props.navigation.state.params.uid, 10);
+        props.route.params.userId ||
+        parseInt(props.route.params.id, 10) ||
+        parseInt(props.route.params.uid, 10);
       if (userBookmarkNovels[userId]) {
         const items = denormalize(
           userBookmarkNovels[userId].items,
           Schemas.NOVEL_ARRAY,
           entities,
         );
-        if (muteSettings.isHideMute) {
-          return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-        }
-        return items;
+        return getNonMutedTagsAndUsersItems(
+          muteSettings.isHideMute,
+          items,
+          muteTags,
+          muteUsers,
+        );
       }
       return defaultArray;
     },
@@ -725,7 +791,7 @@ export const makeGetNovelCommentsItems = () =>
   createUserItemsSelector(
     [selectNovelComments, selectEntities, getProps],
     (novelComments, entities, props) => {
-      const novelId = props.novelId || props.navigation.state.params.novelId;
+      const novelId = props.novelId || props.route.params.novelId;
       return novelComments[novelId]
         ? denormalize(
             novelComments[novelId].items,
@@ -755,7 +821,7 @@ export const makeGetNovelSeriesItems = () =>
   createNovelItemsSelector(
     [selectNovelSeries, selectEntities, getProps],
     (novelSeries, entities, props) => {
-      const seriesId = props.seriesId || props.navigation.state.params.seriesId;
+      const seriesId = props.seriesId || props.route.params.seriesId;
       return novelSeries[seriesId]
         ? denormalize(
             novelSeries[seriesId].items,
@@ -768,18 +834,25 @@ export const makeGetNovelSeriesItems = () =>
 
 export const makeGetParsedNovelText = () =>
   createSelector(
-    [selectNovelText, getProps],
-    (novelText, props) => {
-      const novelId = props.novelId || props.navigation.state.params.novelId;
-      return novelText[novelId] && novelText[novelId].text
-        ? parseNovelText(novelText[novelId].text)
-        : null;
+    [selectNovelText, selectReadingSettings, getProps],
+    (novelText, readingSettings, props) => {
+      const novelId = props.novelId || props.route.params.novelId;
+      if (novelText[novelId] && novelText[novelId].text) {
+        if (
+          readingSettings.novelReadingDirection ===
+          READING_DIRECTION_TYPES.RIGHT_TO_LEFT
+        ) {
+          return parseNovelText(novelText[novelId].text).reverse();
+        }
+        return parseNovelText(novelText[novelId].text);
+      }
+      return null;
     },
   );
 
 export const makeGetUserItem = () =>
   createUserItemSelector([selectEntities, getProps], (entities, props) => {
-    const userId = props.userId || props.navigation.state.params.userId;
+    const userId = props.userId || props.route.params.userId;
     return (
       denormalize(userId, Schemas.USER, entities) ||
       denormalize(userId, Schemas.USER_PROFILE, entities)
@@ -792,9 +865,9 @@ const makeGetUserDetailItem = () =>
     (userDetail, entities, props) => {
       const userId =
         props.userId ||
-        props.navigation.state.params.userId ||
-        parseInt(props.navigation.state.params.id, 10) ||
-        parseInt(props.navigation.state.params.uid, 10);
+        props.route.params.userId ||
+        parseInt(props.route.params.id, 10) ||
+        parseInt(props.route.params.uid, 10);
       return userDetail[userId]
         ? denormalize(userDetail[userId].item, Schemas.USER_PROFILE, entities)
         : defaultObject;
@@ -844,7 +917,7 @@ export const makeGetDetailItem = () =>
       illustId, // from deep link params
       items,
       index,
-    } = props.navigation.state.params;
+    } = props.route.params;
     let id;
     if (illustIdFromQS) {
       id = parseInt(illustIdFromQS, 10);
@@ -863,7 +936,7 @@ export const makeGetDetailNovelItem = () =>
       novelId, // from deep link params
       items,
       index,
-    } = props.navigation.state.params;
+    } = props.route.params;
     let id;
     if (novelIdFromQS) {
       id = parseInt(novelIdFromQS, 10);
@@ -892,7 +965,7 @@ export const makeGetTagsWithStatus = () =>
     [selectHighlightTags, selectMuteTags, getProps],
     (highlightTags, muteTags, { item }) => {
       if (item && item.tags && item.tags.length) {
-        return item.tags.map(tag => ({
+        return item.tags.map((tag) => ({
           ...tag,
           isHighlight: highlightTags.includes(tag.name),
           isMute: muteTags.includes(tag.name),
@@ -922,10 +995,12 @@ export const getRecommendedIllustsItems = createIllustItemsSelector(
       Schemas.ILLUST_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -943,10 +1018,12 @@ export const getRecommendedMangasItems = createIllustItemsSelector(
       Schemas.ILLUST_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -964,10 +1041,12 @@ export const getRecommendedNovelsItems = createIllustItemsSelector(
       Schemas.NOVEL_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -985,10 +1064,12 @@ export const getFollowingUserIllustsItems = createIllustItemsSelector(
       Schemas.ILLUST_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -1006,10 +1087,12 @@ export const getFollowingUserNovelsItems = createIllustItemsSelector(
       Schemas.NOVEL_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -1023,10 +1106,12 @@ export const getNewIllustsItems = createIllustItemsSelector(
   ],
   (newIllusts, muteSettings, muteTags, muteUsers, entities) => {
     const items = denormalize(newIllusts.items, Schemas.ILLUST_ARRAY, entities);
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -1040,10 +1125,12 @@ export const getNewMangasItems = createIllustItemsSelector(
   ],
   (newMangas, muteSettings, muteTags, muteUsers, entities) => {
     const items = denormalize(newMangas.items, Schemas.ILLUST_ARRAY, entities);
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -1057,10 +1144,12 @@ export const getNewNovelsItems = createIllustItemsSelector(
   ],
   (newNovels, muteSettings, muteTags, muteUsers, entities) => {
     const items = denormalize(newNovels.items, Schemas.NOVEL_ARRAY, entities);
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -1078,10 +1167,12 @@ export const getMyPixivIllustsItems = createIllustItemsSelector(
       Schemas.ILLUST_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -1099,10 +1190,12 @@ export const getMyPixivNovelsItems = createIllustItemsSelector(
       Schemas.NOVEL_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -1120,10 +1213,12 @@ export const getMyPrivateBookmarkIllustsItems = createIllustItemsSelector(
       Schemas.ILLUST_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -1141,10 +1236,12 @@ export const getMyPrivateBookmarkNovelsItems = createIllustItemsSelector(
       Schemas.NOVEL_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedTagsAndUsersItems(items, muteTags, muteUsers);
-    }
-    return items;
+    return getNonMutedTagsAndUsersItems(
+      muteSettings.isHideMute,
+      items,
+      muteTags,
+      muteUsers,
+    );
   },
 );
 
@@ -1191,10 +1288,7 @@ export const getRecommendedUsersItems = createUserPreviewItemsSelector(
       Schemas.USER_PREVIEW_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedUsersItems(items, muteUsers);
-    }
-    return items;
+    return getNonMutedUsersItems(muteSettings.isHideMute, items, muteUsers);
   },
 );
 
@@ -1211,10 +1305,7 @@ export const getSearchUsersAutoCompleteItems = createUserPreviewItemsSelector(
       Schemas.USER_PREVIEW_ARRAY,
       entities,
     );
-    if (muteSettings.isHideMute) {
-      return getNonMutedUsersItems(items, muteUsers);
-    }
-    return items;
+    return getNonMutedUsersItems(muteSettings.isHideMute, items, muteUsers);
   },
 );
 

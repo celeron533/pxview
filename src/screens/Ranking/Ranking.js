@@ -5,6 +5,7 @@ import PXTabView from '../../components/PXTabView';
 import TabContentWrapper from '../../components/TabContentWrapper';
 import { connectLocalization } from '../../components/Localization';
 import { RANKING_TYPES, RANKING_FOR_UI } from '../../common/constants';
+import mapRankingTypeString from '../../common/helpers/mapRankingTypeString';
 
 class Ranking extends Component {
   constructor(props) {
@@ -15,19 +16,18 @@ class Ranking extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { lang: prevLang } = this.props;
-    const { lang } = nextProps;
-    if (lang !== prevLang) {
-      this.setState({
-        routes: this.getRoutes(),
-      });
-    }
+  componentDidMount() {
+    const { navigation, route, i18n } = this.props;
+    navigation.setOptions({
+      title: `${mapRankingTypeString(route.params?.rankingType, i18n)} ${
+        i18n.ranking
+      }`,
+    });
   }
 
   getRoutes = () => {
-    const { i18n, navigation } = this.props;
-    const { rankingType } = navigation.state.params;
+    const { i18n, route } = this.props;
+    const { rankingType } = route.params;
     // always return new array so that localized title will be updated on switch language
     switch (rankingType) {
       case RANKING_TYPES.ILLUST:
@@ -98,27 +98,28 @@ class Ranking extends Component {
     }
   };
 
-  handleChangeTab = index => {
+  handleChangeTab = (index) => {
     this.setState({ index });
   };
 
-  renderScene = ({ index }) => {
-    const { navigation } = this.props;
-    const { rankingType } = navigation.state.params;
-    const { rankingMode, reload } = this.state.routes[index];
+  renderScene = ({ route }) => {
+    const { route: navigationRoute } = this.props;
+    const { routes, index } = this.state;
+    const { rankingType } = navigationRoute.params;
+    const { rankingMode, reload } = route;
     return (
-      <TabContentWrapper active={index === this.state.index}>
+      <TabContentWrapper active={routes.indexOf(route) === index}>
         {rankingMode === RANKING_FOR_UI.PAST_ILLUST ||
         rankingMode === RANKING_FOR_UI.PAST_MANGA ? (
           <PastRanking
             rankingType={rankingType}
             rankingMode={rankingMode}
-            navigation={navigation}
+            route={route}
           />
         ) : (
           <RankingList
             rankingMode={rankingMode}
-            navigation={navigation}
+            route={route}
             reload={reload}
           />
         )}
@@ -132,9 +133,7 @@ class Ranking extends Component {
         navigationState={this.state}
         renderScene={this.renderScene}
         onIndexChange={this.handleChangeTab}
-        tabBarProps={{
-          scrollEnabled: true,
-        }}
+        scrollEnabled
       />
     );
   }

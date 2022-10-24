@@ -23,9 +23,10 @@ class SearchAutoCompleteResult extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { word: prevWord } = this.props;
-    const { word, clearSearchAutoComplete } = nextProps;
+  componentDidUpdate(prevProps) {
+    const { word, clearSearchAutoComplete } = this.props;
+    const { word: prevWord } = prevProps;
+
     if (word && word !== prevWord) {
       clearSearchAutoComplete();
       InteractionManager.runAfterInteractions(() => {
@@ -34,7 +35,7 @@ class SearchAutoCompleteResult extends Component {
     }
   }
 
-  submitSearchAutoComplete = word => {
+  submitSearchAutoComplete = (word) => {
     const { fetchSearchAutoComplete, user } = this.props;
     if (user && word && word.length > 1) {
       fetchSearchAutoComplete(word);
@@ -47,11 +48,8 @@ class SearchAutoCompleteResult extends Component {
       searchAutoComplete,
       word,
       searchAutoComplete: { loading, loaded },
-      searchHistory,
       onPressItem,
       onPressSearchHistoryItem,
-      onPressRemoveSearchHistoryItem,
-      onPressClearSearchHistory,
       theme,
     } = this.props;
     return (
@@ -59,12 +57,7 @@ class SearchAutoCompleteResult extends Component {
         style={[styles.container, { backgroundColor: theme.colors.background }]}
       >
         {((!loaded && !loading) || !word) && (
-          <SearchHistory
-            items={searchHistory.items}
-            onPressItem={onPressSearchHistoryItem}
-            onPressRemoveSearchHistoryItem={onPressRemoveSearchHistoryItem}
-            onPressClearSearchHistory={onPressClearSearchHistory}
-          />
+          <SearchHistory onPressItem={onPressSearchHistoryItem} />
         )}
         {user && word && word.length > 1 ? (
           <SearchAutoCompleteList
@@ -79,7 +72,7 @@ class SearchAutoCompleteResult extends Component {
 
 export default withTheme(
   connect(
-    state => ({
+    (state) => ({
       searchAutoComplete: state.searchAutoComplete,
       user: state.auth.user,
     }),

@@ -57,12 +57,12 @@ class NovelSettingsModal extends Component {
     closeModal();
   };
 
-  handleOnFontSizeSlidingComplete = value => {
+  handleOnFontSizeSlidingComplete = (value) => {
     const { setProperties } = this.props;
     setProperties({ fontSize: value });
   };
 
-  handleOnLineHeightSlidingComplete = value => {
+  handleOnLineHeightSlidingComplete = (value) => {
     const { setProperties } = this.props;
     setProperties({ lineHeight: value });
   };
@@ -110,9 +110,9 @@ class NovelSettingsModal extends Component {
                   <Slider
                     style={styles.slider}
                     value={lineHeight}
-                    minimumValue={1}
+                    minimumValue={1.2}
                     maximumValue={2}
-                    step={0.25}
+                    step={0.2}
                     minimumTrackTintColor={globalStyleVariables.PRIMARY_COLOR}
                     thumbTintColor={globalStyleVariables.PRIMARY_COLOR}
                     onSlidingComplete={this.handleOnLineHeightSlidingComplete}
@@ -130,7 +130,7 @@ class NovelSettingsModal extends Component {
 export default withTheme(
   connectLocalization(
     connect(
-      state => {
+      (state) => {
         const { novelSettings } = state;
         return {
           novelSettings,

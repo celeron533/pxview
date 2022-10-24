@@ -22,9 +22,14 @@ class SearchIllustsResult extends Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { options: prevOptions, word: prevWord } = this.props;
-    const { clearSearchIllusts, navigationStateKey, word, options } = nextProps;
+  componentDidUpdate(prevProps) {
+    const {
+      clearSearchIllusts,
+      navigationStateKey,
+      word,
+      options,
+    } = this.props;
+    const { options: prevOptions, word: prevWord } = prevProps;
     if ((word && word !== prevWord) || (options && options !== prevOptions)) {
       clearSearchIllusts(navigationStateKey);
       this.search(word, options);
@@ -77,19 +82,16 @@ class SearchIllustsResult extends Component {
 }
 
 export default connectLocalization(
-  connect(
-    () => {
-      const getSearchIllustsItems = makeGetSearchIllustsItems();
-      return (state, props) => {
-        const { searchIllusts } = state;
-        const { navigationStateKey } = props;
-        return {
-          searchIllusts: searchIllusts[navigationStateKey],
-          items: getSearchIllustsItems(state, props),
-          listKey: navigationStateKey,
-        };
+  connect(() => {
+    const getSearchIllustsItems = makeGetSearchIllustsItems();
+    return (state, props) => {
+      const { searchIllusts } = state;
+      const { navigationStateKey } = props;
+      return {
+        searchIllusts: searchIllusts[navigationStateKey],
+        items: getSearchIllustsItems(state, props),
+        listKey: navigationStateKey,
       };
-    },
-    searchIllustsActionCreators,
-  )(SearchIllustsResult),
+    };
+  }, searchIllustsActionCreators)(SearchIllustsResult),
 );

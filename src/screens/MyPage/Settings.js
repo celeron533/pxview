@@ -27,6 +27,10 @@ const settingsList = [
   //   title: 'accountSettings',
   // },
   {
+    id: 'readingSettings',
+    title: 'readingSettings',
+  },
+  {
     id: 'saveImageSettings',
     title: 'saveImageSettings',
   },
@@ -34,14 +38,18 @@ const settingsList = [
     id: 'initialScreenSettings',
     title: 'initialScreenSettings',
   },
-  // {
-  //   id: 'likeButtonSettings',
-  //   title: 'likeButtonSettings',
-  // },
-  // {
-  //   id: 'tagHighlightSettings',
-  //   title: 'tagHighlightSettings',
-  // },
+  {
+    id: 'likeButtonSettings',
+    title: 'likeButtonSettings',
+  },
+  {
+    id: 'trendingSearchSettings',
+    title: 'trendingSearchSettings',
+  },
+  {
+    id: 'tagHighlightSettings',
+    title: 'tagHighlightSettings',
+  },
   {
     id: 'muteSettings',
     title: 'muteSettings',
@@ -49,6 +57,10 @@ const settingsList = [
   {
     id: 'lang',
     title: 'lang',
+  },
+  {
+    id: 'backup',
+    title: 'backup',
   },
   {
     id: 'cacheClear',
@@ -72,7 +84,7 @@ const otherList = [
 ];
 
 class Settings extends Component {
-  getLanguage = lang => {
+  getLanguage = (lang) => {
     const zhIds = ['zh', 'zh-CN', 'zh-SG'];
     const zhHantIds = ['zh-TW', 'zh-HK', 'zh-MO'];
     if (zhIds.includes(lang)) {
@@ -87,11 +99,12 @@ class Settings extends Component {
     return 'en';
   };
 
-  mapScreenName = routeId => {
+  mapScreenName = (routeId) => {
     const { i18n } = this.props;
     switch (routeId) {
       case SCREENS.Recommended:
         return i18n.recommended;
+      case SCREENS.RankingPreview:
       case SCREENS.Ranking:
         return i18n.ranking;
       case SCREENS.Trending:
@@ -103,7 +116,7 @@ class Settings extends Component {
     }
   };
 
-  mapLanguageName = lang => {
+  mapLanguageName = (lang) => {
     switch (lang) {
       case 'ja':
         return '日本語';
@@ -130,7 +143,7 @@ class Settings extends Component {
     });
   };
 
-  handleOnPressListItem = item => {
+  handleOnPressListItem = (item) => {
     const {
       navigation: { navigate },
       i18n,
@@ -138,6 +151,10 @@ class Settings extends Component {
     switch (item.id) {
       case 'accountSettings': {
         navigate(SCREENS.AccountSettings);
+        break;
+      }
+      case 'readingSettings': {
+        navigate(SCREENS.ReadingSettings);
         break;
       }
       case 'saveImageSettings': {
@@ -156,8 +173,16 @@ class Settings extends Component {
         navigate(SCREENS.MuteSettings);
         break;
       }
+      case 'trendingSearchSettings': {
+        navigate(SCREENS.TrendingSearchSettings);
+        break;
+      }
       case 'tagHighlightSettings': {
         navigate(SCREENS.HighlightTagsSettings);
+        break;
+      }
+      case 'backup': {
+        navigate(SCREENS.Backup);
         break;
       }
       case 'lang': {
@@ -203,21 +228,23 @@ class Settings extends Component {
     }
   };
 
-  handleOnPressConfirmClearCache = () => {
+  handleOnPressConfirmClearCache = async () => {
     const { i18n } = this.props;
-    RNFetchBlob.fs
-      .unlink(`${RNFetchBlob.fs.dirs.CacheDir}/pxview/`)
-      .then(() => {
-        DeviceEventEmitter.emit('showToast', i18n.cacheClearSuccess);
-      })
-      .catch(() => {});
+    const { dirs, exists, unlink } = RNFetchBlob.fs;
+    try {
+      const isCacheDirExists = await exists(dirs.CacheDir);
+      if (isCacheDirExists) {
+        await unlink(dirs.CacheDir);
+      }
+      DeviceEventEmitter.emit('showToast', i18n.cacheClearSuccess);
+    } catch (err) {}
   };
 
-  renderList = list => {
+  renderList = (list) => {
     const { i18n, initialScreenId, lang } = this.props;
     return (
       <View>
-        {list.map(item => {
+        {list.map((item) => {
           let description;
           if (item.id === 'initialScreenSettings') {
             description = this.mapScreenName(initialScreenId);
@@ -253,7 +280,7 @@ class Settings extends Component {
 export default withTheme(
   connectLocalization(
     connect(
-      state => ({
+      (state) => ({
         initialScreenId: state.initialScreenSettings.routeName,
         lang: state.i18n.lang,
       }),

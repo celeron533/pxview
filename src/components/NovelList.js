@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, forwardRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,12 +7,10 @@ import {
   Platform,
   DeviceEventEmitter,
 } from 'react-native';
-import { connect } from 'react-redux';
-import { withNavigation } from 'react-navigation';
-import { withTheme, Divider } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
+import { useTheme, Divider } from 'react-native-paper';
 import NovelItem from './NovelItem';
 import Loader from './Loader';
-import * as bookmarkIllustActionCreators from '../common/actions/bookmarkIllust';
 import { globalStyles } from '../styles';
 import { SCREENS } from '../common/constants';
 
@@ -20,9 +18,22 @@ const styles = StyleSheet.create({
   footer: {
     marginBottom: 20,
   },
+  contentContainer: {
+    flexGrow: 1,
+  },
 });
 
 class NovelList extends Component {
+  componentDidMount() {
+    const { listKey, loadMoreItems } = this.props;
+    if (listKey && loadMoreItems) {
+      this.onNovelDetailListEndReachedListener = DeviceEventEmitter.addListener(
+        `onNovelDetailListEndReached`,
+        this.handleOnNovelDetailListEndReached,
+      );
+    }
+  }
+
   componentDidUpdate(prevProps) {
     const {
       data: { items: prevItems },
@@ -32,13 +43,26 @@ class NovelList extends Component {
       listKey,
       maxItems,
     } = this.props;
-    if (listKey && (items && items.length) && items !== prevItems) {
+    if (listKey && items && items.length && items !== prevItems) {
       DeviceEventEmitter.emit('masterListUpdate', {
         listKey,
         items: maxItems ? items.slice(0, maxItems) : items,
       });
     }
   }
+
+  componentWillUnmount() {
+    if (this.onNovelDetailListEndReachedListener) {
+      this.onNovelDetailListEndReachedListener.remove();
+    }
+  }
+
+  handleOnNovelDetailListEndReached = ({ parentListKey }) => {
+    const { loadMoreItems, listKey } = this.props;
+    if (loadMoreItems && listKey === parentListKey) {
+      loadMoreItems();
+    }
+  };
 
   renderItem = ({ item, index }) => (
     <NovelItem
@@ -64,19 +88,17 @@ class NovelList extends Component {
     const {
       data: { items },
       navigation: { push },
-      loadMoreItems,
       listKey,
       maxItems,
     } = this.props;
     push(SCREENS.NovelDetail, {
       items: maxItems ? items.slice(0, maxItems) : items,
       index,
-      onListEndReached: loadMoreItems,
       parentListKey: listKey,
     });
   };
 
-  handleOnLayout = e => {
+  handleOnLayout = (e) => {
     const { onListLayout } = this.props;
     if (onListLayout) {
       onListLayout(e, this.novelList);
@@ -97,6 +119,7 @@ class NovelList extends Component {
       showsVerticalScrollIndicator,
       maxItems,
       theme,
+      innerRef,
     } = this.props;
     return (
       <View
@@ -110,18 +133,24 @@ class NovelList extends Component {
         {loaded ? (
           <FlatList
             onLayout={this.handleOnLayout}
-            ref={ref => (this.novelList = ref)}
+            ref={(ref) => {
+              this.novelList = ref;
+              if (innerRef) {
+                innerRef.current = ref;
+              }
+            }}
             data={
-              maxItems && (items && items.length)
+              maxItems && items && items.length
                 ? items.slice(0, maxItems)
                 : items
             }
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={this.renderItem}
             removeClippedSubviews={Platform.OS === 'android'}
             initialNumToRender={5}
             onEndReachedThreshold={onEndReachedThreshold || 0.1}
             onEndReached={loadMoreItems}
+            contentContainerStyle={styles.contentContainer}
             ListEmptyComponent={renderEmpty}
             ListHeaderComponent={renderHeader}
             ListFooterComponent={this.renderFooter}
@@ -142,11 +171,16 @@ class NovelList extends Component {
   }
 }
 
-export default withTheme(
-  withNavigation(
-    connect(
-      null,
-      bookmarkIllustActionCreators,
-    )(NovelList),
-  ),
-);
+export default forwardRef((props, ref) => {
+  const theme = useTheme();
+  const navigation = useNavigation();
+  return (
+    <NovelList
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+      theme={theme}
+      navigation={navigation}
+      innerRef={ref}
+    />
+  );
+});

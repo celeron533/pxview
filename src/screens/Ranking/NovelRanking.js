@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import { Platform } from 'react-native';
 import NovelRankingList from './NovelRankingList';
 import PastRanking from './PastRanking';
 import PXTabView from '../../components/PXTabView';
 import TabContentWrapper from '../../components/TabContentWrapper';
 import { connectLocalization } from '../../components/Localization';
 import { RANKING_FOR_UI } from '../../common/constants';
-import config from '../../common/config';
+import mapRankingTypeString from '../../common/helpers/mapRankingTypeString';
 
 class NovelRanking extends Component {
   constructor(props) {
@@ -16,14 +17,13 @@ class NovelRanking extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { lang: prevLang } = this.props;
-    const { lang } = nextProps;
-    if (lang !== prevLang) {
-      this.setState({
-        routes: this.getRoutes(),
-      });
-    }
+  componentDidMount() {
+    const { navigation, route, i18n } = this.props;
+    navigation.setOptions({
+      title: `${mapRankingTypeString(route.params?.rankingType, i18n)} ${
+        i18n.ranking
+      }`,
+    });
   }
 
   getRoutes = () => {
@@ -48,26 +48,27 @@ class NovelRanking extends Component {
     ];
   };
 
-  handleChangeTab = index => {
+  handleChangeTab = (index) => {
     this.setState({ index });
   };
 
-  renderScene = ({ index }) => {
-    const { navigation } = this.props;
-    const { rankingType } = navigation.state.params;
-    const { rankingMode, reload } = this.state.routes[index];
+  renderScene = ({ route }) => {
+    const { route: navigationRoute } = this.props;
+    const { routes, index } = this.state;
+    const { rankingType } = navigationRoute.params;
+    const { rankingMode, reload } = route;
     return (
-      <TabContentWrapper active={index === this.state.index}>
+      <TabContentWrapper active={routes.indexOf(route) === index}>
         {rankingMode === RANKING_FOR_UI.PAST_NOVEL ? (
           <PastRanking
             rankingType={rankingType}
             rankingMode={rankingMode}
-            navigation={navigation}
+            route={route}
           />
         ) : (
           <NovelRankingList
             rankingMode={rankingMode}
-            navigation={navigation}
+            route={route}
             reload={reload}
           />
         )}
@@ -81,10 +82,8 @@ class NovelRanking extends Component {
         navigationState={this.state}
         renderScene={this.renderScene}
         onIndexChange={this.handleChangeTab}
-        tabBarProps={{
-          scrollEnabled: true,
-        }}
-        includeStatusBarPadding={config.navigation.tab}
+        scrollEnabled
+        includeStatusBarPadding={Platform.OS === 'ios'}
       />
     );
   }

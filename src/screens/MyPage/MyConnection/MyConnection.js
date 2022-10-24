@@ -21,28 +21,14 @@ class MyConnection extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { lang: prevLang } = this.props;
-    const { lang, i18n } = nextProps;
-    if (lang !== prevLang) {
-      this.setState({
-        routes: [
-          { key: '1', title: i18n.following },
-          // { key: '2', title: i18n.followingPrivate },
-          { key: '3', title: i18n.follower },
-          // { key: '4', title: i18n.myPixiv },
-        ],
-      });
-    }
-  }
-
-  handleChangeTab = index => {
+  handleChangeTab = (index) => {
     this.setState({ index });
   };
 
   renderScene = ({ route }) => {
-    const { navigation } = this.props;
-    const { userId } = navigation.state.params;
+    const { navigation, route: navigationRoute } = this.props;
+    const { userId } = navigationRoute.params;
+
     switch (route.key) {
       case '1':
         return (
@@ -50,6 +36,7 @@ class MyConnection extends Component {
             userId={userId}
             followingType={FOLLOWING_TYPES.PUBLIC}
             navigation={navigation}
+            route={navigationRoute}
           />
         );
       // case '2':
@@ -58,12 +45,25 @@ class MyConnection extends Component {
       //       userId={userId}
       //       followingType={FOLLOWING_TYPES.PRIVATE}
       //       navigation={navigation}
+      //       route={navigationRoute}
       //     />
       //   );
       case '3':
-        return <UserFollowers userId={userId} navigation={navigation} />;
+        return (
+          <UserFollowers
+            userId={userId}
+            navigation={navigation}
+            route={navigationRoute}
+          />
+        );
       // case '4':
-      //   return <UserMyPixiv userId={userId} navigation={navigation} />;
+      //   return (
+      //     <UserMyPixiv
+      //       userId={userId}
+      //       navigation={navigation}
+      //       route={navigationRoute}
+      //     />
+      //   );
       default:
         return null;
     }
@@ -75,9 +75,7 @@ class MyConnection extends Component {
         navigationState={this.state}
         renderScene={this.renderScene}
         onIndexChange={this.handleChangeTab}
-        // tabBarProps={{
-        //   scrollEnabled: true,
-        // }}
+        scrollEnabled
       />
     );
   }

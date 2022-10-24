@@ -28,12 +28,17 @@ export default function highlightTags(
     case HIGHLIGHT_TAGS.REMOVE:
       return {
         ...state,
-        items: state.items.filter(item => item !== action.payload.item),
+        items: state.items.filter((item) => item !== action.payload.item),
       };
     case HIGHLIGHT_TAGS.CLEAR:
       return {
         ...state,
         items: [],
+      };
+    case HIGHLIGHT_TAGS.RESTORE:
+      return {
+        ...state,
+        ...action.payload.state,
       };
     default:
       return state;

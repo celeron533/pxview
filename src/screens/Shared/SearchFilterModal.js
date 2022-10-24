@@ -46,11 +46,13 @@ class SearchFilterModal extends Component {
         end_date,
         bookmark_num_min,
         bookmark_num_max,
+        bookmarkCountsTag,
       },
-    } = props.navigation.state.params;
+    } = props.route.params;
     this.state = {
       target: search_target || 'partial_match_for_tags',
       period: period || SEARCH_PERIOD_TYPES.ALL,
+      bookmarkCountsTag: bookmarkCountsTag || '',
       sort: sort || 'date_desc',
       startDate: start_date,
       endDate: end_date,
@@ -66,12 +68,13 @@ class SearchFilterModal extends Component {
     };
   }
 
-  getFilterList = init => {
-    const { i18n, navigation, user } = this.props;
+  getFilterList = (init) => {
+    const { i18n, user, route } = this.props;
+    // const { startDate, endDate } = this.state;
     const {
       searchFilter: { start_date, end_date },
       searchType,
-    } = navigation.state.params;
+    } = route.params;
     let targetOptions;
     if (searchType === SEARCH_TYPES.ILLUST) {
       targetOptions = [
@@ -108,6 +111,44 @@ class SearchFilterModal extends Component {
         },
       ];
     }
+    const bookmarkCountsTagOptions = [
+      {
+        value: '',
+        label: i18n.searchBookmarkCountsTagAll,
+      },
+      {
+        value: '100users入り',
+        label: '100users入り',
+      },
+      {
+        value: '500users入り',
+        label: '500users入り',
+      },
+      {
+        value: '1000users入り',
+        label: '1000users入り',
+      },
+      {
+        value: '5000users入り',
+        label: '5000users入り',
+      },
+      {
+        value: '10000users入り',
+        label: '10000users入り',
+      },
+      {
+        value: '30000users入り',
+        label: '30000users入り',
+      },
+      {
+        value: '50000users入り',
+        label: '50000users入り',
+      },
+      {
+        value: '100000users入り',
+        label: '100000users入り',
+      },
+    ];
     const extraPeriodOption = {};
     if (init) {
       if (start_date && end_date) {
@@ -161,6 +202,10 @@ class SearchFilterModal extends Component {
         options: periodOptions,
       },
       {
+        key: 'bookmarkCountsTag',
+        options: bookmarkCountsTagOptions,
+      },
+      {
         key: 'sort',
         options: [
           {
@@ -192,11 +237,13 @@ class SearchFilterModal extends Component {
     return filterOptions;
   };
 
-  getSearchTypeName = type => {
+  getSearchTypeName = (type) => {
     const { i18n } = this.props;
     switch (type) {
       case 'target':
         return i18n.searchTarget;
+      case 'bookmarkCountsTag':
+        return i18n.searchBookmarkCountsTag;
       case 'period':
         return i18n.searchPeriod;
       case 'sort':
@@ -210,7 +257,7 @@ class SearchFilterModal extends Component {
 
   getSelectedFilterName = (key, options) => {
     if (key !== 'likes') {
-      return options.find(o => o.value === this.state[key]).label;
+      return options.find((o) => o.value === this.state[key]).label;
     }
     const { bookmarkNumMin, bookmarkNumMax } = this.state;
     if (!bookmarkNumMin && !bookmarkNumMax) {
@@ -233,7 +280,7 @@ class SearchFilterModal extends Component {
     return `bookmarkNumMin=${bookmarkNumMin}&bookmarkNumMax=${bookmarkNumMax}`;
   };
 
-  handleOnPressFilterOption = filterType => {
+  handleOnPressFilterOption = (filterType) => {
     const value = this.state[filterType];
     this.setState({
       selectedFilterType: filterType,
@@ -241,7 +288,7 @@ class SearchFilterModal extends Component {
     });
   };
 
-  handleOnOkPickerDialog = value => {
+  handleOnOkPickerDialog = (value) => {
     const { selectedFilterType, startDate, endDate } = this.state;
     if (selectedFilterType === 'period') {
       if (value === SEARCH_PERIOD_TYPES.DATE) {
@@ -308,7 +355,9 @@ class SearchFilterModal extends Component {
   };
 
   handleOnPressApplyFilter = () => {
-    const { onPressApplyFilter } = this.props.navigation.state.params;
+    const {
+      navigation: { navigate },
+    } = this.props;
     const {
       target,
       period,
@@ -317,8 +366,9 @@ class SearchFilterModal extends Component {
       endDate,
       bookmarkNumMin,
       bookmarkNumMax,
+      bookmarkCountsTag,
     } = this.state;
-    onPressApplyFilter(
+    navigate(SCREENS.SearchResult, {
       target,
       period,
       sort,
@@ -326,12 +376,13 @@ class SearchFilterModal extends Component {
       endDate,
       bookmarkNumMin,
       bookmarkNumMax,
-    );
+      bookmarkCountsTag,
+    });
   };
 
   render() {
-    const { i18n, navigationStateKey, navigation, theme } = this.props;
-    const { word, searchType } = navigation.state.params;
+    const { i18n, navigationStateKey, route, theme } = this.props;
+    const { word, searchType } = route.params;
     const {
       selectedFilterType,
       selectedPickerValue,
@@ -349,7 +400,7 @@ class SearchFilterModal extends Component {
         ]}
       >
         <View style={styles.listContainer}>
-          {filterList.map(list => (
+          {filterList.map((list) => (
             <PXListItem
               key={list.key}
               title={this.getSearchTypeName(list.key)}
@@ -367,8 +418,8 @@ class SearchFilterModal extends Component {
           <SingleChoiceDialog
             title={this.getSearchTypeName(selectedFilterType)}
             items={filterList
-              .find(f => f.key === selectedFilterType)
-              .options.map(option => ({
+              .find((f) => f.key === selectedFilterType)
+              .options.map((option) => ({
                 value: option.value,
                 label: option.label,
               }))}
@@ -418,7 +469,7 @@ export default withTheme(
   connectLocalization(
     connect((state, props) => ({
       user: state.auth.user,
-      navigationStateKey: props.navigation.state.key,
+      navigationStateKey: props.route.key,
     }))(SearchFilterModal),
   ),
 );

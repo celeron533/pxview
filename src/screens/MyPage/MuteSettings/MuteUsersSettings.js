@@ -8,29 +8,23 @@ import PXListItemRemoveButton from '../../../components/PXListItemRemoveButton';
 import PXThumbnail from '../../../components/PXThumbnail';
 import EmptyStateView from '../../../components/EmptyStateView';
 import * as muteUsersActionCreators from '../../../common/actions/muteUsers';
-import { getMuteUsersItems } from '../../../common/selectors';
 import { SCREENS } from '../../../common/constants';
 import { globalStyles } from '../../../styles';
 
 class MuteUsersSettings extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      word: null,
-    };
-  }
-
-  handleOnPressRemoveMuteUser = userId => {
+  handleOnPressRemoveMuteUser = (userId) => {
     const { removeMuteUser } = this.props;
     removeMuteUser(userId);
   };
 
-  handleOnPressUser = userId => {
-    const { push } = this.props.navigation;
+  handleOnPressUser = (userId) => {
+    const {
+      navigation: { push },
+    } = this.props;
     push(SCREENS.UserDetail, { userId });
   };
 
-  showToast = message => {
+  showToast = (message) => {
     DeviceEventEmitter.emit('showToast', message);
   };
 
@@ -61,7 +55,7 @@ class MuteUsersSettings extends Component {
         {items.length ? (
           <FlatList
             data={items}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={(item) => item.id.toString()}
             renderItem={this.renderItem}
           />
         ) : (
@@ -79,8 +73,8 @@ class MuteUsersSettings extends Component {
 export default withTheme(
   connectLocalization(
     connect(
-      state => ({
-        items: getMuteUsersItems(state),
+      (state) => ({
+        items: state.muteUsers.items,
       }),
       muteUsersActionCreators,
     )(MuteUsersSettings),

@@ -28,12 +28,17 @@ export default function muteTags(
     case MUTE_TAGS.REMOVE:
       return {
         ...state,
-        items: state.items.filter(item => item !== action.payload.item),
+        items: state.items.filter((item) => item !== action.payload.item),
       };
     case MUTE_TAGS.CLEAR:
       return {
         ...state,
         items: [],
+      };
+    case MUTE_TAGS.RESTORE:
+      return {
+        ...state,
+        ...action.payload.state,
       };
     default:
       return state;

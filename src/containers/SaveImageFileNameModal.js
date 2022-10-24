@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, Modal } from 'react-native';
+import { View, StyleSheet, BackHandler } from 'react-native';
 import { connect } from 'react-redux';
-import { Dialog, Switch, Button, Text } from 'react-native-paper';
+import { Portal, Dialog, Switch, Button, Text } from 'react-native-paper';
 import { connectLocalization } from '../components/Localization';
 import PXDropdown from '../components/PXDropdown';
 import {
@@ -43,6 +43,17 @@ class SaveImageFileNameModal extends Component {
     };
   }
 
+  componentDidMount() {
+    this.backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      this.handleOnPressHardwareBackButton,
+    );
+  }
+
+  componentWillUnmount() {
+    this.backHandler.remove();
+  }
+
   handleOnModalClose = () => {
     const { closeModal } = this.props;
     closeModal();
@@ -62,13 +73,13 @@ class SaveImageFileNameModal extends Component {
     this.handleOnModalClose();
   };
 
-  handleOnChangeIsCreateFolderForUser = value => {
+  handleOnChangeIsCreateFolderForUser = (value) => {
     this.setState({
       isCreateFolderForUser: value,
     });
   };
 
-  mapUserFolderNameFormatLabel = value => {
+  mapUserFolderNameFormatLabel = (value) => {
     const { i18n } = this.props;
     switch (value) {
       case SAVE_FILE_NAME_USER_FOLDER_FORMAT.USER_ID:
@@ -82,7 +93,7 @@ class SaveImageFileNameModal extends Component {
     }
   };
 
-  mapImageFileNameFormatLabel = value => {
+  mapImageFileNameFormatLabel = (value) => {
     const { i18n } = this.props;
     switch (value) {
       case SAVE_FILE_NAME_FORMAT.WORK_ID:
@@ -97,7 +108,7 @@ class SaveImageFileNameModal extends Component {
   };
 
   getUserFolderNameFormatList = () =>
-    Object.keys(SAVE_FILE_NAME_USER_FOLDER_FORMAT).map(key => ({
+    Object.keys(SAVE_FILE_NAME_USER_FOLDER_FORMAT).map((key) => ({
       value: SAVE_FILE_NAME_USER_FOLDER_FORMAT[key],
       label: this.mapUserFolderNameFormatLabel(
         SAVE_FILE_NAME_USER_FOLDER_FORMAT[key],
@@ -105,21 +116,26 @@ class SaveImageFileNameModal extends Component {
     }));
 
   getFileNameFormatList = () =>
-    Object.keys(SAVE_FILE_NAME_FORMAT).map(key => ({
+    Object.keys(SAVE_FILE_NAME_FORMAT).map((key) => ({
       value: SAVE_FILE_NAME_FORMAT[key],
       label: this.mapImageFileNameFormatLabel(SAVE_FILE_NAME_FORMAT[key]),
     }));
 
-  handleOnChangeUserFolderName = value => {
+  handleOnChangeUserFolderName = (value) => {
     this.setState({
       selectedFileNameUserFolder: value,
     });
   };
 
-  handleOnChangeFileName = value => {
+  handleOnChangeFileName = (value) => {
     this.setState({
       selectedFileNameWork: value,
     });
+  };
+
+  handleOnPressHardwareBackButton = () => {
+    this.handleOnModalClose();
+    return true;
   };
 
   render() {
@@ -130,66 +146,56 @@ class SaveImageFileNameModal extends Component {
       isCreateFolderForUser,
     } = this.state;
     return (
-      <Modal
-        animationType="fade"
-        transparent
-        visible
-        onRequestClose={this.handleOnModalClose}
-      >
-        <Dialog dismissable={false} visible onDismiss={this.handleOnModalClose}>
-          <Dialog.Title>{i18n.saveImageCreateFolderForUser}</Dialog.Title>
-          <Dialog.Content>
-            <View>
-              <View style={styles.row}>
-                <Text>{i18n.saveImageCreateFolderForUser}</Text>
-                <Switch
-                  value={isCreateFolderForUser}
-                  onValueChange={this.handleOnChangeIsCreateFolderForUser}
-                />
-              </View>
-              <View style={styles.form}>
-                {isCreateFolderForUser && (
-                  <View style={styles.dropdownContainer}>
-                    <PXDropdown
-                      label={i18n.saveImageUserFolderName}
-                      data={this.getUserFolderNameFormatList()}
-                      value={selectedFileNameUserFolder}
-                      onChangeText={this.handleOnChangeUserFolderName}
-                    />
-                  </View>
-                )}
-                {isCreateFolderForUser && (
-                  <View style={styles.slashContainer}>
-                    <Text>/</Text>
-                  </View>
-                )}
+      <Dialog dismissable visible onDismiss={this.handleOnModalClose}>
+        <Dialog.Title>{i18n.saveImageFileName}</Dialog.Title>
+        <Dialog.Content>
+          <View>
+            <View style={styles.row}>
+              <Text>{i18n.saveImageCreateFolderForUser}</Text>
+              <Switch
+                value={isCreateFolderForUser}
+                onValueChange={this.handleOnChangeIsCreateFolderForUser}
+              />
+            </View>
+            <View style={styles.form}>
+              {isCreateFolderForUser && (
                 <View style={styles.dropdownContainer}>
                   <PXDropdown
-                    label={i18n.saveImageFileName}
-                    data={this.getFileNameFormatList()}
-                    value={selectedFileNameWork}
-                    onChangeText={this.handleOnChangeFileName}
+                    label={i18n.saveImageUserFolderName}
+                    items={this.getUserFolderNameFormatList()}
+                    value={selectedFileNameUserFolder}
+                    onChange={this.handleOnChangeUserFolderName}
                   />
                 </View>
+              )}
+              {isCreateFolderForUser && (
+                <View style={styles.slashContainer}>
+                  <Text>/</Text>
+                </View>
+              )}
+              <View style={styles.dropdownContainer}>
+                <PXDropdown
+                  label={i18n.saveImageFileName}
+                  items={this.getFileNameFormatList()}
+                  value={selectedFileNameWork}
+                  onChange={this.handleOnChangeFileName}
+                />
               </View>
             </View>
-          </Dialog.Content>
-          <Dialog.Actions>
-            <Button onPress={this.handleOnModalClose}>{i18n.cancel}</Button>
-            <Button onPress={this.handleOnPressOkButton}>{i18n.ok}</Button>
-          </Dialog.Actions>
-        </Dialog>
-      </Modal>
+          </View>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={this.handleOnModalClose}>{i18n.cancel}</Button>
+          <Button onPress={this.handleOnPressOkButton}>{i18n.ok}</Button>
+        </Dialog.Actions>
+      </Dialog>
     );
   }
 }
 
 export default connectLocalization(
-  connect(
-    null,
-    {
-      ...modalActionCreators,
-      ...saveImageSettingsActionCreators,
-    },
-  )(SaveImageFileNameModal),
+  connect(null, {
+    ...modalActionCreators,
+    ...saveImageSettingsActionCreators,
+  })(SaveImageFileNameModal),
 );

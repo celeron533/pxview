@@ -20,7 +20,7 @@ class MyPixivNewWorks extends Component {
     };
   }
 
-  handleOnPressPill = index => {
+  handleOnPressPill = (index) => {
     this.setState({ index });
   };
 
@@ -45,23 +45,15 @@ class MyPixivNewWorks extends Component {
   };
 
   renderContent = () => {
-    const { navigation } = this.props;
+    const { active } = this.props;
     const { index } = this.state;
     if (index === 0) {
       return (
-        <MyPixivIllusts
-          navigation={navigation}
-          renderHeader={this.renderHeader}
-        />
+        <MyPixivIllusts renderHeader={this.renderHeader} active={active} />
       );
     }
     if (index === 1) {
-      return (
-        <MyPixivNovels
-          navigation={navigation}
-          renderHeader={this.renderHeader}
-        />
-      );
+      return <MyPixivNovels renderHeader={this.renderHeader} active={active} />;
     }
     return null;
   };

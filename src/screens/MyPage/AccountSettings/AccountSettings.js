@@ -117,17 +117,17 @@ class AccountSettings extends Component {
         <PXListItem
           title={i18n.accountSettingsEmail}
           description={user.mail_address || null}
-          onPress={this.handleOnPressChangeEmail}
+          // onPress={this.handleOnPressChangeEmail}
         />
         <PXListItem
           title={i18n.accountSettingsPixivId}
           description={user.account}
-          onPress={this.handleOnPressChangePixivId}
+          // onPress={this.handleOnPressChangePixivId}
         />
         <PXListItem
           title={i18n.password}
           description="******"
-          onPress={this.handleOnPressChangePassword}
+          // onPress={this.handleOnPressChangePassword}
         />
         {!hideAdvanceSettings && (
           <PXListItem
@@ -185,8 +185,7 @@ export default withTheme(
         modal: state.modal,
         myAccountState: state.myAccountState,
         hideAdvanceSettings:
-          props.navigation.state.params &&
-          props.navigation.state.params.hideAdvanceSettings,
+          props.route.params && props.route.params.hideAdvanceSettings,
       }),
       {
         ...authActionCreators,

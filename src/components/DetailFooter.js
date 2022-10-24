@@ -76,7 +76,7 @@ class DetailFooter extends PureComponent {
     onPressAvatar(item.user.id);
   };
 
-  handleOnPressLink = url => {
+  handleOnPressLink = (url) => {
     const {
       navigation: { push },
     } = this.props;
@@ -97,14 +97,19 @@ class DetailFooter extends PureComponent {
       }
     } else {
       Linking.canOpenURL(url)
-        .then(supported => {
+        .then((supported) => {
           if (!supported) {
             return null;
           }
           return Linking.openURL(url);
         })
-        .catch(err => err);
+        .catch((err) => err);
     }
+  };
+
+  renderHtmlViewTextComponent = (props) => {
+    // eslint-disable-next-line react/jsx-props-no-spreading
+    return <Text {...props} />;
   };
 
   render() {
@@ -112,12 +117,14 @@ class DetailFooter extends PureComponent {
       item,
       authUser,
       navigation,
+      route,
       i18n,
       onLayoutView,
       onPressTag,
       onLongPressTag,
       tags,
       theme,
+      isDetailPageReady,
     } = this.props;
     return (
       <SafeAreaView>
@@ -157,7 +164,7 @@ class DetailFooter extends PureComponent {
                 value={item.caption}
                 onLinkPress={this.handleOnPressLink}
                 textComponentProps={{ selectable: true }}
-                TextComponent={Text}
+                TextComponent={this.renderHtmlViewTextComponent}
               />
             </View>
             <View style={styles.statContainer}>
@@ -190,16 +197,20 @@ class DetailFooter extends PureComponent {
                 novelId={item.id}
                 authorId={item.user.id}
                 isFeatureInDetailPage
+                isDetailPageReady={isDetailPageReady}
                 maxItems={6}
                 navigation={navigation}
+                route={route}
               />
             ) : (
               <IllustComments
                 illustId={item.id}
                 authorId={item.user.id}
                 isFeatureInDetailPage
+                isDetailPageReady={isDetailPageReady}
                 maxItems={6}
                 navigation={navigation}
+                route={route}
               />
             )}
           </View>
@@ -210,10 +221,12 @@ class DetailFooter extends PureComponent {
               </View>
               <RelatedIllusts
                 illustId={item.id}
-                listKey={`relatedIllusts-${navigation.state.key}-${item.id}`}
+                listKey={`relatedIllusts-${route.key}-${item.id}`}
                 isFeatureInDetailPage
+                isDetailPageReady={isDetailPageReady}
                 maxItems={6}
                 navigation={navigation}
+                route={route}
               />
             </View>
           )}
@@ -231,8 +244,10 @@ class DetailFooter extends PureComponent {
                 seriesId={item.series.id}
                 seriesTitle={item.series.title}
                 isFeatureInDetailPage
+                isDetailPageReady={isDetailPageReady}
                 maxItems={6}
                 navigation={navigation}
+                route={route}
               />
             </View>
           )}

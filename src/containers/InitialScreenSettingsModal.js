@@ -14,7 +14,7 @@ const screenList = [
     id: SCREENS.NewWorks,
   },
   {
-    id: SCREENS.Ranking,
+    id: SCREENS.RankingPreview,
   },
   {
     id: SCREENS.Trending,
@@ -23,11 +23,12 @@ const screenList = [
 ];
 
 class InitialScreenSettingsModal extends Component {
-  mapScreenName = routeId => {
+  mapScreenName = (routeId) => {
     const { i18n } = this.props;
     switch (routeId) {
       case SCREENS.Recommended:
         return i18n.recommended;
+      case SCREENS.RankingPreview:
       case SCREENS.Ranking:
         return i18n.ranking;
       case SCREENS.Trending:
@@ -39,15 +40,18 @@ class InitialScreenSettingsModal extends Component {
     }
   };
 
-  mapItemsOptions = items =>
-    items.map(item => ({ value: item.id, label: this.mapScreenName(item.id) }));
+  mapItemsOptions = (items) =>
+    items.map((item) => ({
+      value: item.id,
+      label: this.mapScreenName(item.id),
+    }));
 
   handleOnCancelPickerDialog = () => {
     const { closeModal } = this.props;
     closeModal();
   };
 
-  handleOnOkPickerDialog = value => {
+  handleOnOkPickerDialog = (value) => {
     const { setInitialRoute } = this.props;
     setInitialRoute(value);
     this.handleOnCancelPickerDialog();
@@ -69,11 +73,8 @@ class InitialScreenSettingsModal extends Component {
 }
 
 export default connectLocalization(
-  connect(
-    null,
-    {
-      ...modalActionCreators,
-      ...initialScreenSettingsActionCreators,
-    },
-  )(InitialScreenSettingsModal),
+  connect(null, {
+    ...modalActionCreators,
+    ...initialScreenSettingsActionCreators,
+  })(InitialScreenSettingsModal),
 );

@@ -6,15 +6,16 @@ import {
   InteractionManager,
   Keyboard,
 } from 'react-native';
+import database from '@react-native-firebase/database';
 import { connect } from 'react-redux';
 import { withTheme, TextInput } from 'react-native-paper';
 import DeviceInfo from 'react-native-device-info';
+import * as RNLocalize from 'react-native-localize';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import OverlaySpinner from 'react-native-loading-spinner-overlay';
 import { connectLocalization } from '../../components/Localization';
 import PXTouchable from '../../components/PXTouchable';
 import * as errorActionCreators from '../../common/actions/error';
-import firebase from '../../common/helpers/firebase';
 
 const styles = StyleSheet.create({
   container: {
@@ -36,22 +37,6 @@ const styles = StyleSheet.create({
 });
 
 class Feedback extends Component {
-  static navigationOptions = ({ navigation }) => {
-    const { params } = navigation.state;
-    return {
-      headerRight: params && params.submit && (
-        <PXTouchable onPress={params.submit} disabled={!params.feedback}>
-          <Icon
-            name="pencil"
-            style={{ padding: 10 }}
-            size={20}
-            color={params.feedback ? '#fff' : 'gray'}
-          />
-        </PXTouchable>
-      ),
-    };
-  };
-
   constructor(props) {
     super(props);
     const { user } = props;
@@ -63,37 +48,51 @@ class Feedback extends Component {
   }
 
   componentDidMount() {
-    const {
-      navigation: { setParams },
-    } = this.props;
-    setParams({
-      submit: this.handleOnSubmitFeedback,
-      feedback: '',
-    });
-    this.ref = firebase.database().ref('feedback');
+    this.setHeaderRight();
+    this.ref = database().ref('feedback');
   }
 
   componentWillUnmount() {
     this.ref.off();
   }
 
-  handleOnChangeFeedback = text => {
-    const { setParams } = this.props.navigation;
-    this.setState({
-      feedback: text,
-    });
-    setParams({
-      feedback: text,
+  setHeaderRight = () => {
+    const {
+      navigation: { setOptions },
+    } = this.props;
+    const { feedback } = this.state;
+    setOptions({
+      headerRight: () => (
+        <PXTouchable onPress={this.handleOnSubmitFeedback} disabled={!feedback}>
+          <Icon
+            name="pencil"
+            style={{ padding: 10 }}
+            size={20}
+            color={feedback ? '#fff' : 'gray'}
+          />
+        </PXTouchable>
+      ),
     });
   };
 
-  handleOnChangeEmail = text => {
+  handleOnChangeFeedback = (text) => {
+    this.setState(
+      {
+        feedback: text,
+      },
+      () => {
+        this.setHeaderRight();
+      },
+    );
+  };
+
+  handleOnChangeEmail = (text) => {
     this.setState({
       email: text,
     });
   };
 
-  handleOnSubmitFeedback = () => {
+  handleOnSubmitFeedback = async () => {
     const {
       i18n,
       addError,
@@ -102,18 +101,20 @@ class Feedback extends Component {
     const { feedback, email } = this.state;
     Keyboard.dismiss();
     this.setState({ loading: true });
+    const manufacturer = await DeviceInfo.getManufacturer();
     this.ref
       .push()
       .set({
         platform: DeviceInfo.getSystemName(),
-        manufacturer: DeviceInfo.getManufacturer(),
+        manufacturer,
         brand: DeviceInfo.getBrand(),
         model: DeviceInfo.getModel(),
         systemVersion: DeviceInfo.getSystemVersion(),
         appVersion: DeviceInfo.getVersion(),
         appBuildNumber: DeviceInfo.getBuildNumber(),
-        locale: DeviceInfo.getDeviceLocale(),
-        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        locale: RNLocalize.getLocales()[0].languageTag,
+        country: RNLocalize.getCountry(),
+        createdAt: database.ServerValue.TIMESTAMP,
         feedback,
         email,
       })
@@ -163,7 +164,7 @@ class Feedback extends Component {
 export default withTheme(
   connectLocalization(
     connect(
-      state => ({
+      (state) => ({
         user: state.auth.user,
       }),
       errorActionCreators,

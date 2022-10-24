@@ -16,14 +16,14 @@ class MyPrivateBookmarkNovels extends Component {
     fetchMyPrivateBookmarkNovels(userId, tag);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { userId: prevUserId, tag: prevTag } = this.props;
+  componentDidUpdate(prevProps) {
     const {
       userId,
       tag,
       fetchMyPrivateBookmarkNovels,
       clearMyPrivateBookmarkNovels,
-    } = nextProps;
+    } = this.props;
+    const { userId: prevUserId, tag: prevTag } = prevProps;
     if (userId !== prevUserId || tag !== prevTag) {
       clearMyPrivateBookmarkNovels(userId);
       fetchMyPrivateBookmarkNovels(userId, tag);
@@ -66,16 +66,13 @@ class MyPrivateBookmarkNovels extends Component {
   }
 }
 
-export default connect(
-  (state, props) => {
-    const { myPrivateBookmarkNovels } = state;
-    const userId = props.userId || props.navigation.state.params.userId;
-    return {
-      myPrivateBookmarkNovels,
-      items: getMyPrivateBookmarkNovelsItems(state),
-      userId,
-      listKey: props.navigation.state.key,
-    };
-  },
-  myPrivateBookmarkNovelsActionCreators,
-)(MyPrivateBookmarkNovels);
+export default connect((state, props) => {
+  const { myPrivateBookmarkNovels } = state;
+  const userId = props.userId || props.route.params.userId;
+  return {
+    myPrivateBookmarkNovels,
+    items: getMyPrivateBookmarkNovelsItems(state),
+    userId,
+    listKey: props.route.key,
+  };
+}, myPrivateBookmarkNovelsActionCreators)(MyPrivateBookmarkNovels);

@@ -9,7 +9,7 @@ import { globalStyles } from '../../styles';
 
 const appStoreUrl = '';
 const googlePlayUrl =
-  'https://play.google.com/store/apps/details?id=com.utopia.pxview';
+  'https://play.google.com/store/apps/details?id=com.furcoder.wilddream';
 const sourceUrl = 'https://github.com/FurCoder/pxview';
 
 const styles = StyleSheet.create({
@@ -64,7 +64,7 @@ const list = [
 ];
 
 class About extends Component {
-  handleOnPressListItem = item => {
+  handleOnPressListItem = (item) => {
     switch (item.id) {
       case 'forkPxView': {
         this.openUrl('https://github.com/alphasp/pxview');
@@ -90,15 +90,15 @@ class About extends Component {
     }
   };
 
-  openUrl = url => {
+  openUrl = (url) => {
     Linking.canOpenURL(url)
-      .then(supported => {
+      .then((supported) => {
         if (!supported) {
           return null;
         }
         return Linking.openURL(url);
       })
-      .catch(err => err);
+      .catch((err) => err);
   };
 
   render() {
@@ -120,7 +120,7 @@ class About extends Component {
           </View>
         </View>
         <View style={styles.listContainer}>
-          {list.map(item => (
+          {list.map((item) => (
             <PXListItem
               key={item.id}
               title={i18n.formatString(

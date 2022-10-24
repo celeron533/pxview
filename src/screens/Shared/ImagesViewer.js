@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, View, StatusBar } from 'react-native';
-import {
-  TabViewAnimated,
-  TabViewPagerScroll,
-  TabViewPagerPan,
-} from 'react-native-tab-view';
+import { StyleSheet, View, StatusBar } from 'react-native';
+import { connect } from 'react-redux';
 import PXHeader from '../../components/PXHeader';
+import PXTabView from '../../components/PXTabView';
 import PXPhotoView from '../../components/PXPhotoView';
 import HeaderTextTitle from '../../components/HeaderTextTitle';
 import HeaderSaveImageButton from '../../components/HeaderSaveImageButton';
 import Loader from '../../components/Loader';
-import { globalStyles } from '../../styles';
+import { READING_DIRECTION_TYPES } from '../../common/constants';
 
 const styles = StyleSheet.create({
   container: {
@@ -25,52 +22,49 @@ const styles = StyleSheet.create({
 class ImagesViewer extends Component {
   constructor(props) {
     super(props);
-    const { images, viewerIndex } = this.props.navigation.state.params;
+    const { route, imageReadingDirection } = props;
+    const { images, viewerIndex } = route.params;
+    const imagesWithDirection =
+      imageReadingDirection === READING_DIRECTION_TYPES.RIGHT_TO_LEFT
+        ? images.reverse()
+        : images;
     this.state = {
-      loading: true,
-      index: viewerIndex,
-      images: images.map(image => ({
+      index:
+        imageReadingDirection === READING_DIRECTION_TYPES.RIGHT_TO_LEFT
+          ? images.length - 1 - viewerIndex
+          : viewerIndex,
+      images: imagesWithDirection.map((image) => ({
         url: image,
         loading: true,
       })),
-      routes: images.map(image => ({
+      routes: imagesWithDirection.map((image) => ({
         key: image.toString(),
       })),
       hideHeader: true,
     };
   }
 
-  handleOnImageLoaded = imageUrl => {
+  handleOnImageLoaded = (imageUrl) => {
     this.setState(({ images }) => ({
-      images: images.map(image =>
+      images: images.map((image) =>
         image.url === imageUrl ? { ...image, loading: false } : image,
       ),
     }));
   };
 
   handleOnPressImage = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       hideHeader: !prevState.hideHeader,
     }));
   };
 
-  renderPager = props =>
-    Platform.OS === 'ios' ? (
-      <TabViewPagerScroll {...props} />
-    ) : (
-      <TabViewPagerPan {...props} />
-    );
-
-  renderScene = ({ route, index }) => {
-    if (Math.abs(this.state.index - this.state.routes.indexOf(route)) > 2) {
-      return null;
-    }
-    const image = this.state.images[index];
+  renderScene = ({ route }) => {
+    const { routes, images } = this.state;
+    const sceneIndex = routes.indexOf(route);
+    const image = images[sceneIndex];
     return (
       <View key={image.url} style={styles.slide}>
-        {image.loading && (
-          <Loader absolutePosition style={styles.loader} color="#fff" />
-        )}
+        {image.loading && <Loader absolutePosition style={styles.loader} />}
         <PXPhotoView
           uri={image.url}
           onLoad={this.handleOnImageLoaded}
@@ -81,38 +75,52 @@ class ImagesViewer extends Component {
     );
   };
 
-  handleChangeTab = index => {
+  handleChangeTab = (index) => {
     this.setState({ index });
   };
 
+  getCurrentPageNumber = () => {
+    const { route, imageReadingDirection } = this.props;
+    const { images } = route.params;
+    const { index } = this.state;
+    if (imageReadingDirection === READING_DIRECTION_TYPES.RIGHT_TO_LEFT) {
+      return images.length - index;
+    }
+    return index + 1;
+  };
+
+  renderTabBar = () => null;
+
   render() {
-    const { images, item } = this.props.navigation.state.params;
+    const { route, imageReadingDirection } = this.props;
+    const { images, item } = route.params;
     const { index, hideHeader } = this.state;
     const selectedImages = [images[index]];
     return (
       <View style={styles.container}>
-        <StatusBar
-          hidden={hideHeader}
-          barStyle="light-content"
-          translucent
-          animated
-        />
+        <StatusBar hidden={hideHeader} barStyle="light-content" animated />
         {!hideHeader && (
           <PXHeader
             darkTheme
             withShadow
-            hideStatusBar
             absolutePosition
             showBackButton
             headerTitle={
               <HeaderTextTitle>
-                {images.length > 1 ? `${index + 1}/${images.length}` : null}
+                {images.length > 1
+                  ? `${this.getCurrentPageNumber()}/${images.length}`
+                  : null}
               </HeaderTextTitle>
             }
             headerRight={
               <HeaderSaveImageButton
                 imageUrls={selectedImages}
-                imageIndex={index}
+                imageIndex={
+                  imageReadingDirection ===
+                  READING_DIRECTION_TYPES.RIGHT_TO_LEFT
+                    ? images.length - index
+                    : index
+                }
                 workId={item.id}
                 workTitle={item.title}
                 workType={item.type}
@@ -122,16 +130,21 @@ class ImagesViewer extends Component {
             }
           />
         )}
-        <TabViewAnimated
-          style={globalStyles.container}
+        <PXTabView
           navigationState={this.state}
+          renderTabBar={this.renderTabBar}
           renderScene={this.renderScene}
-          renderPager={this.renderPager}
           onIndexChange={this.handleChangeTab}
+          lazyPreloadDistance={3}
         />
       </View>
     );
   }
 }
 
-export default ImagesViewer;
+export default connect((state) => {
+  const { imageReadingDirection } = state.readingSettings;
+  return {
+    imageReadingDirection,
+  };
+})(ImagesViewer);

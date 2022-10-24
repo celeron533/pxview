@@ -45,9 +45,9 @@ class NovelRankingPreview extends Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { refreshing: prevRefreshing } = this.props;
-    const { refreshing, onRefreshSuccess } = nextProps;
+  componentDidUpdate(prevProps) {
+    const { refreshing, onRefreshSuccess } = this.props;
+    const { refreshing: prevRefreshing } = prevProps;
     if (refreshing && refreshing !== prevRefreshing) {
       this.handleOnRefresh();
       if (onRefreshSuccess) {
@@ -104,17 +104,14 @@ class NovelRankingPreview extends Component {
 }
 
 export default connectLocalization(
-  connect(
-    () => {
-      const getRankingItems = makeGetNovelRankingItems();
-      return (state, props) => {
-        const { ranking } = state;
-        return {
-          ranking: ranking[props.rankingMode],
-          items: getRankingItems(state, props),
-        };
+  connect(() => {
+    const getRankingItems = makeGetNovelRankingItems();
+    return (state, props) => {
+      const { ranking } = state;
+      return {
+        ranking: ranking[props.rankingMode],
+        items: getRankingItems(state, props),
       };
-    },
-    rankingActionCreators,
-  )(NovelRankingPreview),
+    };
+  }, rankingActionCreators)(NovelRankingPreview),
 );

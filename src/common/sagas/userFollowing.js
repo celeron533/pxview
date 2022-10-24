@@ -25,7 +25,7 @@ export function* handleFetchUserFollowing(action) {
     }
     const transformedResult = {
       ...response,
-      user_previews: response.user_previews.map(result => ({
+      user_previews: response.user_previews.map((result) => ({
         ...result,
         id: result.user.id,
       })),
@@ -45,7 +45,7 @@ export function* handleFetchUserFollowing(action) {
       ),
     );
   } catch (err) {
-    yield put(fetchUserFollowingFailure(userId));
+    yield put(fetchUserFollowingFailure(userId, followingType));
     yield put(addError(err));
   }
 }

@@ -1,4 +1,3 @@
-import { delay } from 'redux-saga';
 import {
   take,
   call,
@@ -8,6 +7,7 @@ import {
   select,
   fork,
   cancel,
+  delay,
 } from 'redux-saga/effects';
 import moment from 'moment';
 import { REHYDRATE } from 'redux-persist';
@@ -40,14 +40,13 @@ const setProvisionalAccountOptions = (isProvisionalAccount, password) => ({
   password: isProvisionalAccount ? password : null,
 });
 
-export function* authorize(email, password, isProvisionalAccount) {
+export function* authorize(code, codeVerifier) {
   // use apply instead of call to pass this to function
-  const loginResponse = yield apply(pixiv, pixiv.login, [
-    email,
-    password,
-    false,
+  const loginResponse = yield apply(pixiv, pixiv.tokenRequest, [
+    code,
+    codeVerifier,
   ]);
-  const options = setProvisionalAccountOptions(isProvisionalAccount, password);
+  const options = setProvisionalAccountOptions(false);
   yield put(loginSuccess(loginResponse, options));
   return loginResponse;
 }
@@ -67,13 +66,13 @@ export function* handleRefreshAccessToken(refreshToken) {
     return response;
   } catch (err) {
     yield put(refreshAccessTokenFailure());
-    yield put(logout());
+    // yield put(logout());
   }
   return null;
 }
 
 export function* scheduleRefreshAccessToken(refreshToken, delayMilisecond) {
-  yield call(delay, delayMilisecond);
+  yield delay(delayMilisecond);
   const response = yield call(handleRefreshAccessToken, refreshToken);
   return response;
 }
@@ -118,13 +117,8 @@ export function* watchLoginRequestTask() {
   while (true) {
     try {
       const action = yield take(AUTH_LOGIN.REQUEST);
-      const { email, password, isProvisionalAccount } = action.payload;
-      const authResponse = yield call(
-        authorize,
-        email,
-        password,
-        isProvisionalAccount,
-      );
+      const { code, codeVerifier } = action.payload;
+      const authResponse = yield call(authorize, code, codeVerifier);
       yield race([
         take(AUTH_LOGOUT.SUCCESS),
         call(refreshAccessTokenOnExpiry, authResponse),

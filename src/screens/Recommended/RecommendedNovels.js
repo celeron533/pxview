@@ -1,64 +1,53 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigationState, useScrollToTop } from '@react-navigation/native';
 import NovelList from '../../components/NovelList';
-import * as recommendedNovelsActionCreators from '../../common/actions/recommendedNovels';
+import {
+  fetchRecommendedNovels,
+  clearRecommendedNovels,
+} from '../../common/actions/recommendedNovels';
 import { getRecommendedNovelsItems } from '../../common/selectors';
 
-class RecommendedNovels extends Component {
-  componentDidMount() {
-    const { fetchRecommendedNovels, clearRecommendedNovels } = this.props;
-    clearRecommendedNovels();
-    fetchRecommendedNovels();
-  }
+const RecommendedNovels = (props) => {
+  const { active } = props;
+  const scrollableRef = useRef(null);
+  const dummyRef = useRef(null);
+  const dispatch = useDispatch();
+  const allState = useSelector((state) => state);
+  const recommendedNovels = useSelector((state) => state.recommendedNovels);
+  const navigationState = useNavigationState((state) => state);
+  const items = getRecommendedNovelsItems(allState, props);
+  const listKey = `${navigationState.key}-recommendedNovels`;
 
-  componentWillReceiveProps(nextProps) {
-    const { user: prevUser } = this.props;
-    const { user } = nextProps;
-    if ((!user && prevUser) || (user && !prevUser)) {
-      const { fetchRecommendedNovels, clearRecommendedNovels } = this.props;
-      clearRecommendedNovels();
-      fetchRecommendedNovels();
-    }
-  }
+  // only apply scroll to top when current tab is active
+  useScrollToTop(active ? scrollableRef : dummyRef);
 
-  loadMoreItems = () => {
-    const {
-      recommendedNovels: { nextUrl, loading },
-      fetchRecommendedNovels,
-    } = this.props;
+  useEffect(() => {
+    dispatch(clearRecommendedNovels());
+    dispatch(fetchRecommendedNovels());
+  }, [dispatch]);
+
+  const loadMoreItems = () => {
+    const { nextUrl, loading } = recommendedNovels;
     if (!loading && nextUrl) {
-      fetchRecommendedNovels(null, nextUrl);
+      dispatch(fetchRecommendedNovels(null, nextUrl));
     }
   };
 
-  handleOnRefresh = () => {
-    const { clearRecommendedNovels, fetchRecommendedNovels } = this.props;
-    clearRecommendedNovels();
-    fetchRecommendedNovels(null, null, true);
+  const handleOnRefresh = () => {
+    dispatch(clearRecommendedNovels());
+    dispatch(fetchRecommendedNovels(null, null, true));
   };
 
-  render() {
-    const { recommendedNovels, items, listKey } = this.props;
-    return (
-      <NovelList
-        data={{ ...recommendedNovels, items }}
-        listKey={listKey}
-        loadMoreItems={this.loadMoreItems}
-        onRefresh={this.handleOnRefresh}
-      />
-    );
-  }
-}
+  return (
+    <NovelList
+      ref={scrollableRef}
+      data={{ ...recommendedNovels, items }}
+      listKey={listKey}
+      loadMoreItems={loadMoreItems}
+      onRefresh={handleOnRefresh}
+    />
+  );
+};
 
-export default connect(
-  (state, props) => {
-    const { recommendedNovels, user } = state;
-    return {
-      recommendedNovels,
-      items: getRecommendedNovelsItems(state, props),
-      user,
-      listKey: `${props.navigation.state.key}-recommendedNovels`,
-    };
-  },
-  recommendedNovelsActionCreators,
-)(RecommendedNovels);
+export default RecommendedNovels;

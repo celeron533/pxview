@@ -11,9 +11,10 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { withTheme } from 'react-native-paper';
-import { AndroidBackHandler } from 'react-navigation-backhandler';
+import analytics from '@react-native-firebase/analytics';
 import Share from 'react-native-share';
 import ActionButton from 'react-native-action-button';
+import { AndroidBackHandler } from 'react-navigation-backhandler';
 import enhanceSaveImage from '../../components/HOC/enhanceSaveImage';
 import NovelDetailContent from '../../components/NovelDetailContent';
 import PXHeader from '../../components/PXHeader';
@@ -103,31 +104,36 @@ class NovelDetail extends Component {
       }
       if (isFromDeepLink) {
         fetchNovelDetail(novelId);
+        analytics().logEvent(`Screen_${SCREENS.NovelDetail}`, {
+          id: novelId.toString(),
+          fromDeepLink: true,
+        });
       } else {
         this.masterListUpdateListener = DeviceEventEmitter.addListener(
           'masterListUpdate',
           this.handleOnMasterListUpdate,
         );
+        analytics().logEvent(`Screen_${SCREENS.NovelDetail}`, {
+          id: item.id.toString(),
+        });
         addBrowsingHistoryNovels(item.id);
       }
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { novelDetail: prevNovelDetail } = this.props;
+  componentDidUpdate(prevProps) {
     const {
       novelId,
       isFromDeepLink,
       novelDetail,
       addBrowsingHistoryNovels,
-    } = nextProps;
+    } = this.props;
+    const { novelDetail: prevNovelDetail } = prevProps;
     if (
       novelId &&
       isFromDeepLink &&
-      novelDetail &&
-      novelDetail.loaded &&
-      novelDetail.loaded !== (prevNovelDetail && prevNovelDetail.prevLoaded) &&
-      novelDetail.item
+      novelDetail?.loaded !== prevNovelDetail?.loaded &&
+      novelDetail?.item
     ) {
       // only add browsing history if item is loaded for novel that open from deep link
       addBrowsingHistoryNovels(novelId);
@@ -138,9 +144,12 @@ class NovelDetail extends Component {
     if (this.masterListUpdateListener) {
       this.masterListUpdateListener.remove();
     }
+    if (this.navigationListener) {
+      this.navigationListener();
+    }
   }
 
-  handleOnScrollDetailImageList = e => {
+  handleOnScrollDetailImageList = (e) => {
     // Simple fade-in / fade-out animation
     const CustomLayoutLinear = {
       duration: 100,
@@ -174,7 +183,7 @@ class NovelDetail extends Component {
     this.handleOnPressOpenMenuBottomSheet();
   };
 
-  handleOnViewPagerPageSelected = index => {
+  handleOnViewPagerPageSelected = (index) => {
     const { items, addBrowsingHistoryNovels, navigation } = this.props;
     if (this.props.index !== undefined && this.props.index !== index) {
       const { setParams } = navigation;
@@ -183,15 +192,19 @@ class NovelDetail extends Component {
       });
       InteractionManager.runAfterInteractions(() => {
         addBrowsingHistoryNovels(items[index].id);
+        analytics().logEvent(`Screen_${SCREENS.NovelDetail}`, {
+          id: items[index].id.toString(),
+          fromSwipe: true,
+        });
       });
     }
   };
 
   handleOnListEndReached = () => {
-    const { onListEndReached } = this.props;
-    if (onListEndReached) {
-      onListEndReached();
-    }
+    const { parentListKey } = this.props;
+    DeviceEventEmitter.emit(`onNovelDetailListEndReached`, {
+      parentListKey,
+    });
   };
 
   handleOnMasterListUpdate = ({ listKey, items }) => {
@@ -224,7 +237,11 @@ class NovelDetail extends Component {
     if (isMuteUser) {
       removeMuteUser(item.user.id);
     } else {
-      addMuteUser(item.user.id);
+      addMuteUser({
+        id: item.user.id,
+        name: item.user.name,
+        profile_image_urls: item.user.profile_image_urls,
+      });
     }
     this.handleOnCancelMenuBottomSheet();
   };
@@ -232,7 +249,7 @@ class NovelDetail extends Component {
   handleOnPressShareNovel = () => {
     const { item } = this.props;
     const shareOptions = {
-      message: `${item.title} | ${item.user.name} #pxview`,
+      message: `${item.title} | ${item.user.name} #pxviewr`,
       url: `https://www.pixiv.net/novel/show.php?id=${item.id}`,
     };
     Share.open(shareOptions)
@@ -287,7 +304,7 @@ class NovelDetail extends Component {
     return false;
   };
 
-  renderHeaderTitle = item => {
+  renderHeaderTitle = (item) => {
     const {
       navigation: { push },
     } = this.props;
@@ -322,7 +339,7 @@ class NovelDetail extends Component {
     );
   };
 
-  renderHeaderRight = item => (
+  renderHeaderRight = (item) => (
     <View style={styles.headerRightContainer}>
       <HeaderInfoButton onPress={this.handleOnPressOpenDetailInfoModal} />
       <HeaderSaveImageButton
@@ -338,8 +355,8 @@ class NovelDetail extends Component {
     </View>
   );
 
-  renderContent = ({ item }) => {
-    const { navigation, authUser } = this.props;
+  renderContent = ({ item, index: itemIndex }) => {
+    const { navigation, authUser, route, index } = this.props;
     return (
       <View key={item.id} style={styles.content}>
         <PXHeader
@@ -352,7 +369,10 @@ class NovelDetail extends Component {
         />
         <NovelDetailContent
           item={item}
+          itemIndex={itemIndex}
+          currentIndex={index}
           navigation={navigation}
+          route={route}
           authUser={authUser}
           onLongPressImage={this.handleOnLongPressImage}
         />
@@ -373,7 +393,7 @@ class NovelDetail extends Component {
       return (
         <PXViewPager
           items={[item]}
-          keyExtractor={vpItem => vpItem.id.toString()}
+          keyExtractor={(vpItem) => vpItem.id.toString()}
           index={0}
           renderContent={this.renderContent}
           onPageSelected={this.handleOnViewPagerPageSelected}
@@ -384,7 +404,7 @@ class NovelDetail extends Component {
     return (
       <PXViewPager
         items={items}
-        keyExtractor={vpItem => vpItem.id.toString()}
+        keyExtractor={(vpItem) => vpItem.id.toString()}
         index={index}
         renderContent={this.renderContent}
         onPageSelected={this.handleOnViewPagerPageSelected}
@@ -399,7 +419,7 @@ class NovelDetail extends Component {
   };
 
   render() {
-    const { item, isMuteUser, i18n, navigation, theme } = this.props;
+    const { item, isMuteUser, i18n, navigation, route, theme } = this.props;
     const {
       isActionButtonVisible,
       isOpenMenuBottomSheet,
@@ -412,7 +432,7 @@ class NovelDetail extends Component {
             globalStyles.container,
             { backgroundColor: theme.colors.background },
           ]}
-          ref={ref => (this.detailView = ref)}
+          ref={(ref) => (this.detailView = ref)}
         >
           {this.renderMainContent()}
           {isActionButtonVisible && item && (
@@ -426,6 +446,7 @@ class NovelDetail extends Component {
           <DetailInfoModal
             item={item}
             navigation={navigation}
+            route={route}
             visible={isOpenDetailInfoModal}
             onCancel={this.handleOnCancelDetailInfoModal}
           />
@@ -476,7 +497,7 @@ export default withTheme(
         return (state, props) => {
           const item = getDetailItem(state, props);
           const isMuteUser = item
-            ? state.muteUsers.items.some(m => m === item.user.id)
+            ? state.muteUsers.items.some((m) => m.id === item.user.id)
             : false;
           const {
             id: novelIdFromQS,
@@ -485,7 +506,7 @@ export default withTheme(
             index,
             onListEndReached,
             parentListKey,
-          } = props.navigation.state.params;
+          } = props.route.params;
           const id = parseInt(novelIdFromQS || novelId, 0);
           return {
             novelId: id || item.id,

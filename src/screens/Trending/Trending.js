@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, Keyboard } from 'react-native';
+import { connect } from 'react-redux';
 import { AndroidBackHandler } from 'react-navigation-backhandler';
 import TrendingIllustTags from './TrendingIllustTags';
 import TrendingNovelTags from './TrendingNovelTags';
-import RecommendedUsers from '../Shared/RecommendedUsers';
+import TrendingRecommendUsers from './TrendingRecommendedUsers';
 import Search from '../../containers/Search';
 import PXSearchBar from '../../components/PXSearchBar';
 import Pills from '../../components/Pills';
 import { connectLocalization } from '../../components/Localization';
 import { SEARCH_TYPES, SCREENS } from '../../common/constants';
-import config from '../../common/config';
+import { addSearchHistory } from '../../common/actions/searchHistory';
 
 const styles = StyleSheet.create({
   container: {
@@ -38,7 +39,7 @@ class Trending extends Component {
     this.setState({ isFocusSearchBar: true });
   };
 
-  handleOnChangeSearchText = word => {
+  handleOnChangeSearchText = (word) => {
     this.setState({ word });
   };
 
@@ -55,14 +56,22 @@ class Trending extends Component {
     return false;
   };
 
-  handleOnSubmitSearch = word => {
-    const { push } = this.props.navigation;
+  handleOnSubmitSearch = (word) => {
+    const {
+      navigation: { push },
+    } = this.props;
     const { searchType } = this.state;
     this.handleOnPressBackButton();
     push(SCREENS.SearchResult, { word, searchType });
   };
 
-  handleOnChangePill = index => {
+  handleOnPressSearchHistoryItem = (word) => {
+    const { dispatch } = this.props;
+    this.handleOnSubmitSearch(word);
+    dispatch(addSearchHistory(word));
+  };
+
+  handleOnChangePill = (index) => {
     const newState = {
       index,
     };
@@ -76,7 +85,7 @@ class Trending extends Component {
     this.setState(newState);
   };
 
-  handleOnPressPill = index => {
+  handleOnPressPill = (index) => {
     const newState = {
       index,
     };
@@ -99,9 +108,9 @@ class Trending extends Component {
           {
             title: i18n.illustManga,
           },
-          {
-            title: i18n.novel,
-          },
+          // {
+          //   title: i18n.novel,
+          // },
           {
             title: i18n.user,
           },
@@ -114,32 +123,48 @@ class Trending extends Component {
   };
 
   renderContent = () => {
-    const { navigation } = this.props;
     const { index } = this.state;
     switch (index) {
       case 0:
-        return <TrendingIllustTags navigation={navigation} />;
+        return (
+          <TrendingIllustTags
+            onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
+          />
+        );
       case 1:
-        // return <TrendingNovelTags navigation={navigation} />;
-        return null;
-      case 2:
-        return <RecommendedUsers navigation={navigation} />;
+        return (
+          <TrendingRecommendUsers
+            onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
+          />
+        );
       default:
         return null;
     }
   };
 
   render() {
-    const { navigation } = this.props;
-    const { word, isFocusSearchBar, searchType } = this.state;
+    const { navigation, trendingSearchSettings } = this.props;
+    const { word, isFocusSearchBar, searchType, index } = this.state;
+    let showBackButton = isFocusSearchBar;
+    if (!isFocusSearchBar) {
+      if (index === 0 && !trendingSearchSettings.isShowTrendingIllustTag) {
+        showBackButton = false;
+      }
+      if (index === 1 && !trendingSearchSettings.isShowTrendingNovelTag) {
+        showBackButton = false;
+      }
+      if (index === 2 && !trendingSearchSettings.isShowRecommendedUser) {
+        showBackButton = false;
+      }
+    }
     return (
       <AndroidBackHandler onBackPress={this.handleOnPressBackButton}>
         <View style={styles.container}>
           <PXSearchBar
             showSearchBar
             word={word}
-            showBackButton={isFocusSearchBar}
-            showMenuButton={!config.navigation.tab && !isFocusSearchBar}
+            showBackButton={showBackButton}
+            // showMenuButton={!config.navigation.tab && !isFocusSearchBar}
             searchType={searchType}
             onFocus={this.handleOnFocusSearchBar}
             onChangeText={this.handleOnChangeSearchText}
@@ -166,4 +191,8 @@ class Trending extends Component {
   }
 }
 
-export default connectLocalization(Trending);
+export default connectLocalization(
+  connect((state) => ({
+    trendingSearchSettings: state.trendingSearchSettings,
+  }))(Trending),
+);

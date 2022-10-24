@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, forwardRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,12 +7,12 @@ import {
   Platform,
   DeviceEventEmitter,
 } from 'react-native';
-import { connect } from 'react-redux';
-import { withNavigation } from 'react-navigation';
-import { withTheme } from 'react-native-paper';
+import { useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
+import { useTheme, Button } from 'react-native-paper';
 import IllustItem from './IllustItem';
 import Loader from './Loader';
-import * as bookmarkIllustActionCreators from '../common/actions/bookmarkIllust';
+import EmptyStateView from './EmptyStateView';
 import { globalStyles, globalStyleVariables } from '../styles';
 import { SCREENS } from '../common/constants';
 
@@ -22,9 +22,22 @@ const styles = StyleSheet.create({
   footer: {
     marginBottom: 20,
   },
+  contentContainer: {
+    flexGrow: 1,
+  },
 });
 
 class IllustList extends Component {
+  componentDidMount() {
+    const { listKey, loadMoreItems } = this.props;
+    if (listKey && loadMoreItems) {
+      this.onDetailListEndReachedListener = DeviceEventEmitter.addListener(
+        `onDetailListEndReached`,
+        this.handleOnDetailListEndReached,
+      );
+    }
+  }
+
   componentDidUpdate(prevProps) {
     const {
       data: { items: prevItems },
@@ -34,13 +47,26 @@ class IllustList extends Component {
       listKey,
       maxItems,
     } = this.props;
-    if (listKey && (items && items.length) && items !== prevItems) {
+    if (listKey && items && items.length && items !== prevItems) {
       DeviceEventEmitter.emit('masterListUpdate', {
         listKey,
         items: maxItems ? items.slice(0, maxItems) : items,
       });
     }
   }
+
+  componentWillUnmount() {
+    if (this.onDetailListEndReachedListener) {
+      this.onDetailListEndReachedListener.remove();
+    }
+  }
+
+  handleOnDetailListEndReached = ({ parentListKey }) => {
+    const { loadMoreItems, listKey } = this.props;
+    if (loadMoreItems && listKey === parentListKey) {
+      loadMoreItems();
+    }
+  };
 
   renderItem = ({ item, index }) => {
     const { hideBookmarkButton } = this.props;
@@ -71,23 +97,45 @@ class IllustList extends Component {
     const {
       data: { items },
       navigation: { push },
-      loadMoreItems,
       listKey,
       maxItems,
     } = this.props;
     push(SCREENS.Detail, {
       items: maxItems ? items.slice(0, maxItems) : items,
       index,
-      onListEndReached: loadMoreItems,
       parentListKey: listKey,
     });
   };
 
-  handleOnLayout = e => {
+  handleOnLayout = (e) => {
     const { onListLayout } = this.props;
     if (onListLayout) {
       onListLayout(e, this.illustList);
     }
+  };
+
+  renderEmpty = () => {
+    const { renderEmpty } = this.props;
+    // if (!isConnected) {
+    //   // todo
+    //   return (
+    //     <EmptyStateView
+    //       iconName="users"
+    //       iconType="font-awesome"
+    //       title="title here"
+    //       description="some description"
+    //       actionButton={
+    //         <Button mode="contained" onPress={onRefresh}>
+    //           Reload
+    //         </Button>
+    //       }
+    //     />
+    //   );
+    // }
+    if (renderEmpty) {
+      return renderEmpty();
+    }
+    return null;
   };
 
   render() {
@@ -95,7 +143,6 @@ class IllustList extends Component {
       data: { items, loading, loaded, refreshing },
       listKey,
       onRefresh,
-      renderEmpty,
       renderHeader,
       loadMoreItems,
       onScroll,
@@ -103,6 +150,7 @@ class IllustList extends Component {
       showsVerticalScrollIndicator,
       maxItems,
       theme,
+      innerRef,
     } = this.props;
     return (
       <View
@@ -116,14 +164,19 @@ class IllustList extends Component {
         {loaded ? (
           <FlatList
             onLayout={this.handleOnLayout}
-            ref={ref => (this.illustList = ref)}
+            ref={(ref) => {
+              this.illustList = ref;
+              if (innerRef) {
+                innerRef.current = ref;
+              }
+            }}
             data={
-              maxItems && (items && items.length)
+              maxItems && items && items.length
                 ? items.slice(0, maxItems)
                 : items
             }
             numColumns={ILLUST_COLUMNS}
-            keyExtractor={item => item.id.toString()}
+            keyExtractor={(item) => item.id.toString()}
             listKey={listKey}
             renderItem={this.renderItem}
             getItemLayout={(data, index) => ({
@@ -136,7 +189,8 @@ class IllustList extends Component {
             initialNumToRender={5}
             onEndReachedThreshold={onEndReachedThreshold || 0.1}
             onEndReached={loadMoreItems}
-            ListEmptyComponent={renderEmpty}
+            contentContainerStyle={styles.contentContainer}
+            ListEmptyComponent={this.renderEmpty}
             ListHeaderComponent={renderHeader}
             ListFooterComponent={this.renderFooter}
             onScroll={onScroll}
@@ -155,11 +209,18 @@ class IllustList extends Component {
   }
 }
 
-export default withTheme(
-  withNavigation(
-    connect(
-      null,
-      bookmarkIllustActionCreators,
-    )(IllustList),
-  ),
-);
+export default forwardRef((props, ref) => {
+  const theme = useTheme();
+  const navigation = useNavigation();
+  // const isConnected = useSelector((state) => state.network.isConnected);
+  return (
+    <IllustList
+      // eslint-disable-next-line react/jsx-props-no-spreading
+      {...props}
+      // isConnected={isConnected}
+      theme={theme}
+      navigation={navigation}
+      innerRef={ref}
+    />
+  );
+});

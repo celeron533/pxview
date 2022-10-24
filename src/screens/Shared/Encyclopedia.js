@@ -1,27 +1,25 @@
-import React, { Component } from 'react';
+import React, { useLayoutEffect } from 'react';
 import PXWebView from '../../components/PXWebView';
 
 const ENCYCLOPEDIA_URL = 'https://zh.moegirl.org';
 
-class Encyclopedia extends Component {
-  static navigationOptions = ({ navigation }) => {
-    const { word } = navigation.state.params;
-    return {
-      title: word,
-    };
-  };
+const Encyclopedia = ({ navigation, route }) => {
+  const { word } = route.params;
+  const url = `${ENCYCLOPEDIA_URL}/${encodeURIComponent(word)}`;
 
-  render() {
-    const { word } = this.props.navigation.state.params;
-    const url = `${ENCYCLOPEDIA_URL}/${encodeURIComponent(word)}`;
-    return (
-      <PXWebView
-        source={{
-          uri: url,
-        }}
-      />
-    );
-  }
-}
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      title: word,
+    });
+  }, [navigation, word]);
+
+  return (
+    <PXWebView
+      source={{
+        uri: url,
+      }}
+    />
+  );
+};
 
 export default Encyclopedia;

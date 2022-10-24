@@ -11,9 +11,10 @@ import {
 } from 'react-native';
 import { connect } from 'react-redux';
 import { withTheme } from 'react-native-paper';
-import { AndroidBackHandler } from 'react-navigation-backhandler';
+import analytics from '@react-native-firebase/analytics';
 import Share from 'react-native-share';
 import ActionButton from 'react-native-action-button';
+import { AndroidBackHandler } from 'react-navigation-backhandler';
 import enhanceSaveImage from '../../components/HOC/enhanceSaveImage';
 import IllustDetailContent from '../../components/IllustDetailContent';
 import PXHeader from '../../components/PXHeader';
@@ -101,12 +102,19 @@ class Detail extends Component {
       }
       if (isFromDeepLink) {
         fetchIllustDetail(illustId);
+        analytics().logEvent(`Screen_${SCREENS.Detail}`, {
+          id: illustId.toString(),
+          fromDeepLink: true,
+        });
       } else {
         this.masterListUpdateListener = DeviceEventEmitter.addListener(
           'masterListUpdate',
           this.handleOnMasterListUpdate,
         );
         addBrowsingHistoryIllusts(item.id);
+        analytics().logEvent(`Screen_${SCREENS.Detail}`, {
+          id: item.id.toString(),
+        });
       }
     });
   }
@@ -122,11 +130,8 @@ class Detail extends Component {
     if (
       illustId &&
       isFromDeepLink &&
-      illustDetail &&
-      illustDetail.loaded &&
-      illustDetail.loaded !==
-        (prevIllustDetail && prevIllustDetail.prevLoaded) &&
-      illustDetail.item
+      illustDetail?.loaded !== prevIllustDetail?.loaded &&
+      illustDetail?.item
     ) {
       // only add browsing history if item is loaded for illust that open from deep link
       addBrowsingHistoryIllusts(illustId);
@@ -139,7 +144,7 @@ class Detail extends Component {
     }
   }
 
-  handleOnScrollDetailImageList = e => {
+  handleOnScrollDetailImageList = (e) => {
     // Simple fade-in / fade-out animation
     const CustomLayoutLinear = {
       duration: 100,
@@ -169,11 +174,11 @@ class Detail extends Component {
     this.listViewOffset = currentOffset;
   };
 
-  handleOnPressImage = index => {
+  handleOnPressImage = (index) => {
     const { navigation, item } = this.props;
     const images =
       item.page_count > 1
-        ? item.meta_pages.map(page => page.image_urls.original)
+        ? item.meta_pages.map((page) => page.image_urls.original)
         : [item.meta_single_page.original_image_url];
     navigation.navigate(SCREENS.ImagesViewer, {
       images,
@@ -182,11 +187,11 @@ class Detail extends Component {
     });
   };
 
-  handleOnLongPressImage = index => {
+  handleOnLongPressImage = (index) => {
     this.handleOnPressOpenMenuBottomSheet(index);
   };
 
-  handleOnViewPagerPageSelected = index => {
+  handleOnViewPagerPageSelected = (index) => {
     const { items, addBrowsingHistoryIllusts, navigation } = this.props;
     if (this.props.index !== undefined && this.props.index !== index) {
       const { setParams } = navigation;
@@ -194,16 +199,20 @@ class Detail extends Component {
         index,
       });
       InteractionManager.runAfterInteractions(() => {
+        analytics().logEvent(`Screen_${SCREENS.Detail}`, {
+          id: items[index].id.toString(),
+          fromSwipe: true,
+        });
         addBrowsingHistoryIllusts(items[index].id);
       });
     }
   };
 
   handleOnListEndReached = () => {
-    const { onListEndReached } = this.props;
-    if (onListEndReached) {
-      onListEndReached();
-    }
+    const { parentListKey } = this.props;
+    DeviceEventEmitter.emit(`onDetailListEndReached`, {
+      parentListKey,
+    });
   };
 
   handleOnMasterListUpdate = ({ listKey, items }) => {
@@ -221,7 +230,7 @@ class Detail extends Component {
     goBack();
   };
 
-  handleOnPressOpenMenuBottomSheet = selectedImageIndex => {
+  handleOnPressOpenMenuBottomSheet = (selectedImageIndex) => {
     const newState = {
       isOpenMenuBottomSheet: true,
     };
@@ -243,7 +252,11 @@ class Detail extends Component {
     if (isMuteUser) {
       removeMuteUser(item.user.id);
     } else {
-      addMuteUser(item.user.id);
+      addMuteUser({
+        id: item.user.id,
+        name: item.user.name,
+        profile_image_urls: item.user.profile_image_urls,
+      });
     }
     this.handleOnCancelMenuBottomSheet();
   };
@@ -251,8 +264,8 @@ class Detail extends Component {
   handleOnPressShareIllust = () => {
     const { item } = this.props;
     const shareOptions = {
-      message: `${item.title} | ${item.user.name} #pxview`,
-      url: `http://www.pixiv.net/member_illust.php?illust_id=${item.id}&mode=medium`,
+      message: `${item.title} | ${item.user.name} #pxviewr`,
+      url: `https://www.pixiv.net/artworks/${item.id}`,
     };
     Share.open(shareOptions)
       .then(this.handleOnCancelMenuBottomSheet)
@@ -264,7 +277,7 @@ class Detail extends Component {
     const { selectedImageIndex } = this.state;
     const images =
       item.page_count > 1
-        ? item.meta_pages.map(page => page.image_urls.original)
+        ? item.meta_pages.map((page) => page.image_urls.original)
         : [item.meta_single_page.original_image_url];
     saveImage({
       imageUrls: [images[selectedImageIndex]],
@@ -301,7 +314,7 @@ class Detail extends Component {
     return false;
   };
 
-  renderHeaderTitle = item => {
+  renderHeaderTitle = (item) => {
     const {
       navigation: { push },
     } = this.props;
@@ -336,10 +349,10 @@ class Detail extends Component {
     );
   };
 
-  renderHeaderRight = item => {
+  renderHeaderRight = (item) => {
     const images =
       item.page_count > 1
-        ? item.meta_pages.map(page => page.image_urls.original)
+        ? item.meta_pages.map((page) => page.image_urls.original)
         : [item.meta_single_page.original_image_url];
     return (
       <View style={styles.headerRightContainer}>
@@ -360,8 +373,8 @@ class Detail extends Component {
     );
   };
 
-  renderContent = ({ item }) => {
-    const { navigation, authUser, index } = this.props;
+  renderContent = ({ item, index: itemIndex }) => {
+    const { navigation, authUser, route, index } = this.props;
     return (
       <View style={styles.content} key={item.id}>
         <PXHeader
@@ -374,7 +387,10 @@ class Detail extends Component {
         />
         <IllustDetailContent
           item={item}
+          itemIndex={itemIndex}
+          currentIndex={index}
           navigation={navigation}
+          route={route}
           authUser={authUser}
           onPressImage={this.handleOnPressImage}
           onLongPressImage={this.handleOnLongPressImage}
@@ -397,7 +413,7 @@ class Detail extends Component {
       return (
         <PXViewPager
           items={[item]}
-          keyExtractor={vpItem => vpItem.id.toString()}
+          keyExtractor={(vpItem) => vpItem.id.toString()}
           index={0}
           renderContent={this.renderContent}
           onPageSelected={this.handleOnViewPagerPageSelected}
@@ -408,7 +424,7 @@ class Detail extends Component {
     return (
       <PXViewPager
         items={items}
-        keyExtractor={vpItem => vpItem.id.toString()}
+        keyExtractor={(vpItem) => vpItem.id.toString()}
         index={index}
         renderContent={this.renderContent}
         onPageSelected={this.handleOnViewPagerPageSelected}
@@ -423,7 +439,7 @@ class Detail extends Component {
   };
 
   render() {
-    const { item, isMuteUser, i18n, navigation, theme } = this.props;
+    const { item, isMuteUser, i18n, navigation, theme, route } = this.props;
     const {
       isActionButtonVisible,
       isOpenDetailInfoModal,
@@ -437,7 +453,7 @@ class Detail extends Component {
             globalStyles.container,
             { backgroundColor: theme.colors.background },
           ]}
-          ref={ref => (this.detailView = ref)}
+          ref={(ref) => (this.detailView = ref)}
         >
           {this.renderMainContent()}
           {isActionButtonVisible && item && (
@@ -451,6 +467,7 @@ class Detail extends Component {
           <DetailInfoModal
             item={item}
             navigation={navigation}
+            route={route}
             visible={isOpenDetailInfoModal}
             onCancel={this.handleOnCancelDetailInfoModal}
           />
@@ -503,16 +520,15 @@ export default withTheme(
         return (state, props) => {
           const item = getDetailItem(state, props);
           const isMuteUser = item
-            ? state.muteUsers.items.some(m => m === item.user.id)
+            ? state.muteUsers.items.some((m) => m.id === item.user.id)
             : false;
           const {
             illust_id: illustIdFromQS,
             illustId,
             items,
             index,
-            onListEndReached,
             parentListKey,
-          } = props.navigation.state.params;
+          } = props.route.params;
           const id = parseInt(illustIdFromQS || illustId, 0);
           return {
             illustId: id || item.id,
@@ -522,7 +538,6 @@ export default withTheme(
             isFromDeepLink: !!id,
             items,
             index,
-            onListEndReached,
             parentListKey,
             authUser: state.auth.user,
           };

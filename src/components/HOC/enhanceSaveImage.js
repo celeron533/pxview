@@ -6,11 +6,11 @@ import {
   Alert,
   PermissionsAndroid,
   DeviceEventEmitter,
+  Linking,
 } from 'react-native';
 import { connect } from 'react-redux';
 import CameraRoll from '@react-native-community/cameraroll';
 import RNFetchBlob from 'rn-fetch-blob';
-import OpenSettings from 'react-native-open-settings';
 import hoistNonReactStatic from 'hoist-non-react-statics';
 import Promise from 'bluebird';
 import sanitize from 'sanitize-filename';
@@ -20,7 +20,7 @@ import {
   SAVE_FILE_NAME_FORMAT,
 } from '../../common/constants';
 
-const enhanceSaveImage = WrappedComponent => {
+const enhanceSaveImage = (WrappedComponent) => {
   class Hoc extends Component {
     requestWriteExternalStoragePermission = async () => {
       try {
@@ -34,7 +34,7 @@ const enhanceSaveImage = WrappedComponent => {
     };
 
     handleOnPressOpenAppSettings = () => {
-      OpenSettings.openSettings();
+      Linking.openSettings();
     };
 
     getImageSavePath = (
@@ -98,14 +98,14 @@ const enhanceSaveImage = WrappedComponent => {
       let fileName;
       switch (saveImageSettings.fileName) {
         case SAVE_FILE_NAME_FORMAT.WORK_TITLE:
-          fileName = `${workTitle}_p${index}.jpg`;
+          fileName = `${workTitle}_p${index}.png`;
           break;
         case SAVE_FILE_NAME_FORMAT.WORK_ID_WORK_TITLE:
-          fileName = `${workId}_${workTitle}_p${index}.jpg`;
+          fileName = `${workId}_${workTitle}_p${index}.png`;
           break;
         case SAVE_FILE_NAME_FORMAT.WORK_ID:
         default:
-          fileName = `${workId}_p${index}.jpg`;
+          fileName = `${workId}_p${index}.png`;
           break;
       }
       return sanitize(fileName, {
@@ -131,7 +131,7 @@ const enhanceSaveImage = WrappedComponent => {
         if (granted === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
           return Alert.alert(
             i18n.formatString(
-              i18n.permissionPromptStorageTitle,
+              i18n.permissionPromptStorageToSaveImage,
               i18n.permissionStorage,
             ),
             i18n.formatString(
@@ -206,7 +206,7 @@ const enhanceSaveImage = WrappedComponent => {
       return null;
     };
 
-    showToast = message => {
+    showToast = (message) => {
       DeviceEventEmitter.emit('showToast', message);
     };
 
@@ -218,7 +218,7 @@ const enhanceSaveImage = WrappedComponent => {
   hoistNonReactStatic(Hoc, WrappedComponent);
 
   return connectLocalization(
-    connect(state => ({
+    connect((state) => ({
       saveImageSettings: state.saveImageSettings,
     }))(Hoc),
   );

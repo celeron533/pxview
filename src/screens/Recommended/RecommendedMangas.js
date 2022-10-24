@@ -1,53 +1,53 @@
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigationState, useScrollToTop } from '@react-navigation/native';
 import IllustList from '../../components/IllustList';
-import * as recommendedMangasActionCreators from '../../common/actions/recommendedMangas';
+import {
+  fetchRecommendedMangas,
+  clearRecommendedMangas,
+} from '../../common/actions/recommendedMangas';
 import { getRecommendedMangasItems } from '../../common/selectors';
 
-class RecommendedMangas extends Component {
-  componentDidMount() {
-    const { fetchRecommendedMangas, clearRecommendedMangas } = this.props;
-    clearRecommendedMangas();
-    fetchRecommendedMangas();
-  }
+const RecommendedMangas = (props) => {
+  const { active } = props;
+  const scrollableRef = useRef(null);
+  const dummyRef = useRef(null);
+  const dispatch = useDispatch();
+  const allState = useSelector((state) => state);
+  const recommendedMangas = useSelector((state) => state.recommendedMangas);
+  const navigationState = useNavigationState((state) => state);
+  const items = getRecommendedMangasItems(allState, props);
+  const listKey = `${navigationState.key}-recommendedMangas`;
 
-  loadMoreItems = () => {
-    const {
-      recommendedMangas: { nextUrl, loading },
-      fetchRecommendedMangas,
-    } = this.props;
+  // only apply scroll to top when current tab is active
+  useScrollToTop(active ? scrollableRef : dummyRef);
+
+  useEffect(() => {
+    dispatch(clearRecommendedMangas());
+    dispatch(fetchRecommendedMangas());
+  }, [dispatch]);
+
+  const loadMoreItems = () => {
+    const { nextUrl, loading } = recommendedMangas;
     if (!loading && nextUrl) {
-      fetchRecommendedMangas('', nextUrl);
+      dispatch(fetchRecommendedMangas(null, nextUrl));
     }
   };
 
-  handleOnRefresh = () => {
-    const { fetchRecommendedMangas, clearRecommendedMangas } = this.props;
-    clearRecommendedMangas();
-    fetchRecommendedMangas(null, null, true);
+  const handleOnRefresh = () => {
+    dispatch(clearRecommendedMangas());
+    dispatch(fetchRecommendedMangas(null, null, true));
   };
 
-  render() {
-    const { recommendedMangas, items, listKey } = this.props;
-    return (
-      <IllustList
-        data={{ ...recommendedMangas, items }}
-        listKey={listKey}
-        loadMoreItems={this.loadMoreItems}
-        onRefresh={this.handleOnRefresh}
-      />
-    );
-  }
-}
+  return (
+    <IllustList
+      ref={scrollableRef}
+      data={{ ...recommendedMangas, items }}
+      listKey={listKey}
+      loadMoreItems={loadMoreItems}
+      onRefresh={handleOnRefresh}
+    />
+  );
+};
 
-export default connect(
-  (state, props) => {
-    const { recommendedMangas } = state;
-    return {
-      recommendedMangas,
-      items: getRecommendedMangasItems(state, props),
-      listKey: `${props.navigation.state.key}-recommendedMangas`,
-    };
-  },
-  recommendedMangasActionCreators,
-)(RecommendedMangas);
+export default RecommendedMangas;

@@ -20,14 +20,17 @@ export function* handleFetchSearchNovels(action) {
     if (nextUrl) {
       response = yield apply(pixiv, pixiv.requestUrl, [nextUrl]);
       normalized = normalize(
-        response.novels.filter(novel => novel.visible && novel.id),
+        response.novels.filter((novel) => novel.visible && novel.id),
         Schemas.NOVEL_ARRAY,
       );
     } else {
+      const searchWord = options?.bookmarkCountsTag
+        ? `${word} 小説${options.bookmarkCountsTag}`
+        : word;
       let finalOptions;
       if (options) {
         finalOptions = Object.keys(options)
-          .filter(key => options[key] && key !== 'period')
+          .filter((key) => options[key] && key !== 'period')
           .reduce((prev, key) => {
             prev[key] = options[key];
             return prev;
@@ -49,25 +52,28 @@ export function* handleFetchSearchNovels(action) {
         if (user.is_premium) {
           finalOptions.sort = 'popular_desc';
           response = yield apply(pixiv, pixiv.searchNovel, [
-            word,
+            searchWord,
             finalOptions,
           ]);
         } else {
           delete finalOptions.sort;
           response = yield apply(pixiv, pixiv.searchNovelPopularPreview, [
-            word,
+            searchWord,
             finalOptions,
           ]);
         }
       } else {
-        response = yield apply(pixiv, pixiv.searchNovel, [word, finalOptions]);
+        response = yield apply(pixiv, pixiv.searchNovel, [
+          searchWord,
+          finalOptions,
+        ]);
       }
       normalized = normalize(
-        response.novels.filter(novel => novel.visible && novel.id),
+        response.novels.filter((novel) => novel.visible && novel.id),
         Schemas.NOVEL_ARRAY,
       );
       if (!response.novels || !response.novels.length) {
-        // check if keyword is number, if is number, try to search illust by id
+        // check if keyword is number, if is number, try to search novel by id
         const novelId = parseInt(word, 10);
         if (novelId) {
           response = yield apply(pixiv, pixiv.novelDetail, [novelId]);

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import { View, StyleSheet, ScrollView, InteractionManager } from 'react-native';
 import { connect } from 'react-redux';
 import { withTheme } from 'react-native-paper';
 import TagBottomSheet from './TagBottomSheet';
@@ -30,16 +30,38 @@ const styles = StyleSheet.create({
 class NovelDetailContent extends Component {
   constructor(props) {
     super(props);
+    const { itemIndex, currentIndex } = props;
     this.state = {
+      isVisible: currentIndex === undefined || itemIndex === currentIndex, // currentIndex will be undefined if open from deep link
       isOpenTagBottomSheet: false,
       selectedTag: null,
+      isMounted: false,
     };
   }
 
-  handleOnPressAvatar = userId => {
-    const { push } = this.props.navigation;
-    push(SCREENS.UserDetail, { userId });
-  };
+  componentDidMount() {
+    InteractionManager.runAfterInteractions(() => {
+      this.setState({
+        isMounted: true,
+      });
+    });
+  }
+
+  componentDidUpdate(prevProps) {
+    const { itemIndex, currentIndex } = this.props;
+    const { currentIndex: prevCurrentIndex } = prevProps;
+    const { isVisible } = this.state;
+    if (
+      !isVisible &&
+      currentIndex !== prevCurrentIndex &&
+      currentIndex - 1 <= itemIndex <= currentIndex + 1
+    ) {
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({
+        isVisible: true,
+      });
+    }
+  }
 
   handleOnPressNovelImage = () => {
     const {
@@ -51,12 +73,14 @@ class NovelDetailContent extends Component {
     });
   };
 
-  handleOnPressAvatar = userId => {
-    const { push } = this.props.navigation;
+  handleOnPressAvatar = (userId) => {
+    const {
+      navigation: { push },
+    } = this.props;
     push(SCREENS.UserDetail, { userId });
   };
 
-  handleOnPressTag = tag => {
+  handleOnPressTag = (tag) => {
     const {
       addSearchHistory,
       navigation: { push },
@@ -68,7 +92,7 @@ class NovelDetailContent extends Component {
     });
   };
 
-  handleOnLongPressTag = tag => {
+  handleOnLongPressTag = (tag) => {
     this.setState({
       isOpenTagBottomSheet: true,
       selectedTag: tag,
@@ -85,6 +109,7 @@ class NovelDetailContent extends Component {
     const {
       item,
       navigation,
+      route,
       authUser,
       highlightTags,
       muteTags,
@@ -93,8 +118,16 @@ class NovelDetailContent extends Component {
       onLongPressImage,
       theme,
     } = this.props;
-    const { isOpenTagBottomSheet, selectedTag } = this.state;
-    const isMute = tags.some(t => t.isMute) || isMuteUser;
+    const {
+      isOpenTagBottomSheet,
+      selectedTag,
+      isVisible,
+      isMounted,
+    } = this.state;
+    if (!isMounted) {
+      return null;
+    }
+    const isMute = tags.some((t) => t.isMute) || isMuteUser;
     return (
       <View style={styles.container}>
         <ScrollView>
@@ -127,10 +160,12 @@ class NovelDetailContent extends Component {
             item={item}
             tags={tags}
             navigation={navigation}
+            route={route}
             authUser={authUser}
             onPressAvatar={this.handleOnPressAvatar}
             onPressTag={this.handleOnPressTag}
             onLongPressTag={this.handleOnLongPressTag}
+            isDetailPageReady={isVisible}
           />
         </ScrollView>
         <TagBottomSheet
@@ -147,16 +182,15 @@ class NovelDetailContent extends Component {
 }
 
 export default withTheme(
-  connect(
-    () => {
-      const getTagsWithStatus = makeGetTagsWithStatus();
-      return (state, props) => ({
-        highlightTags: state.highlightTags.items,
-        muteTags: state.muteTags.items,
-        isMuteUser: state.muteUsers.items.some(m => m === props.item.user.id),
-        tags: getTagsWithStatus(state, props),
-      });
-    },
-    searchHistoryActionCreators,
-  )(NovelDetailContent),
+  connect(() => {
+    const getTagsWithStatus = makeGetTagsWithStatus();
+    return (state, props) => ({
+      highlightTags: state.highlightTags.items,
+      muteTags: state.muteTags.items,
+      isMuteUser: state.muteUsers.items.some(
+        (m) => m.id === props.item.user.id,
+      ),
+      tags: getTagsWithStatus(state, props),
+    });
+  }, searchHistoryActionCreators)(NovelDetailContent),
 );

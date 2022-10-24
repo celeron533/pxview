@@ -1,6 +1,8 @@
-import React, { Component } from 'react';
+import React, { Component, useRef } from 'react';
 import { StyleSheet, View, ScrollView, Alert } from 'react-native';
 import { connect } from 'react-redux';
+import { useScrollToTop } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Icon } from 'react-native-elements';
 import { withTheme } from 'react-native-paper';
 // import CookieManager from 'react-native-cookies';
@@ -72,7 +74,7 @@ const menuList2 = [
 ];
 
 class MyPage extends Component {
-  handleOnPressListItem = item => {
+  handleOnPressListItem = (item) => {
     const {
       user,
       navigation: { navigate },
@@ -160,7 +162,9 @@ class MyPage extends Component {
   };
 
   handleOnPressRegisterAccount = () => {
-    const { navigate } = this.props.navigation;
+    const {
+      navigation: { navigate },
+    } = this.props;
     navigate(SCREENS.AccountSettingsModal, {
       hideAdvanceSettings: true,
     });
@@ -200,14 +204,14 @@ class MyPage extends Component {
     );
   };
 
-  renderList = list => {
+  renderList = (list) => {
     const { user, i18n } = this.props;
-    if (!user && list.some(l => l.id === 'logout')) {
-      list = list.filter(l => l.id !== 'logout');
+    if (!user && list.some((l) => l.id === 'logout')) {
+      list = list.filter((l) => l.id !== 'logout');
     }
     return (
       <View style={styles.listContainer}>
-        {list.map(item => (
+        {list.map((item) => (
           <PXListItem
             key={item.id}
             title={i18n[item.title]}
@@ -227,25 +231,30 @@ class MyPage extends Component {
   };
 
   render() {
-    const { theme } = this.props;
+    const { theme, scrollRef } = this.props;
     return (
-      <View
-        style={[styles.container, { backgroundColor: theme.colors.background }]}
+      <SafeAreaView
+        style={[
+          styles.container,
+          {
+            backgroundColor: theme.colors.background,
+          },
+        ]}
       >
-        <ScrollView style={styles.container}>
+        <ScrollView ref={scrollRef} style={styles.container}>
           {this.renderCover()}
           {this.renderList(menuList)}
           {this.renderList(menuList2)}
         </ScrollView>
-      </View>
+      </SafeAreaView>
     );
   }
 }
 
-export default withTheme(
+const MyPageWithHOC = withTheme(
   connectLocalization(
     connect(
-      state => ({
+      (state) => ({
         user: state.auth.user,
         themeName: state.theme.name,
       }),
@@ -259,3 +268,10 @@ export default withTheme(
     )(MyPage),
   ),
 );
+
+export default function (props) {
+  const ref = useRef(null);
+  useScrollToTop(ref);
+  // eslint-disable-next-line react/jsx-props-no-spreading
+  return <MyPageWithHOC {...props} scrollRef={ref} />;
+}

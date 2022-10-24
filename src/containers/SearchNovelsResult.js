@@ -17,9 +17,9 @@ class SearchNovelsResult extends Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { options: prevOptions, word: prevWord } = this.props;
-    const { clearSearchNovels, navigationStateKey, word, options } = nextProps;
+  componentDidUpdate(prevProps) {
+    const { clearSearchNovels, navigationStateKey, word, options } = this.props;
+    const { options: prevOptions, word: prevWord } = prevProps;
     if ((word && word !== prevWord) || (options && options !== prevOptions)) {
       clearSearchNovels(navigationStateKey);
       this.search(word, options);
@@ -67,19 +67,16 @@ class SearchNovelsResult extends Component {
 }
 
 export default connectLocalization(
-  connect(
-    () => {
-      const getSearchNovelsItems = makeGetSearchNovelsItems();
-      return (state, props) => {
-        const { searchNovels } = state;
-        const { navigationStateKey } = props;
-        return {
-          searchNovels: searchNovels[navigationStateKey],
-          items: getSearchNovelsItems(state, props),
-          listKey: navigationStateKey,
-        };
+  connect(() => {
+    const getSearchNovelsItems = makeGetSearchNovelsItems();
+    return (state, props) => {
+      const { searchNovels } = state;
+      const { navigationStateKey } = props;
+      return {
+        searchNovels: searchNovels[navigationStateKey],
+        items: getSearchNovelsItems(state, props),
+        listKey: navigationStateKey,
       };
-    },
-    searchNovelsActionCreators,
-  )(SearchNovelsResult),
+    };
+  }, searchNovelsActionCreators)(SearchNovelsResult),
 );

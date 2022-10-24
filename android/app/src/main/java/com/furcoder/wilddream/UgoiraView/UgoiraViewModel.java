@@ -1,4 +1,8 @@
+<<<<<<<< HEAD:android/app/src/main/java/com/furcoder/wilddream/UgoiraView/UgoiraViewModel.java
 package com.furcoder.wilddream.UgoiraView;
+========
+package com.utopia.pxviewr.UgoiraView;
+>>>>>>>> upstream/master:android/app/src/main/java/com/utopia/pxviewr/UgoiraView/UgoiraViewModel.java
 
 import android.graphics.Bitmap;
 

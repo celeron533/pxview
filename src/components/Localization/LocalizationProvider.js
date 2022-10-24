@@ -1,19 +1,20 @@
-import { Component, Children } from 'react';
-import PropTypes from 'prop-types';
+import React, { createContext } from 'react';
+import { useSelector } from 'react-redux';
 
-class LocalizationProvider extends Component {
-  static childContextTypes = {
-    i18n: PropTypes.object,
-  };
+export const LocalizationContext = createContext();
 
-  getChildContext() {
-    const { i18n } = this.props;
-    return { i18n };
-  }
-
-  render() {
-    return Children.only(this.props.children);
-  }
-}
+const LocalizationProvider = ({ children, i18n }) => {
+  const lang = useSelector((state) => state.i18n.lang);
+  return (
+    <LocalizationContext.Provider
+      value={{
+        i18n,
+        lang,
+      }}
+    >
+      {children}
+    </LocalizationContext.Provider>
+  );
+};
 
 export default LocalizationProvider;

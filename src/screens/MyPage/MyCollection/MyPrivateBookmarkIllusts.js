@@ -16,14 +16,14 @@ class MyPrivateBookmarkIllusts extends Component {
     fetchMyPrivateBookmarkIllusts(userId, tag);
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { userId: prevUserId, tag: prevTag } = this.props;
+  componentDidUpdate(prevProps) {
     const {
       userId,
       tag,
       fetchMyPrivateBookmarkIllusts,
       clearMyPrivateBookmarkIllusts,
-    } = nextProps;
+    } = this.props;
+    const { userId: prevUserId, tag: prevTag } = prevProps;
     if (userId !== prevUserId || tag !== prevTag) {
       clearMyPrivateBookmarkIllusts(userId);
       fetchMyPrivateBookmarkIllusts(userId, tag);
@@ -66,16 +66,13 @@ class MyPrivateBookmarkIllusts extends Component {
   }
 }
 
-export default connect(
-  (state, props) => {
-    const { myPrivateBookmarkIllusts } = state;
-    const userId = props.userId || props.navigation.state.params.userId;
-    return {
-      myPrivateBookmarkIllusts,
-      items: getMyPrivateBookmarkIllustsItems(state),
-      userId,
-      listKey: props.navigation.state.key,
-    };
-  },
-  myPrivateBookmarkIllustActionCreators,
-)(MyPrivateBookmarkIllusts);
+export default connect((state, props) => {
+  const { myPrivateBookmarkIllusts } = state;
+  const userId = props.userId || props.route.params.userId;
+  return {
+    myPrivateBookmarkIllusts,
+    items: getMyPrivateBookmarkIllustsItems(state),
+    userId,
+    listKey: props.route.key,
+  };
+}, myPrivateBookmarkIllustActionCreators)(MyPrivateBookmarkIllusts);

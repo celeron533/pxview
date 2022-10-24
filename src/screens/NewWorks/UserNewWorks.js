@@ -21,7 +21,7 @@ class UserNewWorks extends Component {
     };
   }
 
-  handleOnPressPill = index => {
+  handleOnPressPill = (index) => {
     this.setState({ index });
   };
 
@@ -49,24 +49,13 @@ class UserNewWorks extends Component {
   };
 
   renderContent = () => {
-    const { navigation } = this.props;
+    const { active } = this.props;
     const { index } = this.state;
     switch (index) {
       case 0:
-        return (
-          <NewIllusts
-            navigation={navigation}
-            renderHeader={this.renderHeader}
-          />
-        );
-      // case 1:
-      //   return (
-      //     <NewMangas navigation={navigation} renderHeader={this.renderHeader} />
-      //   );
+        return <NewIllusts renderHeader={this.renderHeader} active={active} />;
       case 1:
-        return (
-          <NewNovels navigation={navigation} renderHeader={this.renderHeader} />
-        );
+        return <NewNovels renderHeader={this.renderHeader} active={active} />;
       default:
         return null;
     }

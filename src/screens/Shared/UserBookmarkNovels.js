@@ -23,14 +23,14 @@ class UserBookmarkNovels extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { userId: prevUserId, tag: prevTag } = this.props;
+  componentDidUpdate(prevProps) {
     const {
       userId,
       tag,
       fetchUserBookmarkNovels,
       clearUserBookmarkNovels,
-    } = nextProps;
+    } = this.props;
+    const { userId: prevUserId, tag: prevTag } = prevProps;
     if (userId !== prevUserId || tag !== prevTag) {
       clearUserBookmarkNovels(userId);
       fetchUserBookmarkNovels(userId, tag);
@@ -77,19 +77,16 @@ class UserBookmarkNovels extends Component {
   }
 }
 
-export default connect(
-  () => {
-    const getUserBookmarkNovelsItems = makeGetUserBookmarkNovelsItems();
-    return (state, props) => {
-      const { userBookmarkNovels } = state;
-      const userId = props.userId || props.navigation.state.params.userId;
-      return {
-        userBookmarkNovels: userBookmarkNovels[userId],
-        items: getUserBookmarkNovelsItems(state, props),
-        userId,
-        listKey: `${props.navigation.state.key}-userbookmarkNovels`,
-      };
+export default connect(() => {
+  const getUserBookmarkNovelsItems = makeGetUserBookmarkNovelsItems();
+  return (state, props) => {
+    const { userBookmarkNovels } = state;
+    const userId = props.userId || props.route.params.userId;
+    return {
+      userBookmarkNovels: userBookmarkNovels[userId],
+      items: getUserBookmarkNovelsItems(state, props),
+      userId,
+      listKey: `${props.route.key}-userbookmarkNovels`,
     };
-  },
-  userBookmarkNovelsActionCreators,
-)(UserBookmarkNovels);
+  };
+}, userBookmarkNovelsActionCreators)(UserBookmarkNovels);

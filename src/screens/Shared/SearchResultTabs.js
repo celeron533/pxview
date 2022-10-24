@@ -26,8 +26,8 @@ const styles = StyleSheet.create({
 class SearchResultTabs extends Component {
   constructor(props) {
     super(props);
-    const { word, navigation } = props;
-    const { searchType } = navigation.state.params;
+    const { word, route } = props;
+    const { searchType } = route.params;
     this.state = {
       searchType,
       newSearchType: searchType,
@@ -37,17 +37,55 @@ class SearchResultTabs extends Component {
     };
   }
 
+  componentDidUpdate(prevProps) {
+    const { route } = this.props;
+    const { route: prevRoute } = prevProps;
+    if (
+      route?.params?.target !== prevRoute?.params.target ||
+      route?.params?.period !== prevRoute?.params.period ||
+      route?.params?.sort !== prevRoute?.params.sort ||
+      route?.params?.startDate !== prevRoute?.params.startDate ||
+      route?.params?.endDate !== prevRoute?.params.endDate ||
+      route?.params?.bookmarkNumMin !== prevRoute?.params.bookmarkNumMin ||
+      route?.params?.bookmarkNumMax !== prevRoute?.params.bookmarkNumMax ||
+      route?.params?.bookmarkCountsTag !== prevRoute?.params.bookmarkCountsTag
+    ) {
+      const {
+        target,
+        period,
+        sort,
+        startDate,
+        endDate,
+        bookmarkNumMin,
+        bookmarkNumMax,
+        bookmarkCountsTag,
+      } = route.params;
+      this.setState({
+        searchOptions: {
+          search_target: target,
+          period,
+          sort,
+          start_date: startDate,
+          end_date: endDate,
+          bookmark_num_min: bookmarkNumMin,
+          bookmark_num_max: bookmarkNumMax,
+          bookmarkCountsTag,
+        },
+      });
+    }
+  }
+
   handleOnFocusSearchBar = () => {
     this.setState({ isFocusSearchBar: true });
   };
 
-  handleOnChangeSearchText = word => {
+  handleOnChangeSearchText = (word) => {
     this.setState({ newWord: word });
   };
 
   handleOnPressShowFilterModal = () => {
     const { word, navigation } = this.props;
-    const { navigate, goBack } = navigation;
+    const { navigate } = navigation;
     const { searchOptions, newSearchType } = this.state;
     Keyboard.dismiss();
     this.setState({
@@ -58,28 +96,6 @@ class SearchResultTabs extends Component {
         word,
         searchFilter: searchOptions || {},
         searchType: newSearchType,
-        onPressApplyFilter: (
-          searchTarget,
-          period,
-          sort,
-          startDate,
-          endDate,
-          bookmarkNumMin,
-          bookmarkNumMax,
-        ) => {
-          goBack(null);
-          this.setState({
-            searchOptions: {
-              search_target: searchTarget,
-              period,
-              sort,
-              start_date: startDate,
-              end_date: endDate,
-              bookmark_num_min: bookmarkNumMin,
-              bookmark_num_max: bookmarkNumMax,
-            },
-          });
-        },
       });
     });
   };
@@ -127,7 +143,7 @@ class SearchResultTabs extends Component {
     return false;
   };
 
-  handleOnSubmitSearch = word => {
+  handleOnSubmitSearch = (word) => {
     const { setParams } = this.props.navigation;
     const { searchType, newSearchType } = this.state;
     Keyboard.dismiss();
@@ -146,7 +162,7 @@ class SearchResultTabs extends Component {
     return true;
   };
 
-  handleOnChangePill = index => {
+  handleOnChangePill = (index) => {
     const newState = {};
     if (index === 0) {
       newState.newSearchType = SEARCH_TYPES.ILLUST;
@@ -158,7 +174,7 @@ class SearchResultTabs extends Component {
     this.setState(newState);
   };
 
-  renderContent() {
+  renderContent = () => {
     const { word, navigation, navigationStateKey } = this.props;
     const { searchOptions, searchType } = this.state;
     switch (searchType) {
@@ -191,7 +207,7 @@ class SearchResultTabs extends Component {
       default:
         return null;
     }
-  }
+  };
 
   render() {
     const { navigation } = this.props;
@@ -241,8 +257,8 @@ class SearchResultTabs extends Component {
 export default connectLocalization(
   connect(
     (state, props) => ({
-      word: props.navigation.state.params.word,
-      navigationStateKey: props.navigation.state.key,
+      word: props.route.params.word,
+      navigationStateKey: props.route.key,
     }),
     {
       ...searchAutoCompleteActionCreators,

@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { reducer as network } from 'react-native-offline';
 import entities from './entities';
 import walkthroughIllusts from './walkthroughIllusts';
 import recommendedIllusts from './recommendedIllusts';
@@ -68,6 +69,8 @@ import saveImageSettings from './saveImageSettings';
 import initialScreenSettings from './initialScreenSettings';
 import novelSettings from './novelSettings';
 import likeButtonSettings from './likeButtonSettings';
+import readingSettings from './readingSettings';
+import trendingSearchSettings from './trendingSearchSettings';
 import i18n from './i18n';
 import theme from './theme';
 import error from './error';
@@ -143,8 +146,11 @@ const rootReducer = combineReducers({
   initialScreenSettings,
   novelSettings,
   likeButtonSettings,
+  readingSettings,
+  trendingSearchSettings,
   i18n,
   theme,
+  network,
 });
 
 export default rootReducer;

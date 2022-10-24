@@ -27,9 +27,9 @@ class NovelRankingList extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { options: prevOptions } = this.props;
-    const { options, rankingMode, fetchRanking, clearRanking } = nextProps;
+  componentDidUpdate(prevProps) {
+    const { options, rankingMode, fetchRanking, clearRanking } = this.props;
+    const { options: prevOptions } = prevProps;
     if (
       options &&
       (options.mode !== prevOptions.mode || options.date !== prevOptions.date)
@@ -72,17 +72,14 @@ class NovelRankingList extends Component {
   }
 }
 
-export default connect(
-  () => {
-    const getRankingItems = makeGetNovelRankingItems();
-    return (state, props) => {
-      const { ranking } = state;
-      return {
-        ranking: ranking[props.rankingMode],
-        items: getRankingItems(state, props),
-        listKey: `${props.navigation.state.key}-${props.rankingMode}`,
-      };
+export default connect(() => {
+  const getRankingItems = makeGetNovelRankingItems();
+  return (state, props) => {
+    const { ranking } = state;
+    return {
+      ranking: ranking[props.rankingMode],
+      items: getRankingItems(state, props),
+      listKey: `${props.route.key}-${props.rankingMode}`,
     };
-  },
-  rankingActionCreators,
-)(NovelRankingList);
+  };
+}, rankingActionCreators)(NovelRankingList);

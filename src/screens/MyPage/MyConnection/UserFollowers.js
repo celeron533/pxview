@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import UserListContainer from '../../../containers/UserListContainer';
+import UserList from '../../../components/UserList';
 import { connectLocalization } from '../../../components/Localization';
 import EmptyStateView from '../../../components/EmptyStateView';
 import * as userFollowersActionCreators from '../../../common/actions/userFollowers';
@@ -38,7 +38,7 @@ class UserFollowers extends Component {
       );
     }
     return (
-      <UserListContainer
+      <UserList
         userList={{ ...userFollowers, items }}
         loadMoreItems={this.loadMoreItems}
         onRefresh={this.handleOnRefresh}
@@ -48,19 +48,16 @@ class UserFollowers extends Component {
 }
 
 export default connectLocalization(
-  connect(
-    () => {
-      const getUserFollowersItems = makeGetUserFollowersItems();
-      return (state, props) => {
-        const { userFollowers } = state;
-        const userId = props.userId || props.navigation.state.params.userId;
-        return {
-          userFollowers: userFollowers[userId],
-          items: getUserFollowersItems(state, props),
-          userId,
-        };
+  connect(() => {
+    const getUserFollowersItems = makeGetUserFollowersItems();
+    return (state, props) => {
+      const { userFollowers } = state;
+      const userId = props.userId || props.route.params.userId;
+      return {
+        userFollowers: userFollowers[userId],
+        items: getUserFollowersItems(state, props),
+        userId,
       };
-    },
-    userFollowersActionCreators,
-  )(UserFollowers),
+    };
+  }, userFollowersActionCreators)(UserFollowers),
 );

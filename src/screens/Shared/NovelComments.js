@@ -13,6 +13,7 @@ import NovelCommentReplies from '../../containers/NovelCommentReplies';
 import enhancePostComment from '../../components/HOC/enhancePostComment';
 import CommentList from '../../components/CommentList';
 import ViewMoreButton from '../../components/ViewMoreButton';
+import Loader from '../../components/Loader';
 import * as novelCommentsActionCreators from '../../common/actions/novelComments';
 import { makeGetNovelCommentsItems } from '../../common/selectors';
 import { globalStyles } from '../../styles';
@@ -44,6 +45,26 @@ class NovelComments extends Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    const {
+      route,
+      navigation: { setParams },
+      novelId,
+    } = this.props;
+    const { route: prevRoute } = prevProps;
+    if (
+      route.params?.reload &&
+      !prevRoute.params?.reload &&
+      route.params?.fromId === novelId
+    ) {
+      this.handleOnSubmitComment();
+      setParams({
+        reload: false,
+        fromId: null,
+      });
+    }
+  }
+
   loadMoreItems = () => {
     const { fetchNovelComments, novelComments, novelId } = this.props;
     if (novelComments && !novelComments.loading && novelComments.nextUrl) {
@@ -70,34 +91,42 @@ class NovelComments extends Component {
   };
 
   handleOnPressCommentButton = () => {
-    const { checkIfUserEligibleToPostComment } = this.props;
+    const {
+      checkIfUserEligibleToPostComment,
+      novelId,
+      navigation: { navigate },
+      route,
+    } = this.props;
     const isEligible = checkIfUserEligibleToPostComment();
     if (isEligible) {
-      const {
-        novelId,
-        navigation: { navigate },
-      } = this.props;
       navigate(SCREENS.AddNovelComment, {
         novelId,
-        onSubmitComment: this.handleOnSubmitComment,
+        navigateFrom: {
+          name: route.name,
+          key: route.key,
+        },
       });
     }
   };
 
-  handleOnPressReplyCommentButton = commentItem => {
-    const { checkIfUserEligibleToPostComment } = this.props;
+  handleOnPressReplyCommentButton = (commentItem) => {
+    const {
+      checkIfUserEligibleToPostComment,
+      novelId,
+      authorId,
+      navigation: { navigate },
+      route,
+    } = this.props;
     const isEligible = checkIfUserEligibleToPostComment();
     if (isEligible) {
-      const {
-        novelId,
-        authorId,
-        navigation: { navigate },
-      } = this.props;
       navigate(SCREENS.ReplyNovelComment, {
         novelId,
         authorId,
         commentItem,
-        onSubmitComment: this.handleOnSubmitComment,
+        navigateFrom: {
+          name: route.name,
+          key: route.key,
+        },
       });
     }
   };
@@ -108,7 +137,7 @@ class NovelComments extends Component {
     fetchNovelComments(novelId);
   };
 
-  renderCommentReplies = commentId => {
+  renderCommentReplies = (commentId) => {
     const { authorId, navigation } = this.props;
     return (
       <NovelCommentReplies
@@ -132,22 +161,26 @@ class NovelComments extends Component {
       user,
       navigation,
       isFeatureInDetailPage,
+      isDetailPageReady,
       maxItems,
     } = this.props;
     return (
       <SafeAreaView style={globalStyles.container}>
-        <CommentList
-          authorId={authorId}
-          data={{ ...novelComments, items }}
-          loadMoreItems={!isFeatureInDetailPage ? this.loadMoreItems : null}
-          onRefresh={!isFeatureInDetailPage ? this.handleOnRefresh : null}
-          maxItems={isFeatureInDetailPage && maxItems}
-          navigation={navigation}
-          user={user}
-          renderCommentReplies={this.renderCommentReplies}
-          onPressReplyCommentButton={this.handleOnPressReplyCommentButton}
-        />
-        {isFeatureInDetailPage && (
+        {isFeatureInDetailPage && !isDetailPageReady && <Loader />}
+        {(!isFeatureInDetailPage || isDetailPageReady) && (
+          <CommentList
+            authorId={authorId}
+            data={{ ...novelComments, items }}
+            loadMoreItems={!isFeatureInDetailPage ? this.loadMoreItems : null}
+            onRefresh={!isFeatureInDetailPage ? this.handleOnRefresh : null}
+            maxItems={isFeatureInDetailPage && maxItems}
+            navigation={navigation}
+            user={user}
+            renderCommentReplies={this.renderCommentReplies}
+            onPressReplyCommentButton={this.handleOnPressReplyCommentButton}
+          />
+        )}
+        {isFeatureInDetailPage && isDetailPageReady && (
           <View style={styles.viewMoreButtonContainer}>
             <ViewMoreButton onPress={this.handleOnPressViewMoreComments} />
           </View>
@@ -167,22 +200,18 @@ class NovelComments extends Component {
 }
 
 export default enhancePostComment(
-  connect(
-    () => {
-      const getNovelCommentsItems = makeGetNovelCommentsItems();
-      return (state, props) => {
-        const { novelComments } = state;
-        const novelId = props.novelId || props.navigation.state.params.novelId;
-        const authorId =
-          props.authorId || props.navigation.state.params.authorId;
-        return {
-          novelComments: novelComments[novelId],
-          items: getNovelCommentsItems(state, props),
-          novelId,
-          authorId,
-        };
+  connect(() => {
+    const getNovelCommentsItems = makeGetNovelCommentsItems();
+    return (state, props) => {
+      const { novelComments } = state;
+      const novelId = props.novelId || props.route.params.novelId;
+      const authorId = props.authorId || props.route.params.authorId;
+      return {
+        novelComments: novelComments[novelId],
+        items: getNovelCommentsItems(state, props),
+        novelId,
+        authorId,
       };
-    },
-    novelCommentsActionCreators,
-  )(NovelComments),
+    };
+  }, novelCommentsActionCreators)(NovelComments),
 );

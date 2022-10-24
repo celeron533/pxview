@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Button } from 'react-native-elements';
-import UserListContainer from '../../../containers/UserListContainer';
+import { Button } from 'react-native-paper';
+import UserList from '../../../components/UserList';
 import { connectLocalization } from '../../../components/Localization';
 import EmptyStateView from '../../../components/EmptyStateView';
 import * as userFollowingActionCreators from '../../../common/actions/userFollowing';
@@ -45,7 +45,9 @@ class UserFollowing extends Component {
   };
 
   handleOnPressFindRecommendedUsers = () => {
-    const { push } = this.props.navigation;
+    const {
+      navigation: { push },
+    } = this.props;
     push(SCREENS.RecommendedUsers);
   };
 
@@ -59,17 +61,17 @@ class UserFollowing extends Component {
           title={i18n.noFollowUser}
           actionButton={
             <Button
-              title={i18n.recommendedUsersFind}
-              backgroundColor={globalStyleVariables.PRIMARY_COLOR}
+              mode="contained"
               onPress={this.handleOnPressFindRecommendedUsers}
-              raised
-            />
+            >
+              {i18n.recommendedUsersFind}
+            </Button>
           }
         />
       );
     }
     return (
-      <UserListContainer
+      <UserList
         userList={{ ...userFollowing, items }}
         loadMoreItems={this.loadMoreItems}
         onRefresh={this.handleOnRefresh}
@@ -79,22 +81,19 @@ class UserFollowing extends Component {
 }
 
 export default connectLocalization(
-  connect(
-    () => {
-      const getUserFollowingItems = makeGetUserFollowingItems();
-      return (state, props) => {
-        const { userFollowing } = state;
-        const userId = props.userId || props.navigation.state.params.userId;
-        const followingType =
-          props.followingType || props.navigation.state.params.followingType;
-        return {
-          userFollowing: userFollowing[followingType][userId],
-          items: getUserFollowingItems(state, props),
-          userId,
-          followingType,
-        };
+  connect(() => {
+    const getUserFollowingItems = makeGetUserFollowingItems();
+    return (state, props) => {
+      const { userFollowing } = state;
+      const userId = props.userId || props.route.params.userId;
+      const followingType =
+        props.followingType || props.route.params.followingType;
+      return {
+        userFollowing: userFollowing[followingType][userId],
+        items: getUserFollowingItems(state, props),
+        userId,
+        followingType,
       };
-    },
-    userFollowingActionCreators,
-  )(UserFollowing),
+    };
+  }, userFollowingActionCreators)(UserFollowing),
 );

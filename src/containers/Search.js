@@ -64,7 +64,7 @@ class Search extends Component {
     };
   }
 
-  submitSearch = word => {
+  submitSearch = (word) => {
     word = word.trim();
     if (word) {
       const { onSubmitSearch, addSearchHistory } = this.props;
@@ -75,21 +75,21 @@ class Search extends Component {
     }
   };
 
-  handleOnPressAutoCompleteItem = word => {
+  handleOnPressAutoCompleteItem = (word) => {
     this.submitSearch(word);
   };
 
-  handleOnPressSearchHistoryItem = word => {
+  handleOnPressSearchHistoryItem = (word) => {
     this.submitSearch(word);
   };
 
-  handleOnPressUser = userId => {
+  handleOnPressUser = (userId) => {
     const { navigation } = this.props;
     const { push } = navigation;
     push(SCREENS.UserDetail, { userId });
   };
 
-  handleOnPressRemoveSearchHistoryItem = item => {
+  handleOnPressRemoveSearchHistoryItem = (item) => {
     const { removeSearchHistory } = this.props;
     removeSearchHistory(item);
   };
@@ -109,7 +109,7 @@ class Search extends Component {
     }
   };
 
-  handleOnPressPill = index => {
+  handleOnPressPill = (index) => {
     const newState = {
       index,
     };
@@ -151,12 +151,7 @@ class Search extends Component {
   };
 
   renderContent = () => {
-    const {
-      word,
-      searchAutoComplete,
-      searchUsersAutoComplete,
-      searchHistory,
-    } = this.props;
+    const { word, searchAutoComplete, searchUsersAutoComplete } = this.props;
     const { index } = this.state;
     switch (index) {
       case 0:
@@ -164,7 +159,6 @@ class Search extends Component {
           null
           // <SearchAutoCompleteResult
           //   searchAutoComplete={searchAutoComplete}
-          //   searchHistory={searchHistory}
           //   onPressItem={this.handleOnPressAutoCompleteItem}
           //   onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
           //   onPressRemoveSearchHistoryItem={
@@ -179,7 +173,6 @@ class Search extends Component {
           null
           // <SearchAutoCompleteResult
           //   searchAutoComplete={searchAutoComplete}
-          //   searchHistory={searchHistory}
           //   onPressItem={this.handleOnPressAutoCompleteItem}
           //   onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
           //   onPressRemoveSearchHistoryItem={
@@ -191,18 +184,18 @@ class Search extends Component {
         );
       case 2:
         return (
-          <SearchUsersAutoCompleteResult
-            searchUsersAutoComplete={searchUsersAutoComplete}
-            searchHistory={searchHistory}
-            onPressItem={this.handleOnPressUser}
-            onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
-            onPressRemoveSearchHistoryItem={
-              this.handleOnPressRemoveSearchHistoryItem
-            }
-            onPressClearSearchHistory={this.handleOnPressClearSearchHistory}
-            loadMoreItems={this.loadMoreUsers}
-            word={word}
-          />
+          null
+          // <SearchUsersAutoCompleteResult
+          //   searchUsersAutoComplete={searchUsersAutoComplete}
+          //   onPressItem={this.handleOnPressUser}
+          //   onPressSearchHistoryItem={this.handleOnPressSearchHistoryItem}
+          //   onPressRemoveSearchHistoryItem={
+          //     this.handleOnPressRemoveSearchHistoryItem
+          //   }
+          //   onPressClearSearchHistory={this.handleOnPressClearSearchHistory}
+          //   loadMoreItems={this.loadMoreUsers}
+          //   word={word}
+          // />
         );
       default:
         return null;
@@ -226,7 +219,6 @@ export default connectLocalization(
       return {
         searchAutoComplete: state.searchAutoComplete,
         searchUsersAutoComplete: state.searchUsersAutoComplete,
-        searchHistory: state.searchHistory,
         word,
       };
     },

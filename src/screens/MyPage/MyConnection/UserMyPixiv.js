@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import UserListContainer from '../../../containers/UserListContainer';
+import UserList from '../../../components/UserList';
 import * as userMyPixivActionCreators from '../../../common/actions/userMyPixiv';
 import { makeGetUserMyPixivItems } from '../../../common/selectors';
 
@@ -27,7 +27,7 @@ class UserMyPixiv extends Component {
   render() {
     const { userMyPixiv, items } = this.props;
     return (
-      <UserListContainer
+      <UserList
         userList={{ ...userMyPixiv, items }}
         loadMoreItems={this.loadMoreItems}
         onRefresh={this.handleOnRefresh}
@@ -36,18 +36,15 @@ class UserMyPixiv extends Component {
   }
 }
 
-export default connect(
-  () => {
-    const getUserMyPixivItems = makeGetUserMyPixivItems();
-    return (state, props) => {
-      const { userMyPixiv } = state;
-      const userId = props.userId || props.navigation.state.params.userId;
-      return {
-        userMyPixiv: userMyPixiv[userId],
-        items: getUserMyPixivItems(state, props),
-        userId,
-      };
+export default connect(() => {
+  const getUserMyPixivItems = makeGetUserMyPixivItems();
+  return (state, props) => {
+    const { userMyPixiv } = state;
+    const userId = props.userId || props.route.params.userId;
+    return {
+      userMyPixiv: userMyPixiv[userId],
+      items: getUserMyPixivItems(state, props),
+      userId,
     };
-  },
-  userMyPixivActionCreators,
-)(UserMyPixiv);
+  };
+}, userMyPixivActionCreators)(UserMyPixiv);

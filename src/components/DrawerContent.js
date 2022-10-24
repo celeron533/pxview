@@ -1,8 +1,12 @@
 import React, { Component } from 'react';
-import { View, ScrollView, Alert, Linking } from 'react-native';
+import { View, Alert } from 'react-native';
 import { connect } from 'react-redux';
-import { withNavigation } from 'react-navigation';
-import { DrawerNavigatorItems, DrawerActions } from 'react-navigation-drawer';
+// import { DrawerNavigatorItems, DrawerActions } from 'react-navigation-drawer';
+import {
+  DrawerContentScrollView,
+  DrawerItemList,
+  DrawerItem,
+} from '@react-navigation/drawer';
 import { withTheme } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/FontAwesome';
 // import CookieManager from 'react-native-cookies';
@@ -24,25 +28,36 @@ const menuList = [
     title: 'myWorks',
     icon: 'picture-o',
     type: 'font-awesome',
-    size: 22,
+    labelStyle: {
+      marginLeft: -2,
+    },
   },
   {
     id: 'connection',
     title: 'connection',
     icon: 'users',
     type: 'font-awesome',
+    labelStyle: {
+      marginLeft: -2,
+    },
   },
   {
     id: 'collection',
     title: 'collection',
     icon: 'heart',
     type: 'font-awesome',
+    labelStyle: {
+      marginLeft: -1,
+    },
   },
   {
     id: 'browsingHistory',
     title: 'browsingHistory',
     icon: 'clock-o',
     type: 'font-awesome',
+    labelStyle: {
+      marginLeft: 2,
+    },
   },
 ];
 
@@ -52,6 +67,9 @@ const menuList2 = [
     title: 'settings',
     icon: 'cog',
     type: 'font-awesome',
+    labelStyle: {
+      marginLeft: 1,
+    },
   },
   // {
   //   id: 'feedback',
@@ -64,12 +82,18 @@ const menuList2 = [
     title: 'visitWebsite',
     icon: 'external-link',
     type: 'font-awesome',
+    labelStyle: {
+      marginLeft: -2,
+    },
   },
   {
     id: 'logout',
     title: 'logout',
     icon: 'sign-out',
     type: 'font-awesome',
+    labelStyle: {
+      marginLeft: -1,
+    },
   },
 ];
 
@@ -88,12 +112,9 @@ class DrawerContent extends Component {
   };
 
   handleOnDrawerItemPress = (item, focused) => {
-    const {
-      user,
-      navigation: { navigate, dispatch },
-    } = this.props;
-    // navigation.closeDrawer();
-    dispatch(DrawerActions.closeDrawer());
+    const { user, navigation } = this.props;
+    const { navigate } = navigation;
+    navigation.closeDrawer();
     if (!focused) {
       switch (item.id) {
         case 'works':
@@ -189,43 +210,48 @@ class DrawerContent extends Component {
   };
 
   handleOnPressAvatar = () => {
-    const {
-      user,
-      navigation: { navigate, dispatch },
-    } = this.props;
-    // navigation.closeDrawer();
-    dispatch(DrawerActions.closeDrawer());
+    const { user, navigation } = this.props;
+    const { navigate } = navigation;
+    navigation.closeDrawer();
     navigate(SCREENS.UserDetail, {
       userId: user.id,
     });
   };
 
   handleOnPressChangeTheme = () => {
-    const {
-      themeName,
-      setTheme,
-      navigation: { navigate },
-    } = this.props;
+    const { themeName, setTheme, navigation } = this.props;
     if (themeName === THEME_TYPES.DARK) {
       setTheme(THEME_TYPES.LIGHT);
     } else {
       setTheme(THEME_TYPES.DARK);
     }
-    navigate('DrawerClose');
+    navigation.closeDrawer();
   };
 
-  renderList = list => {
-    const { user, i18n } = this.props;
-    if (!user && list.some(l => l.id === 'logout')) {
-      list = list.filter(l => l.id !== 'logout');
+  renderList = (list) => {
+    const { user, i18n, theme } = this.props;
+    if (!user && list.some((l) => l.id === 'logout')) {
+      list = list.filter((l) => l.id !== 'logout');
     }
     return (
       <View>
-        {list.map(item => (
-          <DrawerNavigatorItem
+        {list.map((item) => (
+          <DrawerItem
             key={item.id}
             label={i18n[item.title]}
-            icon={<Icon name={item.icon} size={item.size || 24} />}
+            icon={({ focused, size }) => {
+              return (
+                <Icon
+                  name={item.icon}
+                  size={item.size || size}
+                  color={focused ? theme.colors.activeTint : theme.colors.text}
+                />
+              );
+            }}
+            inactiveTintColor={theme.colors.text}
+            activeBackgroundColor="#D3D3D3"
+            activeTintColor={theme.colors.activeTint}
+            labelStyle={item.labelStyle}
             onPress={() => this.handleOnDrawerItemPress(item)}
           />
         ))}
@@ -236,46 +262,45 @@ class DrawerContent extends Component {
   render() {
     const { theme } = this.props;
     return (
-      <View
+      <DrawerContentScrollView
         style={[
           globalStyles.container,
           { backgroundColor: theme.colors.surface },
         ]}
+        contentContainerStyle={{
+          paddingTop: 0,
+        }}
       >
-        <ScrollView>
-          {this.renderCover()}
-          <DrawerNavigatorItems
-            {...this.props}
-            inactiveTintColor={theme.colors.text}
-            activeBackgroundColor="#D3D3D3"
-            activeTintColor={theme.colors.activeTint}
-          />
-          <Separator noPadding />
-          {this.renderList(menuList)}
-          <Separator noPadding />
-          {this.renderList(menuList2)}
-        </ScrollView>
-      </View>
+        {this.renderCover()}
+        <DrawerItemList
+          {...this.props}
+          inactiveTintColor={theme.colors.text}
+          activeBackgroundColor="#D3D3D3"
+          activeTintColor={theme.colors.activeTint}
+        />
+        <Separator noPadding />
+        {this.renderList(menuList)}
+        <Separator noPadding />
+        {this.renderList(menuList2)}
+      </DrawerContentScrollView>
     );
   }
 }
 
 export default withTheme(
   connectLocalization(
-    withNavigation(
-      connect(
-        state => ({
-          user: state.auth.user,
-          themeName: state.theme.name,
-        }),
-        {
-          ...authActionCreators,
-          ...browsingHistoryIllustsActionCreators,
-          ...browsingHistoryNovelsActionCreators,
-          ...searchHistoryActionCreators,
-          ...themeActionCreators,
-        },
-      )(DrawerContent),
-    ),
+    connect(
+      (state) => ({
+        user: state.auth.user,
+        themeName: state.theme.name,
+      }),
+      {
+        ...authActionCreators,
+        ...browsingHistoryIllustsActionCreators,
+        ...browsingHistoryNovelsActionCreators,
+        ...searchHistoryActionCreators,
+        ...themeActionCreators,
+      },
+    )(DrawerContent),
   ),
 );

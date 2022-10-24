@@ -18,17 +18,6 @@ const styles = StyleSheet.create({
 });
 
 class MyCollection extends Component {
-  static navigationOptions = ({ navigation }) => {
-    const { setParams } = navigation;
-    return {
-      headerRight: (
-        <HeaderFilterButton
-          onPress={() => setParams({ isOpenFilterModal: true })}
-        />
-      ),
-    };
-  };
-
   constructor(props) {
     super(props);
     const { i18n } = props;
@@ -44,31 +33,32 @@ class MyCollection extends Component {
       selectedPrivateIllustTag: '',
       selectedPublicNovelTag: '',
       selectedPrivateNovelTag: '',
+      isOpenFilterModal: false,
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { lang: prevLang } = this.props;
-    const { lang, i18n } = nextProps;
-    if (lang !== prevLang) {
-      this.setState({
-        routes: [
-          { key: '1', title: i18n.illustration },
-          // { key: '2', title: i18n.illustrationPrivate },
-          { key: '3', title: i18n.novel },
-          // { key: '4', title: i18n.novelPrivate },
-        ],
-      });
-    }
+  componentDidMount() {
+    this.setHeaderRight();
   }
 
-  handleChangeTab = index => {
+  setHeaderRight = () => {
+    const {
+      navigation: { setOptions },
+    } = this.props;
+    setOptions({
+      headerRight: () => (
+        <HeaderFilterButton onPress={this.handleOnPressOpenFilterModal} />
+      ),
+    });
+  };
+
+  handleChangeTab = (index) => {
     this.setState({ index });
   };
 
   renderScene = ({ route }) => {
-    const { navigation } = this.props;
-    const { userId } = navigation.state.params;
+    const { navigation, route: navigationRoute } = this.props;
+    const { userId } = navigationRoute.params;
     const {
       selectedPublicIllustTag,
       selectedPrivateIllustTag,
@@ -83,6 +73,7 @@ class MyCollection extends Component {
             tag={selectedPublicIllustTag}
             reload
             navigation={navigation}
+            route={route}
           />
         );
       // case '2':
@@ -91,6 +82,7 @@ class MyCollection extends Component {
       //       userId={userId}
       //       tag={selectedPrivateIllustTag}
       //       navigation={navigation}
+      //       route={route}
       //     />
       //   );
       case '3':
@@ -100,6 +92,7 @@ class MyCollection extends Component {
             tag={selectedPublicNovelTag}
             reload
             navigation={navigation}
+            route={route}
           />
         );
       // case '4':
@@ -108,6 +101,7 @@ class MyCollection extends Component {
       //       userId={userId}
       //       tag={selectedPrivateNovelTag}
       //       navigation={navigation}
+      //       route={route}
       //     />
       //   );
       default:
@@ -115,21 +109,23 @@ class MyCollection extends Component {
     }
   };
 
+  handleOnPressOpenFilterModal = () => {
+    this.setState({
+      isOpenFilterModal: true,
+    });
+  };
+
   handleOnPressCloseFilterButton = () => {
-    const {
-      navigation: { setParams },
-    } = this.props;
-    setParams({
+    this.setState({
       isOpenFilterModal: false,
     });
   };
 
-  handleOnSelectTag = tag => {
-    const {
-      navigation: { setParams },
-    } = this.props;
+  handleOnSelectTag = (tag) => {
     const { index } = this.state;
-    const newState = {};
+    const newState = {
+      isOpenFilterModal: false,
+    };
     switch (index) {
       case 0:
         newState.selectedPublicIllustTag = tag;
@@ -146,16 +142,12 @@ class MyCollection extends Component {
       default:
         break;
     }
-    setParams({
-      isOpenFilterModal: false,
-    });
     this.setState(newState);
   };
 
   render() {
-    const isOpenFilterModal =
-      this.props.navigation.state.params.isOpenFilterModal || false;
     const {
+      isOpenFilterModal,
       index,
       selectedPublicIllustTag,
       selectedPrivateIllustTag,
@@ -168,9 +160,7 @@ class MyCollection extends Component {
           navigationState={this.state}
           renderScene={this.renderScene}
           onIndexChange={this.handleChangeTab}
-          // tabBarProps={{
-          //   scrollEnabled: true,
-          // }}
+          scrollEnabled
         />
         {index === 0 && (
           // <IllustTagsFilterModal

@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
@@ -109,15 +109,15 @@ class DetailInfoModal extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    const { visible } = nextProps;
-    const { visible: prevVisible } = this.props;
+  componentDidUpdate(prevProps) {
+    const { visible } = this.props;
+    const { visible: prevVisible } = prevProps;
     if (visible !== null && visible !== prevVisible) {
       this.setModalVisible(visible);
     }
   }
 
-  setModalVisible = visible => {
+  setModalVisible = (visible) => {
     const { height, duration } = this.props;
     const { modalVisible, animatedHeight } = this.state;
     if (visible && !modalVisible) {
@@ -125,11 +125,13 @@ class DetailInfoModal extends Component {
       Animated.timing(animatedHeight, {
         toValue: height,
         duration,
+        useNativeDriver: false,
       }).start();
     } else if (!visible && modalVisible) {
       Animated.timing(animatedHeight, {
         toValue: 0,
         duration,
+        useNativeDriver: false,
       }).start(() => {
         this.setState({ modalVisible: visible });
       });
@@ -141,22 +143,25 @@ class DetailInfoModal extends Component {
   };
 
   handleOnPressAvatar = () => {
-    const { onPressAvatar, item } = this.props;
-    onPressAvatar(item.user.id);
+    const {
+      navigation: { push },
+      item,
+    } = this.props;
+    push(SCREENS.UserDetail, { userId: item.user.id });
   };
 
-  handleOnPressLink = url => {
+  handleOnPressLink = (url) => {
     Linking.canOpenURL(url)
-      .then(supported => {
+      .then((supported) => {
         if (!supported) {
           return null;
         }
         return Linking.openURL(url);
       })
-      .catch(err => err);
+      .catch((err) => err);
   };
 
-  handleOnPressTag = tag => {
+  handleOnPressTag = (tag) => {
     const {
       addSearchHistory,
       navigation: { push },
@@ -168,7 +173,7 @@ class DetailInfoModal extends Component {
     });
   };
 
-  handleOnLongPressTag = tag => {
+  handleOnLongPressTag = (tag) => {
     this.setState({
       isOpenTagBottomSheet: true,
       selectedTag: tag,
@@ -179,6 +184,11 @@ class DetailInfoModal extends Component {
     this.setState({
       isOpenTagBottomSheet: false,
     });
+  };
+
+  renderHtmlViewTextComponent = (props) => {
+    // eslint-disable-next-line react/jsx-props-no-spreading
+    return <Text {...props} />;
   };
 
   render() {
@@ -192,6 +202,7 @@ class DetailInfoModal extends Component {
       highlightTags,
       muteTags,
       theme,
+      route,
     } = this.props;
     const {
       animatedHeight,
@@ -203,7 +214,7 @@ class DetailInfoModal extends Component {
       return null;
     }
     return (
-      <Fragment>
+      <>
         <TouchableWithoutFeedback onPress={onCancel}>
           <View style={styles.backdropContainer} />
         </TouchableWithoutFeedback>
@@ -245,7 +256,7 @@ class DetailInfoModal extends Component {
                     value={item.caption}
                     onLinkPress={this.handleOnPressLink}
                     textComponentProps={{ selectable: true }}
-                    TextComponent={Text}
+                    TextComponent={this.renderHtmlViewTextComponent}
                   />
                 </View>
                 <View style={styles.statContainer}>
@@ -278,16 +289,20 @@ class DetailInfoModal extends Component {
                     novelId={item.id}
                     authorId={item.user.id}
                     isFeatureInDetailPage
+                    isDetailPageReady
                     maxItems={6}
                     navigation={navigation}
+                    route={route}
                   />
                 ) : (
                   <IllustComments
                     illustId={item.id}
                     authorId={item.user.id}
                     isFeatureInDetailPage
+                    isDetailPageReady
                     maxItems={6}
                     navigation={navigation}
+                    route={route}
                   />
                 )}
               </View>
@@ -298,10 +313,12 @@ class DetailInfoModal extends Component {
                   </View>
                   <RelatedIllusts
                     illustId={item.id}
-                    listKey={`relatedIllusts-${navigation.state.key}-${item.id}`}
+                    listKey={`relatedIllusts-${route.key}-${item.id}`}
                     isFeatureInDetailPage
+                    isDetailPageReady
                     maxItems={6}
                     navigation={navigation}
+                    route={route}
                   />
                 </View>
               )}
@@ -319,8 +336,10 @@ class DetailInfoModal extends Component {
                     seriesId={item.series.id}
                     seriesTitle={item.series.title}
                     isFeatureInDetailPage
+                    isDetailPageReady
                     maxItems={6}
                     navigation={navigation}
+                    route={route}
                   />
                 </View>
               )}
@@ -335,23 +354,20 @@ class DetailInfoModal extends Component {
           navigation={navigation}
           onCancel={this.handleOnCancelTagBottomSheet}
         />
-      </Fragment>
+      </>
     );
   }
 }
 
 export default withTheme(
   connectLocalization(
-    connect(
-      () => {
-        const getTagsWithStatus = makeGetTagsWithStatus();
-        return (state, props) => ({
-          highlightTags: state.highlightTags.items,
-          muteTags: state.muteTags.items,
-          tags: getTagsWithStatus(state, props),
-        });
-      },
-      searchHistoryActionCreators,
-    )(DetailInfoModal),
+    connect(() => {
+      const getTagsWithStatus = makeGetTagsWithStatus();
+      return (state, props) => ({
+        highlightTags: state.highlightTags.items,
+        muteTags: state.muteTags.items,
+        tags: getTagsWithStatus(state, props),
+      });
+    }, searchHistoryActionCreators)(DetailInfoModal),
   ),
 );
