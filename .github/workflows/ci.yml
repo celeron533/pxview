@@ -51,9 +51,9 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Install react-native-cli
-        run: |
-          npm install -g react-native-cli
+      # - name: Install react-native-cli
+      #   run: |
+      #     npm install -g react-native-cli
 
       - name: Install node modules
         run: |
