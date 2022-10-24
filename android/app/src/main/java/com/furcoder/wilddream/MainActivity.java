@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:android/app/src/main/java/com/furcoder/wilddream/MainActivity.java
 package com.furcoder.wilddream;
-========
-package com.utopia.pxviewr;
->>>>>>>> upstream/master:android/app/src/main/java/com/utopia/pxviewr/MainActivity.java
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity;
@@ -19,11 +15,7 @@ public class MainActivity extends ReactActivity {
      */
     @Override
     protected String getMainComponentName() {
-<<<<<<<< HEAD:android/app/src/main/java/com/furcoder/wilddream/MainActivity.java
         return "WildDream";
-========
-        return "PxViewR";
->>>>>>>> upstream/master:android/app/src/main/java/com/utopia/pxviewr/MainActivity.java
     }
 
     @Override

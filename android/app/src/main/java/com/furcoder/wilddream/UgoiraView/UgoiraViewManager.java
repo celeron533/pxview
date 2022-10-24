@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:android/app/src/main/java/com/furcoder/wilddream/UgoiraView/UgoiraViewManager.java
 package com.furcoder.wilddream.UgoiraView;
-========
-package com.utopia.pxviewr.UgoiraView;
->>>>>>>> upstream/master:android/app/src/main/java/com/utopia/pxviewr/UgoiraView/UgoiraViewManager.java
 
 
 import com.facebook.react.bridge.ReadableArray;
