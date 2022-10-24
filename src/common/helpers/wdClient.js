@@ -2,6 +2,9 @@
 
 'use strict';
 
+import DeviceInfo from 'react-native-device-info';
+import * as RNLocalize from 'react-native-localize';
+
 const axios = require('axios');
 const qs = require('qs');
 const md5 = require('blueimp-md5');
@@ -14,9 +17,7 @@ const HASH_SECRET =
   '28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c';
 const filter = 'for_ios';
 const WD_BASE_URL = 'https://www.wilddream.net/art/api';
-const WD_POST_URL = 'https://static.zjuapa.com/art/api'
-
-// axios.defaults.withCredentials = true
+// const WD_POST_URL = 'https://static.zjuapa.com/art/api'
 
 function callApi(url, options) {
   const finalUrl = /^https?:\/\//i.test(url) ? url : BASE_URL + url;
@@ -40,15 +41,18 @@ function callApi(url, options) {
 }
 
 class WildDreamApi {
-  constructor() {
-    this.headers = {
-      // 'App-OS': 'ios',
-      // 'Accept-Language': 'en-us',
-      // 'App-OS-Version': '12.0.1',
-      // 'App-Version': '7.6.2',
-      'User-Agent': 'WildDreamApp',
-    };
-  }
+    constructor(options) {
+        this.headers = {
+            'App-OS': DeviceInfo.getSystemName(),
+            'Accept-Language': RNLocalize.getLocales()[0].languageTag,
+            'App-OS-Version': DeviceInfo.getSystemVersion(),
+            'App-Version': DeviceInfo.getVersion(),
+            'User-Agent': 'WildDreamApp for ' + DeviceInfo.getSystemName() + ' ' + DeviceInfo.getVersion(),
+        };
+        if (options && options.headers) {
+            this.headers = Object.assign({}, this.headers, options.headers);
+        }
+    }
 
   getDefaultHeaders() {
     const datetime = moment().format();
@@ -58,7 +62,7 @@ class WildDreamApi {
     });
   }
 
-  login(username, password, rememberPassword) {
+  login(username, password, rememberPassword) {  
     if (!username) {
       return Promise.reject(new Error('username required'));
     }
@@ -80,9 +84,9 @@ class WildDreamApi {
       headers: Object.assign(this.getDefaultHeaders(), {
         'Content-Type': 'application/x-www-form-urlencoded',
       }),
-      data,
-    }; 
-    return axios('https://static.zjuapa.com/art/api/login', options) 
+      data,      
+    };     
+    return axios(`${WD_BASE_URL}/login`, options) 
       .then(res => {
         this.auth = res.data;
         // eslint-disable-next-line no-unneeded-ternary
@@ -501,7 +505,7 @@ class WildDreamApi {
     return this.requestUrl(`/v1/user/bookmark-tags/novel?${queryString}`);
   }
 
-  illustWalkthrough() {
+  illustWalkthrough() {      
     return this.requestUrl(`${WD_BASE_URL}/illustranking/mode/year`);
   }
 
@@ -654,7 +658,7 @@ class WildDreamApi {
       },
       data,
     };
-    return this.requestUrl(`${WD_POST_URL}/addcomment/typeid/1`, options);
+    return this.requestUrl(`${WD_BASE_URL}/addcomment/typeid/1`, options);
   }
 
   novelAddComment(id, comment, parentCommentId) {
@@ -676,7 +680,7 @@ class WildDreamApi {
       },
       data,
     };
-    return this.requestUrl(`${WD_POST_URL}/addcomment/typeid/2`, options);
+    return this.requestUrl(`${WD_BASE_URL}/addcomment/typeid/2`, options);
   }
 
   trendingTagsIllust(options) {
@@ -725,7 +729,7 @@ class WildDreamApi {
       },
       data,
     };
-    return this.requestUrl(`${WD_POST_URL}/bookmark/typeid/1`, options);
+    return this.requestUrl(`${WD_BASE_URL}/bookmark/typeid/1`, options);
   }
 
   unbookmarkIllust(id) {
@@ -742,7 +746,7 @@ class WildDreamApi {
       },
       data,
     };
-    return this.requestUrl(`${WD_POST_URL}/unbookmark/typeid/1`, options);
+    return this.requestUrl(`${WD_BASE_URL}/unbookmark/typeid/1`, options);
   }
 
   bookmarkNovel(id, restrict, tags) {
@@ -767,7 +771,7 @@ class WildDreamApi {
       },
       data,
     };
-    return this.requestUrl(`${WD_POST_URL}/bookmark/typeid/2`, options);
+    return this.requestUrl(`${WD_BASE_URL}/bookmark/typeid/2`, options);
   }
 
   unbookmarkNovel(id) {
@@ -784,7 +788,7 @@ class WildDreamApi {
       },
       data,
     };
-    return this.requestUrl(`${WD_POST_URL}/bookmark/typeid/2`, options);
+    return this.requestUrl(`${WD_BASE_URL}/bookmark/typeid/2`, options);
   }
 
   followUser(id, restrict) {
@@ -805,7 +809,7 @@ class WildDreamApi {
       },
       data,
     };
-    return this.requestUrl(`${WD_POST_URL}/followuser`, options);
+    return this.requestUrl(`${WD_BASE_URL}/followuser`, options);
   }
 
   unfollowUser(id) {
@@ -824,7 +828,7 @@ class WildDreamApi {
       },
       data,
     };
-    return this.requestUrl(`${WD_POST_URL}/unfollowuser`, options);
+    return this.requestUrl(`${WD_BASE_URL}/unfollowuser`, options);
   }
 
   mangaRecommended(options) {

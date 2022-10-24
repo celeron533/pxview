@@ -40,13 +40,25 @@ const setProvisionalAccountOptions = (isProvisionalAccount, password) => ({
   password: isProvisionalAccount ? password : null,
 });
 
-export function* authorize(code, codeVerifier) {
+// export function* authorize(code, codeVerifier) {
+//   // use apply instead of call to pass this to function
+//   const loginResponse = yield apply(pixiv, pixiv.tokenRequest, [
+//     code,
+//     codeVerifier,
+//   ]);
+//   const options = setProvisionalAccountOptions(false);
+//   yield put(loginSuccess(loginResponse, options));
+//   return loginResponse;
+// }
+
+export function* authorize(email, password, isProvisionalAccount) {
   // use apply instead of call to pass this to function
-  const loginResponse = yield apply(pixiv, pixiv.tokenRequest, [
-    code,
-    codeVerifier,
+  const loginResponse = yield apply(pixiv, pixiv.login, [
+    email,
+    password,
+    false,
   ]);
-  const options = setProvisionalAccountOptions(false);
+  const options = setProvisionalAccountOptions(isProvisionalAccount, password);
   yield put(loginSuccess(loginResponse, options));
   return loginResponse;
 }
@@ -113,12 +125,40 @@ export function* handleLogout() {
   yield apply(pixiv, pixiv.logout);
 }
 
+// export function* watchLoginRequestTask() {
+//   while (true) {
+//     try {
+//       const action = yield take(AUTH_LOGIN.REQUEST);
+//       const { code, codeVerifier } = action.payload;
+//       const authResponse = yield call(authorize, code, codeVerifier);
+//       yield race([
+//         take(AUTH_LOGOUT.SUCCESS),
+//         call(refreshAccessTokenOnExpiry, authResponse),
+//       ]);
+//       yield call(handleLogout);
+//       // user logged out, next while iteration will wait for the
+//       // next AUTH_LOGIN.REQUEST action
+//     } catch (err) {
+//       const errMessage =
+//         err.errors && err.errors.system && err.errors.system.message
+//           ? err.errors.system.message
+//           : '';
+//       yield put(loginFailure());
+//       yield put(addError(errMessage));
+//     }
+//   }
+// }
 export function* watchLoginRequestTask() {
   while (true) {
     try {
       const action = yield take(AUTH_LOGIN.REQUEST);
-      const { code, codeVerifier } = action.payload;
-      const authResponse = yield call(authorize, code, codeVerifier);
+      const { email, password, isProvisionalAccount } = action.payload;
+      const authResponse = yield call(
+        authorize,
+        email,
+        password,
+        isProvisionalAccount,
+      );
       yield race([
         take(AUTH_LOGOUT.SUCCESS),
         call(refreshAccessTokenOnExpiry, authResponse),

@@ -3,14 +3,18 @@ import {
   View,
   Image,
   StyleSheet,
+  Keyboard,
   KeyboardAvoidingView,
   TouchableOpacity,
 } from 'react-native';
 import { connect } from 'react-redux';
+import { withFormik, Field } from 'formik';
 import { withTheme, Button, Text } from 'react-native-paper';
 import OverlaySpinner from 'react-native-loading-spinner-overlay';
+import PXFormInput from '../../components/PXFormInput';
 import { connectLocalization } from '../../components/Localization';
 import WalkthroughIllustList from '../../containers/WalkthroughIllustList';
+import * as authActionCreators from '../../common/actions/auth';
 import * as modalActionCreators from '../../common/actions/modal';
 import { MODAL_TYPES, SCREENS } from '../../common/constants';
 import PKCE from '../../common/helpers/pkce';
@@ -56,17 +60,29 @@ const styles = StyleSheet.create({
   },
 });
 
-class Auth extends Component {
-  handleOnPressLogin = async () => {
-    const {
-      navigation: { navigate },
-    } = this.props;
-    const { codeChallenge } = await PKCE.generatePKCE();
-    navigate(SCREENS.Login, {
-      url: `https://app-api.pixiv.net/web/v1/login?code_challenge=${codeChallenge}&code_challenge_method=S256&client=pixiv-android`,
-    });
-  };
+const validate = (values, props) => {
+  const { email, password } = values;
+  const { i18n } = props;
+  const errors = {};
+  if (!email) {
+    errors.email = i18n.loginValidateEmailOrPixivId;
+  }
+  if (!password) {
+    errors.password = i18n.loginValidatePassword;
+  }
+  return errors;
+};
 
+const handleOnSubmit = (values, { props }) => {
+  const { login } = props;
+  const { email, password } = values;
+  if (email && password) {
+    Keyboard.dismiss();
+    login(email, password);
+  }
+};
+
+class Auth extends Component {
   handleOnPressSignUp = () => {
     const {
       navigation: { navigate },
@@ -86,6 +102,9 @@ class Auth extends Component {
       auth: { loading },
       modal,
       i18n,
+      handleSubmit,
+      setFieldValue,
+      setFieldTouched,
       theme,
     } = this.props;
     return (
@@ -113,10 +132,28 @@ class Auth extends Component {
                   { backgroundColor: theme.colors.background },
                 ]}
               >
+                <Field
+                  name="email"
+                  component={PXFormInput}
+                  label={i18n.loginEmailOrPixivId}
+                  mode="outlined"
+                  autoCapitalize="none"
+                  onChangeText={setFieldValue}
+                  onBlur={setFieldTouched}
+                />
+                <Field
+                  name="password"
+                  component={PXFormInput}
+                  label={i18n.password}
+                  mode="outlined"
+                  secureTextEntry
+                  onChangeText={setFieldValue}
+                  onBlur={setFieldTouched}
+                />
                 <Button
                   style={styles.buttonContainer}
                   mode="contained"
-                  onPress={this.handleOnPressLogin}
+                  onPress={handleSubmit}
                 >
                   {i18n.login}
                 </Button>
@@ -143,6 +180,15 @@ class Auth extends Component {
   }
 }
 
+const LoginForm = withFormik({
+  mapPropsToValues: () => ({
+    email: '',
+    password: '',
+  }),
+  validate,
+  handleSubmit: handleOnSubmit,
+})(Auth);
+
 export default withTheme(
   connectLocalization(
     connect(
@@ -156,8 +202,9 @@ export default withTheme(
             props.route.params.onLoginSuccess),
       }),
       {
+        ...authActionCreators,
         ...modalActionCreators,
       },
-    )(Auth),
+    )(LoginForm),
   ),
 );

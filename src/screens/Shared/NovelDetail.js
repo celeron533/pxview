@@ -249,8 +249,8 @@ class NovelDetail extends Component {
   handleOnPressShareNovel = () => {
     const { item } = this.props;
     const shareOptions = {
-      message: `${item.title} | ${item.user.name} #pxviewr`,
-      url: `https://www.pixiv.net/novel/show.php?id=${item.id}`,
+      message: `${item.title} | ${item.user.name} #WildDream`,
+      url: `https://www.wilddream.net/journal/view/${item.id}`,
     };
     Share.open(shareOptions)
       .then(this.handleOnCancelMenuBottomSheet)

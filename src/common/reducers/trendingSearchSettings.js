@@ -4,9 +4,9 @@ const initState = {
   isShowTrendingIllustTag: true,
   isShowTrendingNovelTag: true,
   isShowRecommendedUser: true,
-  isShowIllustImage: false,
+  isShowIllustImage: true,
   isShowNovelImage: false,
-  isShowRecommendedUserWork: false,
+  isShowRecommendedUserWork: true,
 };
 
 export default function trendingSearchSettings(state = initState, action) {

@@ -252,8 +252,8 @@ class UserDetail extends Component {
   handleOnPressShareUser = () => {
     const { user } = this.props.userDetailItem;
     const shareOptions = {
-      message: `${user.name} #pxviewr`,
-      url: `https://www.pixiv.net/users/${user.id}`,
+      message: `${user.name} #WildDream`,
+      url: `https://www.wilddream.net/user/${user.account}`,
     };
     Share.open(shareOptions)
       .then(this.handleOnCancelMenuBottomSheet)
