@@ -1,5 +1,5 @@
 import React, { Component, useRef } from 'react';
-import { StyleSheet, View, ScrollView, Alert } from 'react-native';
+import { StyleSheet, View, ScrollView, Alert, Linking } from 'react-native';
 import { connect } from 'react-redux';
 import { useScrollToTop } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -50,6 +50,24 @@ const menuList = [
     icon: 'clock-o',
     type: 'font-awesome',
   },
+  // {
+  //   id: 'publishIllust',
+  //   title: 'publishIllust',
+  //   icon: 'upload',
+  //   type: 'font-awesome',
+  // },
+  // {
+  //   id: 'publishNovel',
+  //   title: 'publishNovel',
+  //   icon: 'pencil',
+  //   type: 'font-awesome',
+  // },
+  {
+    id: 'visitWebsite',
+    title: 'visitWebsite',
+    icon: 'external-link',
+    type: 'font-awesome',
+  },
 ];
 
 const menuList2 = [
@@ -59,12 +77,12 @@ const menuList2 = [
     icon: 'cog',
     type: 'font-awesome',
   },
-  // {
-  //   id: 'feedback',
-  //   title: 'feedback',
-  //   icon: 'comment-o',
-  //   type: 'font-awesome',
-  // }, 
+  {
+    id: 'report',
+    title: 'report',
+    icon: 'warning',
+    type: 'font-awesome',
+  }, 
   {
     id: 'logout',
     title: 'logout',
@@ -79,6 +97,7 @@ class MyPage extends Component {
       user,
       navigation: { navigate },
     } = this.props;
+    console.log(user);
     switch (item.id) {
       case 'works':
         navigate(SCREENS.MyWorks, { userId: user.id });
@@ -88,6 +107,12 @@ class MyPage extends Component {
         break;
       case 'connection':
         navigate(SCREENS.MyConnection, { userId: user.id });
+        break;
+      case 'visitWebsite':
+        this.openUrl('https://www.wilddream.net');
+        break;
+      case 'report':
+        this.openUrl('mailto:admin@wilddream.net');
         break;
       case 'browsingHistory':
         navigate(SCREENS.BrowsingHistory);
@@ -107,6 +132,17 @@ class MyPage extends Component {
       default:
         break;
     }
+  };
+
+  openUrl = (url) => {
+    Linking.canOpenURL(url)
+      .then((supported) => {
+        if (!supported) {
+          return null;          
+        }
+        return Linking.openURL(url);
+      })
+      .catch((err) => err);
   };
 
   handleOnPressLogout = () => {

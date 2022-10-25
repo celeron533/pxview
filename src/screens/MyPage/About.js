@@ -71,7 +71,7 @@ class About extends Component {
         break;
       }
       case 'contactUs': {
-        this.openUrl('mailto:admin@wilddream.net');
+        this.openUrl('https://www.wilddream.net/Art/index/contact');
         break;
       }
       case 'rateApp': {

@@ -185,14 +185,14 @@ class IllustComments extends Component {
             <ViewMoreButton onPress={this.handleOnPressViewMoreComments} />
           </View>
         )}
-        {!isFeatureInDetailPage && (
+        {
           <ActionButton
             buttonColor="#fff"
             renderIcon={this.renderCommentButtonIcon}
             fixNativeFeedbackRadius
             onPress={this.handleOnPressCommentButton}
           />
-        )}
+        }
         <OverlaySpinner visible={verificationEmail.loading} />
       </SafeAreaView>
     );

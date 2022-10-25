@@ -1,4 +1,5 @@
 {
+  "report": "举报与反馈",
   "visitWebsite": "访问WildDream网页版",
   "forkPxView": "本项目基于开源的第三方Pixiv客户端“PxView”",
   "about": "关于WildDream",
@@ -40,7 +41,7 @@
   "collectionTagsAdd": "添加标签",
   "collectionTagsAll": "全部",
   "collectionTagsUncategorized": "未分类",
-  "commentAdd": "發布評論",
+  "commentAdd": "发布评论",
   "commentInput": "输入评论",
   "commentReply": "回复",
   "commentRequireAccountRegistration": "发布评论需要先设置帐号信息",
