@@ -354,18 +354,19 @@ class Detail extends Component {
       item.page_count > 1
         ? item.meta_pages.map((page) => page.image_urls.original)
         : [item.meta_single_page.original_image_url];
+    const saveButton = item.disable_save ? <></> : <HeaderSaveImageButton
+      imageUrls={images}
+      workId={item.id}
+      workTitle={item.title}
+      workType={item.type}
+      userId={item.user.id}
+      userName={item.user.name}
+      saveAll
+    />
     return (
       <View style={styles.headerRightContainer}>
         <HeaderInfoButton onPress={this.handleOnPressOpenDetailInfoModal} />
-        <HeaderSaveImageButton
-          imageUrls={images}
-          workId={item.id}
-          workTitle={item.title}
-          workType={item.type}
-          userId={item.user.id}
-          userName={item.user.name}
-          saveAll
-        />
+        {saveButton}
         <HeaderMenuButton
           onPress={() => this.handleOnPressOpenMenuBottomSheet(null)}
         />

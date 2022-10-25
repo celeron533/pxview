@@ -1,7 +1,7 @@
 {
   "name": "WildDream",
   "version": "0.2.0",
-  "description": "Unofficial Pixiv app client for Android and iOS, built in React Native",
+  "description": "WildDream app client for Android and iOS, built in React Native. A fork of PxView.",
   "private": true,
   "scripts": {
     "start": "react-native start",

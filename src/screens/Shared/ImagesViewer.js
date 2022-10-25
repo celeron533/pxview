@@ -96,6 +96,20 @@ class ImagesViewer extends Component {
     const { images, item } = route.params;
     const { index, hideHeader } = this.state;
     const selectedImages = [images[index]];
+    const saveButton = item.disable_save ? <></> : <HeaderSaveImageButton
+      imageUrls={selectedImages}
+      imageIndex={
+        imageReadingDirection ===
+        READING_DIRECTION_TYPES.RIGHT_TO_LEFT
+          ? images.length - index
+          : index
+      }
+      workId={item.id}
+      workTitle={item.title}
+      workType={item.type}
+      userId={item.user.id}
+      userName={item.user.name}
+    />
     return (
       <View style={styles.container}>
         <StatusBar hidden={hideHeader} barStyle="light-content" animated />
@@ -112,22 +126,7 @@ class ImagesViewer extends Component {
                   : null}
               </HeaderTextTitle>
             }
-            headerRight={
-              <HeaderSaveImageButton
-                imageUrls={selectedImages}
-                imageIndex={
-                  imageReadingDirection ===
-                  READING_DIRECTION_TYPES.RIGHT_TO_LEFT
-                    ? images.length - index
-                    : index
-                }
-                workId={item.id}
-                workTitle={item.title}
-                workType={item.type}
-                userId={item.user.id}
-                userName={item.user.name}
-              />
-            }
+            headerRight={saveButton}
           />
         )}
         <PXTabView

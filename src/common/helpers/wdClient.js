@@ -47,7 +47,7 @@ class WildDreamApi {
             'Accept-Language': RNLocalize.getLocales()[0].languageTag,
             'App-OS-Version': DeviceInfo.getSystemVersion(),
             'App-Version': DeviceInfo.getVersion(),
-            'User-Agent': 'WildDreamApp for ' + DeviceInfo.getSystemName() + ' ' + DeviceInfo.getVersion(),
+            'User-Agent': 'WildDream App for ' + DeviceInfo.getSystemName() + ' ' + DeviceInfo.getVersion(),
         };
         if (options && options.headers) {
             this.headers = Object.assign({}, this.headers, options.headers);
