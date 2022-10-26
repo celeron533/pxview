@@ -508,7 +508,7 @@ class WildDreamApi {
   }
 
   illustWalkthrough() {      
-    return this.requestUrl(`${WD_BASE_URL}/illustranking/mode/year`);
+    return this.requestUrl(`${WD_BASE_URL}/illustranking/mode/year/ratingfilter/1`);
   }
 
   illustComments(id, options) {

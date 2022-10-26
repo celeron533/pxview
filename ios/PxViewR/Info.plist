@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>PxView R</string>
+	<string>WildDream</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -73,6 +73,8 @@
 		<string>FontAwesome5_Solid.ttf</string>
 		<string>Fontisto.ttf</string>
 	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>Launch Screen.storyboard</string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
