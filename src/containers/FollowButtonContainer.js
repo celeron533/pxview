@@ -4,8 +4,11 @@ import { connect } from 'react-redux';
 import FollowButton from '../components/FollowButton';
 import * as followUserActionCreators from '../common/actions/followUser';
 import * as modalActionCreators from '../common/actions/modal';
+import * as authActionCreators from '../common/actions/auth';
 import { FOLLOWING_TYPES, MODAL_TYPES } from '../common/constants';
 import { makeGetUserItem } from '../common/selectors';
+import { Alert } from 'react-native';
+import { connectLocalization } from '../components/Localization';
 
 class FollowButtonContainer extends Component {
   static propTypes = {
@@ -16,7 +19,18 @@ class FollowButtonContainer extends Component {
   };
 
   handleOnPress = () => {
-    const { user } = this.props;
+    const { user, auth, i18n, logout } = this.props;
+    if (auth.user.account === 'guest') {
+      Alert.alert(i18n.loginToView, null,[
+        { text: i18n.cancel, style: 'cancel' },
+        {
+          text: i18n.login,
+          style: 'destructive',
+          onPress: logout,
+        },
+      ]);
+      return;
+    }
     if (user.is_followed) {
       this.unfollowUser(user.id);
     } else {
@@ -24,13 +38,15 @@ class FollowButtonContainer extends Component {
     }
   };
 
-  handleOnLongPress = () => {
-    const { user, openModal } = this.props;
-    openModal(MODAL_TYPES.FOLLOW, {
-      userId: user.id,
-      isFollow: user.is_followed,
-    });
-  };
+  handleOnLongPress = this.handleOnPress;
+
+  // handleOnLongPress = () => {
+  //   const { user, openModal } = this.props;
+  //   openModal(MODAL_TYPES.FOLLOW, {
+  //     userId: user.id,
+  //     isFollow: user.is_followed,
+  //   });
+  // };
 
   followUser = (userId, followType) => {
     const { followUser } = this.props;
@@ -55,15 +71,16 @@ class FollowButtonContainer extends Component {
   }
 }
 
-export default connect(
-  () => {
+export default connectLocalization(connect(
+  (globalState) => {
     const getUserItem = makeGetUserItem();
     return (state, props) => {
       const user = getUserItem(state, props);
       return {
-        user,
+        user: user,
+        auth: globalState.auth
       };
     };
   },
-  { ...followUserActionCreators, ...modalActionCreators },
-)(FollowButtonContainer);
+  { ...followUserActionCreators, ...modalActionCreators, ...authActionCreators },
+)(FollowButtonContainer));

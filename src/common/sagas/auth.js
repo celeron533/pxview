@@ -171,6 +171,7 @@ export function* watchLoginRequestTask() {
         err.errors && err.errors.system && err.errors.system.message
           ? err.errors.system.message
           : '';
+      console.log(errMessage);
       yield put(loginFailure());
       yield put(addError(errMessage));
     }

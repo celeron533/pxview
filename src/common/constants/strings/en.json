@@ -93,7 +93,7 @@
   "list": "All",
   "login": "Login",
   "loginEmailOrPixivId": "Email address / WildDream ID",
-  "loginNoAccount": "Don't have an account?",
+  "loginNoAccount": "Register",
   "loginValidateEmailOrPixivId": "Please enter your email address or WildDream ID",
   "loginValidatePassword": "Please enter your password",
   "logout": "Logout",

@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
 
 const UserCover = ({
   user,
+  i18n,
   avatarSize,
   onPressAvatar,
   onPressChangeTheme,
@@ -60,7 +61,7 @@ const UserCover = ({
         onPress={onPressAvatar}
         hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
       >
-        <Text style={styles.username}>{user.name}</Text>
+        <Text style={styles.username}>{user.account === 'guest' ? i18n.guest : user.name}</Text>
       </PXTouchable>
       {user.is_premium && <PremiumBadge containerStyle={styles.premiumBadge} />}
     </View>

@@ -142,13 +142,15 @@ class WildDreamApi {
       data,
     };
     console.log(data);
-    return axios('https://oauth.secure.pixiv.net/auth/token', options)
+    console.log(`${WD_BASE_URL}/refreshAccessToken`);
+    return axios(`${WD_BASE_URL}/refreshAccessToken`, options)
       .then(res => {
-        this.auth = res.data.response;
-        console.log(res.data.response);
-        return res.data.response;
+        console.log(res.data);
+        this.auth = res.data;        
+        return res.data;
       })
       .catch(err => {
+        console.log(err);
         if (err.response) {
           console.log(res.response.data);
           throw err.response.data;

@@ -15,9 +15,12 @@ import CommentList from '../../components/CommentList';
 import ViewMoreButton from '../../components/ViewMoreButton';
 import Loader from '../../components/Loader';
 import * as novelCommentsActionCreators from '../../common/actions/novelComments';
+import * as authActionCreators from '../../common/actions/auth';
 import { makeGetNovelCommentsItems } from '../../common/selectors';
 import { globalStyles } from '../../styles';
 import { SCREENS } from '../../common/constants';
+import { Alert } from 'react-native';
+import { connectLocalization } from '../../components/Localization';
 
 const styles = StyleSheet.create({
   viewMoreButtonContainer: {
@@ -96,7 +99,21 @@ class NovelComments extends Component {
       novelId,
       navigation: { navigate },
       route,
+      auth,
+      i18n,
+      logout
     } = this.props;
+    if (auth.user.account === 'guest') {
+      Alert.alert(i18n.loginToView, null,[
+        { text: i18n.cancel, style: 'cancel' },
+        {
+          text: i18n.login,
+          style: 'destructive',
+          onPress: logout,
+        },
+      ]);
+      return;
+    }
     const isEligible = checkIfUserEligibleToPostComment();
     if (isEligible) {
       navigate(SCREENS.AddNovelComment, {
@@ -116,7 +133,21 @@ class NovelComments extends Component {
       authorId,
       navigation: { navigate },
       route,
+      auth,
+      i18n,
+      logout
     } = this.props;
+    if (auth.user.account === 'guest') {
+      Alert.alert(i18n.loginToView, null,[
+        { text: i18n.cancel, style: 'cancel' },
+        {
+          text: i18n.login,
+          style: 'destructive',
+          onPress: logout,
+        },
+      ]);
+      return;
+    }
     const isEligible = checkIfUserEligibleToPostComment();
     if (isEligible) {
       navigate(SCREENS.ReplyNovelComment, {
@@ -185,14 +216,14 @@ class NovelComments extends Component {
             <ViewMoreButton onPress={this.handleOnPressViewMoreComments} />
           </View>
         )}
-        {!isFeatureInDetailPage && (
+        {
           <ActionButton
             buttonColor="#fff"
             renderIcon={this.renderCommentButtonIcon}
             onPress={this.handleOnPressCommentButton}
             fixNativeFeedbackRadius
           />
-        )}
+        }
         <OverlaySpinner visible={verificationEmail.loading} />
       </SafeAreaView>
     );
@@ -200,7 +231,7 @@ class NovelComments extends Component {
 }
 
 export default enhancePostComment(
-  connect(() => {
+  connect((globalState) => {
     const getNovelCommentsItems = makeGetNovelCommentsItems();
     return (state, props) => {
       const { novelComments } = state;
@@ -211,7 +242,8 @@ export default enhancePostComment(
         items: getNovelCommentsItems(state, props),
         novelId,
         authorId,
+        auth: globalState.auth
       };
     };
-  }, novelCommentsActionCreators)(NovelComments),
+  }, {...novelCommentsActionCreators, ...authActionCreators})(NovelComments),
 );

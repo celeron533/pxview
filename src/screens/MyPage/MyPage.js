@@ -15,6 +15,8 @@ import * as browsingHistoryNovelsActionCreators from '../../common/actions/brows
 import * as searchHistoryActionCreators from '../../common/actions/searchHistory';
 import * as themeActionCreators from '../../common/actions/theme';
 import { SCREENS, THEME_TYPES } from '../../common/constants';
+import { isEmulator } from 'react-native-device-info';
+import i18n from '../../common/reducers/i18n';
 
 const styles = StyleSheet.create({
   container: {
@@ -26,6 +28,12 @@ const styles = StyleSheet.create({
 });
 
 const menuList = [
+  {
+    id: 'login',
+    title: 'login',
+    icon: 'sign-in',
+    type: 'font-awesome',
+  },
   {
     id: 'works',
     title: 'myWorks',
@@ -96,23 +104,37 @@ class MyPage extends Component {
     const {
       user,
       navigation: { navigate },
+      logout,
+      i18n
     } = this.props;
     console.log(user);
     switch (item.id) {
       case 'works':
-        navigate(SCREENS.MyWorks, { userId: user.id });
+        if (user && user.account !== 'guest') {
+          navigate(SCREENS.MyWorks, { userId: user.id });
+        } else {
+          this.handleGuest();
+        }        
         break;
       case 'collection':
-        navigate(SCREENS.MyCollection, { userId: user.id });
+        if (user && user.account !== 'guest') {
+          navigate(SCREENS.MyCollection, { userId: user.id });
+        } else {
+          this.handleGuest();
+        }  
         break;
       case 'connection':
-        navigate(SCREENS.MyConnection, { userId: user.id });
+        if (user && user.account !== 'guest') {
+          navigate(SCREENS.MyConnection, { userId: user.id });
+        } else {
+          this.handleGuest();
+        }  
         break;
       case 'visitWebsite':
         this.openUrl('https://www.wilddream.net');
         break;
       case 'report':
-        this.openUrl('mailto:admin@wilddream.net');
+        this.openUrl('https://www.wilddream.net/Art/index/copyright');
         break;
       case 'browsingHistory':
         navigate(SCREENS.BrowsingHistory);
@@ -127,6 +149,10 @@ class MyPage extends Component {
       }
       case 'logout': {
         this.handleOnPressLogout();
+        break;
+      }
+      case 'login': {
+        logout();
         break;
       }
       default:
@@ -144,6 +170,18 @@ class MyPage extends Component {
       })
       .catch((err) => err);
   };
+
+  handleGuest = () => {
+    const { logout, i18n } = this.props;
+    Alert.alert(i18n.loginToView, null,[
+      { text: i18n.cancel, style: 'cancel' },
+      {
+        text: i18n.login,
+        style: 'destructive',
+        onPress: logout,
+      },
+    ]);
+  }
 
   handleOnPressLogout = () => {
     const { user, i18n } = this.props;
@@ -210,11 +248,14 @@ class MyPage extends Component {
     const {
       user,
       navigation: { navigate },
+      logout
     } = this.props;
-    if (user) {
+    if (user && user.account !== 'guest') {
       navigate(SCREENS.UserDetail, {
         userId: user.id,
       });
+    } else {
+      logout()
     }
   };
 
@@ -242,8 +283,10 @@ class MyPage extends Component {
 
   renderList = (list) => {
     const { user, i18n } = this.props;
-    if (!user && list.some((l) => l.id === 'logout')) {
-      list = list.filter((l) => l.id !== 'logout');
+    if ((!user || user.account === 'guest')) {
+      if (list.some((l) => l.id === 'logout')) list = list.filter((l) => l.id !== 'logout');
+    } else {
+      if (list.some((l) => l.id === 'login')) list = list.filter((l) => l.id !== 'login');
     }
     return (
       <View style={styles.listContainer}>

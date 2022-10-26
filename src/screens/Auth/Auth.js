@@ -19,6 +19,7 @@ import * as modalActionCreators from '../../common/actions/modal';
 import { MODAL_TYPES, SCREENS } from '../../common/constants';
 import PKCE from '../../common/helpers/pkce';
 import { globalStyleVariables } from '../../styles';
+import { useDispatch } from 'react-redux';
 
 const styles = StyleSheet.create({
   container: {
@@ -95,8 +96,12 @@ class Auth extends Component {
       navigation: { navigate },
     } = this.props;
     navigate(SCREENS.PrivacyPolicy);
-  };
+  };    
 
+  handleOnPressGuestMode = () => {  
+    this.props.login("guest", "guest");
+  }
+  
   render() {
     const {
       auth: { loading },
@@ -106,7 +111,7 @@ class Auth extends Component {
       setFieldValue,
       setFieldTouched,
       theme,
-    } = this.props;
+    } = this.props;       
     return (
       <View style={styles.container}>
         <View style={styles.container}>
@@ -167,6 +172,16 @@ class Auth extends Component {
                 >
                   {i18n.loginNoAccount}
                 </Button>
+                <Button
+                  style={[
+                    styles.buttonContainer,
+                    styles.outlineButtonContainer,
+                  ]}
+                  mode="outlined"
+                  onPress={this.handleOnPressGuestMode}
+                >
+                  {i18n.guestMode}
+                </Button>
                 <TouchableOpacity onPress={this.handleOnPressPrivacyPolicy}>
                   <Text style={styles.privacyPolicy}>{i18n.privacyPolicy}</Text>
                 </TouchableOpacity>
@@ -186,7 +201,7 @@ const LoginForm = withFormik({
     password: '',
   }),
   validate,
-  handleSubmit: handleOnSubmit,
+  handleSubmit: handleOnSubmit
 })(Auth);
 
 export default withTheme(

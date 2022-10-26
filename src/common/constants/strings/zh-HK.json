@@ -1,4 +1,7 @@
 {
+  "loginToView": "請先登錄",
+  "guest": "遊客",
+  "guestMode": "以遊客身份進入", 
   "report": "舉報與反饋",
   "visitWebsite": "訪問WildDream網頁版",
   "forkPxView": "本項目基於開源的第三方Pixiv客戶端“PxView”",
@@ -90,7 +93,7 @@
   "likeRemove": "取消喜歡！",
   "list": "查看全部",
   "login": "登錄",
-  "loginNoAccount": "未持有賬號?",
+  "loginNoAccount": "註冊",
   "loginEmailOrPixivId": "WildDream用戶名或郵箱地址",
   "loginValidateEmailOrPixivId": "請輸入您的WildDream用戶名或郵箱地址",
   "loginValidatePassword": "請輸入您的密碼",

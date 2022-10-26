@@ -1,4 +1,7 @@
 {
+  "loginToView": "Please log in first",
+  "guest": "観光客",
+  "guestMode": "観光で入る", 
   "report": "報告",
   "visitWebsite": "wilddream.net",
   "forkPxView": "This project is a fork of the open-source pixiv APP \"PxView\"",
@@ -92,7 +95,7 @@
   "likeRemove": "すき！解除",
   "list": "一覧",
   "login": "ログイン",
-  "loginNoAccount": "アカウントをお持ちでない方",
+  "loginNoAccount": "アカウントを登録します",
   "loginEmailOrPixivId": "メールアドレス / WildDream ID",
   "loginValidateEmailOrPixivId": "WildDream ID、またはメールアドレスが未記入です",
   "loginValidatePassword": "パスワードが未記入です",

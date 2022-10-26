@@ -15,9 +15,12 @@ import CommentList from '../../components/CommentList';
 import ViewMoreButton from '../../components/ViewMoreButton';
 import Loader from '../../components/Loader';
 import * as illustCommentsActionCreators from '../../common/actions/illustComments';
+import * as authActionCreators from '../../common/actions/auth';
 import { makeGetIllustCommentsItems } from '../../common/selectors';
 import { globalStyles } from '../../styles';
 import { SCREENS } from '../../common/constants';
+import { Alert } from 'react-native';
+import { connectLocalization } from '../../components/Localization';
 
 const styles = StyleSheet.create({
   viewMoreButtonContainer: {
@@ -96,7 +99,21 @@ class IllustComments extends Component {
       illustId,
       navigation: { navigate },
       route,
+      auth,
+      i18n,
+      logout
     } = this.props;
+    if (auth.user.account === 'guest') {
+      Alert.alert(i18n.loginToView, null,[
+        { text: i18n.cancel, style: 'cancel' },
+        {
+          text: i18n.login,
+          style: 'destructive',
+          onPress: logout,
+        },
+      ]);
+      return;
+    }
     const isEligible = checkIfUserEligibleToPostComment();
     if (isEligible) {
       navigate(SCREENS.AddIllustComment, {
@@ -116,7 +133,21 @@ class IllustComments extends Component {
       authorId,
       navigation: { navigate },
       route,
+      auth,
+      i18n,
+      logout
     } = this.props;
+    if (auth.user.account === 'guest') {
+      Alert.alert(i18n.loginToView, null,[
+        { text: i18n.cancel, style: 'cancel' },
+        {
+          text: i18n.login,
+          style: 'destructive',
+          onPress: logout,
+        },
+      ]);
+      return;
+    }
     const isEligible = checkIfUserEligibleToPostComment();
     if (isEligible) {
       navigate(SCREENS.ReplyIllustComment, {
@@ -200,7 +231,7 @@ class IllustComments extends Component {
 }
 
 export default enhancePostComment(
-  connect(() => {
+  connectLocalization(connect((globalState) => {
     const getIllustCommentsItems = makeGetIllustCommentsItems();
     return (state, props) => {
       const { illustComments } = state;
@@ -211,7 +242,8 @@ export default enhancePostComment(
         items: getIllustCommentsItems(state, props),
         illustId,
         authorId,
+        auth: globalState.auth
       };
     };
-  }, illustCommentsActionCreators)(IllustComments),
+  }, {...illustCommentsActionCreators, ...authActionCreators})(IllustComments)),
 );

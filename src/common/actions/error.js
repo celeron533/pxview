@@ -1,6 +1,7 @@
 import { ERROR } from '../constants/actionTypes';
 
 export function addError(error) {
+  error = error.toString();
   return {
     type: ERROR.ADD,
     error: true,
