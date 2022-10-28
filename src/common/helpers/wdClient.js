@@ -115,6 +115,7 @@ class WildDreamApi {
     this.username = null;
     this.password = null;
     delete this.headers.Authorization;
+    this.requestUrl(`${WD_BASE_URL}/logout`);
     return Promise.resolve();
   }
 
@@ -508,7 +509,45 @@ class WildDreamApi {
   }
 
   illustWalkthrough() {      
-    return this.requestUrl(`${WD_BASE_URL}/illustranking/mode/year/ratingfilter/1`);
+    // return this.requestUrl(`${WD_BASE_URL}/illustranking/mode/year/ratingfilter/1`);
+    let url = `${WD_BASE_URL}/illustranking/mode/year/ratingfilter/1`;
+    const f = () => {return axios(url)
+      .then(res => {
+        console.log(JSON.stringify(res.data));
+        return res.data;
+      })
+      .catch(err => {
+        console.error(err);
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve(f());
+          }, 1000);
+        });
+      });
+    };
+    return f();
+    // return axios(url)
+    //   .then(res => {
+    //     console.log(JSON.stringify(res.data));
+    //     return res.data;
+    //   })
+    //   .catch(err => {
+    //     console.error(err);
+    //     return new Promise((resolve, reject) => {
+    //       setTimeout(() => {
+    //         resolve(axios(url)
+    //           .then(res => {
+    //             console.log(JSON.stringify(res.data));
+    //             return res.data;
+    //           })
+    //           .catch(err => {
+    //             console.error(err);
+    //             return {'illusts': [], 'next_url': ''};
+    //           })
+    //         );
+    //       }, 5000);
+    //     });
+    //   });
   }
 
   illustComments(id, options) {

@@ -19,7 +19,7 @@ import * as modalActionCreators from '../../common/actions/modal';
 import { MODAL_TYPES, SCREENS } from '../../common/constants';
 import PKCE from '../../common/helpers/pkce';
 import { globalStyleVariables } from '../../styles';
-import { useDispatch } from 'react-redux';
+import openUrl from '../../common/helpers/openUrl';
 
 const styles = StyleSheet.create({
   container: {
@@ -85,17 +85,19 @@ const handleOnSubmit = (values, { props }) => {
 
 class Auth extends Component {
   handleOnPressSignUp = () => {
-    const {
-      navigation: { navigate },
-    } = this.props;
-    navigate(SCREENS.SignUp);
+    // const {
+    //   navigation: { navigate },
+    // } = this.props;
+    // navigate(SCREENS.SignUp);
+    openUrl("https://www.wilddream.net/Art/register");
   };
 
   handleOnPressPrivacyPolicy = () => {
-    const {
-      navigation: { navigate },
-    } = this.props;
-    navigate(SCREENS.PrivacyPolicy);
+    // const {
+    //   navigation: { navigate },
+    // } = this.props;
+    // navigate(SCREENS.PrivacyPolicy);
+    openUrl("https://github.com/FurCoder/pxview/blob/master/privacy-policy/en.md");
   };    
 
   handleOnPressGuestMode = () => {  

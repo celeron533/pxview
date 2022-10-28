@@ -1,4 +1,7 @@
 {
+  "loginToView": "Please log in first",
+  "guest": "Guest",
+  "guestMode": "Visit as a guest", 
   "report": "Report and Feedback",
   "visitWebsite": "Visit WildDream Art",
   "forkPxView": "This project is a fork of the open-source pixiv APP \"PxView\"",

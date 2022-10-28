@@ -6,6 +6,7 @@ import { Icon } from 'react-native-elements';
 import { connectLocalization } from '../../components/Localization';
 import PXListItem from '../../components/PXListItem';
 import { globalStyles } from '../../styles';
+import openUrl from '../../common/helpers/openUrl';
 
 const appStoreUrl = '';
 const googlePlayUrl =
@@ -67,38 +68,27 @@ class About extends Component {
   handleOnPressListItem = (item) => {
     switch (item.id) {
       case 'forkPxView': {
-        this.openUrl('https://github.com/alphasp/pxview');
+        openUrl('https://github.com/alphasp/pxview');
         break;
       }
       case 'contactUs': {
-        this.openUrl('https://www.wilddream.net/Art/index/contact');
+        openUrl('https://www.wilddream.net/Art/index/contact');
         break;
       }
       case 'rateApp': {
         const url = Platform.OS === 'ios' ? appStoreUrl : googlePlayUrl;
         if (Platform.OS === 'android') {
-          this.openUrl(url);
+          openUrl(url);
         }
         break;
       }
       case 'sourceCode': {
-        this.openUrl(sourceUrl);
+        openUrl(sourceUrl);
         break;
       }
       default:
         break;
     }
-  };
-
-  openUrl = (url) => {
-    Linking.canOpenURL(url)
-      .then((supported) => {
-        if (!supported) {
-          return null;
-        }
-        return Linking.openURL(url);
-      })
-      .catch((err) => err);
   };
 
   render() {

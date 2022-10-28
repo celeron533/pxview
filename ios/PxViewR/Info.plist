@@ -26,7 +26,7 @@
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
-			<string>com.utopia.pxviewr</string>
+			<string>org.furcoder.wilddream</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>pixiv</string>

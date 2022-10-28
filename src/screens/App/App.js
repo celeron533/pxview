@@ -45,7 +45,7 @@ const getActiveRouteName = (state) => {
 
 const App = () => {
   const [initialState, setInitialState] = useState();
-  const [navigationIsReady, setNavigationIsReady] = useState(false);
+  const [navigationIsReady, setNavigationIsReady] = useState(true);
   const rehydrated = useSelector((state) => state.auth.rehydrated);
   const user = useSelector((state) => state.auth.user);
   const initialRouteName = useSelector(

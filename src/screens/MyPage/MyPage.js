@@ -15,8 +15,7 @@ import * as browsingHistoryNovelsActionCreators from '../../common/actions/brows
 import * as searchHistoryActionCreators from '../../common/actions/searchHistory';
 import * as themeActionCreators from '../../common/actions/theme';
 import { SCREENS, THEME_TYPES } from '../../common/constants';
-import { isEmulator } from 'react-native-device-info';
-import i18n from '../../common/reducers/i18n';
+import openUrl from '../../common/helpers/openUrl';
 
 const styles = StyleSheet.create({
   container: {
@@ -131,10 +130,10 @@ class MyPage extends Component {
         }  
         break;
       case 'visitWebsite':
-        this.openUrl('https://www.wilddream.net');
+        openUrl('https://www.wilddream.net');
         break;
       case 'report':
-        this.openUrl('https://www.wilddream.net/Art/index/copyright');
+        openUrl('https://www.wilddream.net/Art/index/copyright');
         break;
       case 'browsingHistory':
         navigate(SCREENS.BrowsingHistory);
@@ -158,17 +157,6 @@ class MyPage extends Component {
       default:
         break;
     }
-  };
-
-  openUrl = (url) => {
-    Linking.canOpenURL(url)
-      .then((supported) => {
-        if (!supported) {
-          return null;          
-        }
-        return Linking.openURL(url);
-      })
-      .catch((err) => err);
   };
 
   handleGuest = () => {
