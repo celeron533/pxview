@@ -1109,20 +1109,16 @@ class WildDreamApi {
       this.getDefaultHeaders(),
       options.headers || {}
     );
-    if (this.auth && this.auth.access_token) {
-      options.headers.Cookie = `PHPSESSID=${this.auth.access_token};`;
-    }
+    // if (this.auth && this.auth.access_token) {
+    //   options.headers.Cookie = `PHPSESSID=${this.auth.access_token};`;
+    // }
     return callApi(url, options)
       .then(json => json)
       .catch(err => {
-        if (this.rememberPassword) {
-          if (this.username && this.password) {
-            return this.login(this.username, this.password).then(() => {
-              options.headers.Cookie = `PHPSESSID=${this.auth.access_token};`;;
-              return callApi(url, options);
-            });
-          }
-        }
+        options.headers.Cookie = `PHPSESSID=${this.auth.access_token};`;
+        return callApi(url, options).then(json => json).catch(err => {
+          throw err;
+        });
         throw err;
       });
   }

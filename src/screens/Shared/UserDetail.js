@@ -252,8 +252,7 @@ class UserDetail extends Component {
   handleOnPressShareUser = () => {
     const { user } = this.props.userDetailItem;
     const shareOptions = {
-      message: `${user.name} #WildDream`,
-      url: `https://www.wilddream.net/user/${user.account}`,
+      message: `${user.name} #WildDream\nhttps://www.wilddream.net/user/${user.account}`
     };
     Share.open(shareOptions)
       .then(this.handleOnCancelMenuBottomSheet)
