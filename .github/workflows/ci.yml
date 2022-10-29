@@ -27,7 +27,11 @@ jobs:
       - name: Install node modules
         run: npm install
       # - run: npm run test
-      - run: npm run android-release
+      - name: build unsigned apk
+        run: |
+          cd android
+          gradlew assembleRelease
+      # - run: npm run android-release
 
   build-ios:
     name: Build IOS app
