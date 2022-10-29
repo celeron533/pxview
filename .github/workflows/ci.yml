@@ -35,7 +35,7 @@ jobs:
 
   build-ios:
     name: Build IOS app
-    if: ${{ false }}
+    if: ${{ true }}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
