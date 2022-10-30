@@ -25,6 +25,9 @@ PODS:
   - Firebase/Database (7.11.0):
     - Firebase/CoreOnly
     - FirebaseDatabase (~> 7.11.0)
+  - Firebase/Messaging (7.11.0):
+    - Firebase/CoreOnly
+    - FirebaseMessaging (~> 7.11.0)
   - Firebase/Performance (7.11.0):
     - Firebase/CoreOnly
     - FirebasePerformance (~> 7.11.0)
@@ -83,6 +86,19 @@ PODS:
     - GoogleUtilities/Environment (~> 7.0)
     - GoogleUtilities/UserDefaults (~> 7.0)
     - PromisesObjC (~> 1.2)
+  - FirebaseInstanceID (7.11.0):
+    - FirebaseCore (~> 7.0)
+    - FirebaseInstallations (~> 7.0)
+    - GoogleUtilities/Environment (~> 7.0)
+    - GoogleUtilities/UserDefaults (~> 7.0)
+  - FirebaseMessaging (7.11.0):
+    - FirebaseCore (~> 7.0)
+    - FirebaseInstallations (~> 7.0)
+    - FirebaseInstanceID (~> 7.0)
+    - GoogleUtilities/AppDelegateSwizzler (~> 7.0)
+    - GoogleUtilities/Environment (~> 7.0)
+    - GoogleUtilities/Reachability (~> 7.0)
+    - GoogleUtilities/UserDefaults (~> 7.0)
   - FirebasePerformance (7.11.0):
     - FirebaseCore (~> 7.0)
     - FirebaseInstallations (~> 7.0)
@@ -472,6 +488,8 @@ PODS:
     - React
   - RNCMaskedView (0.1.10):
     - React
+  - RNCPushNotificationIOS (1.10.1):
+    - React-Core
   - RNDeviceInfo (7.0.2):
     - React-Core
   - RNFBAnalytics (11.4.1):
@@ -487,6 +505,10 @@ PODS:
     - RNFBApp
   - RNFBDatabase (11.4.1):
     - Firebase/Database (= 7.11.0)
+    - React-Core
+    - RNFBApp
+  - RNFBMessaging (11.4.1):
+    - Firebase/Messaging (= 7.11.0)
     - React-Core
     - RNFBApp
   - RNFBPerf (11.4.1):
@@ -530,6 +552,7 @@ DEPENDENCIES:
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/Libraries/FBReactNativeSpec`)
+  - Firebase/Messaging (~> 7.11.0)
   - Flipper (= 0.87.0)
   - Flipper-DoubleConversion (= 1.1.7)
   - Flipper-Folly (~> 2.2)
@@ -587,11 +610,13 @@ DEPENDENCIES:
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-community/async-storage`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
+  - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBAnalytics (from `../node_modules/@react-native-firebase/analytics`)"
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBCrashlytics (from `../node_modules/@react-native-firebase/crashlytics`)"
   - "RNFBDatabase (from `../node_modules/@react-native-firebase/database`)"
+  - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - "RNFBPerf (from `../node_modules/@react-native-firebase/perf`)"
   - "RNFBRemoteConfig (from `../node_modules/@react-native-firebase/remote-config`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -615,6 +640,8 @@ SPEC REPOS:
     - FirebaseCrashlytics
     - FirebaseDatabase
     - FirebaseInstallations
+    - FirebaseInstanceID
+    - FirebaseMessaging
     - FirebasePerformance
     - FirebaseRemoteConfig
     - Flipper
@@ -722,6 +749,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/async-storage"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
+  RNCPushNotificationIOS:
+    :path: "../node_modules/@react-native-community/push-notification-ios"
   RNDeviceInfo:
     :path: "../node_modules/react-native-device-info"
   RNFBAnalytics:
@@ -732,6 +761,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/crashlytics"
   RNFBDatabase:
     :path: "../node_modules/@react-native-firebase/database"
+  RNFBMessaging:
+    :path: "../node_modules/@react-native-firebase/messaging"
   RNFBPerf:
     :path: "../node_modules/@react-native-firebase/perf"
   RNFBRemoteConfig:
@@ -768,6 +799,8 @@ SPEC CHECKSUMS:
   FirebaseCrashlytics: 272b675aa9d1e9bae1f9e1449fcc1f2cf6042806
   FirebaseDatabase: 6c39fbf1c8514a2f32e610f9bf9ef30c535dc15a
   FirebaseInstallations: a58d4f72ec5861840b84df489f2668d970df558a
+  FirebaseInstanceID: ad5135045a498d7775903efd39762d2cdfa1be27
+  FirebaseMessaging: 163435fb6db065e3b6228f1e577b10ed2cc506d2
   FirebasePerformance: 3166d0c16b359b1ef92be774f46f2768b98c8993
   FirebaseRemoteConfig: 0ea30de5fb0231df8c1bdcdf3b6c23bdc5066131
   Flipper: 1bd2db48dcc31e4b167b9a33ec1df01c2ded4893
@@ -825,11 +858,13 @@ SPEC CHECKSUMS:
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNCAsyncStorage: 453cd7c335ec9ba3b877e27d02238956b76f3268
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
+  RNCPushNotificationIOS: 87b8d16d3ede4532745e05b03c42cff33a36cc45
   RNDeviceInfo: e1d82a27d0c1ea6278e3b141784dc38e51fc90f4
   RNFBAnalytics: 1190435dcd25d7403d28ceb4342c0d1e050843de
   RNFBApp: 996860ad6832996faba79ef3f6ec2d3ea5870dd9
   RNFBCrashlytics: 59d9ecfaacddbe10819d9071ee3b9921b79b8c6b
   RNFBDatabase: 026067d3ce9d65c96146f7f32c1f044f27665f29
+  RNFBMessaging: 8d84ceadc705ca6b6047c37376d2e2aaabcb8e3d
   RNFBPerf: d54d3ab9a11fb319074de3d4714168052ac225cd
   RNFBRemoteConfig: 3035dd5d7b2a903f822505f04a5cd01752d5bc37
   RNGestureHandler: 5e58135436aacc1c5d29b75547d3d2b9430d052c
@@ -845,6 +880,6 @@ SPEC CHECKSUMS:
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 59ce3945367a648b2198f5b4f22538347d29b066
+PODFILE CHECKSUM: 938c525d2ab4659a970f2133185d2b81e77f9704
 
 COCOAPODS: 1.11.3

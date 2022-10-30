@@ -4,6 +4,7 @@
 
 import DeviceInfo from 'react-native-device-info';
 import * as RNLocalize from 'react-native-localize';
+import messaging from '@react-native-firebase/messaging';
 
 const axios = require('axios');
 const qs = require('qs');
@@ -20,12 +21,12 @@ const WD_BASE_URL = 'https://www.wilddream.net/art/api';
 // const WD_POST_URL = 'https://static.zjuapa.com/art/api'
 
 function callApi(url, options) {
-  const finalUrl = /^https?:\/\//i.test(url) ? url : BASE_URL + url;
+  const finalUrl = /^https?:\/\//i.test(url) ? url : WD_BASE_URL + url;
   console.log(finalUrl);
   console.log(options);
   return axios(finalUrl, options)
     .then(res => {
-        console.log(JSON.stringify(res.data));
+        console.log(JSON.stringify(res.data).substring(0, 100));
         return res.data;
     })
     .catch(err => {
@@ -41,18 +42,31 @@ function callApi(url, options) {
 }
 
 class WildDreamApi {
-    constructor(options) {
-        this.headers = {
-            'App-OS': DeviceInfo.getSystemName(),
-            'Accept-Language': RNLocalize.getLocales()[0].languageTag,
-            'App-OS-Version': DeviceInfo.getSystemVersion(),
-            'App-Version': DeviceInfo.getVersion(),
-            'User-Agent': 'WildDream App for ' + DeviceInfo.getSystemName() + ' ' + DeviceInfo.getVersion(),
-        };
-        if (options && options.headers) {
-            this.headers = Object.assign({}, this.headers, options.headers);
-        }
+  constructor(options) {
+    this.headers = {
+      'App-OS': DeviceInfo.getSystemName(),
+      'Accept-Language': RNLocalize.getLocales()[0].languageTag,
+      'App-OS-Version': DeviceInfo.getSystemVersion(),
+      'App-Version': DeviceInfo.getVersion(),
+      'User-Agent': 'WildDream App for ' + DeviceInfo.getSystemName() + ' ' + DeviceInfo.getVersion()
+    };    
+    this.firebaseToken = '';
+    messaging().requestPermission()
+      .then(() => {
+        console.log("User Now Has Permission");
+        messaging().getToken().then(token => {
+          console.log("Firebase token: ", token);
+          this.firebaseToken = token;
+        });       
+      })
+      .catch(error => {
+        console.log("Error", error)
+        // User has rejected permissions  
+      });    
+    if (options && options.headers) {
+      this.headers = Object.assign({}, this.headers, options.headers);
     }
+  }
 
   getDefaultHeaders() {
     const datetime = moment().format();
@@ -63,6 +77,7 @@ class WildDreamApi {
   }
 
   login(username, password, rememberPassword) {  
+    console.log(this.firebaseToken);
     if (!username) {
       return Promise.reject(new Error('username required'));
     }
@@ -70,13 +85,9 @@ class WildDreamApi {
       return Promise.reject(new Error('password required'));
     }
     const data = qs.stringify({
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      get_secure_url: true,
-      include_policy: true,
-      grant_type: 'password',
       username: username,
       password: password,
+      firebase_token: this.firebaseToken
     });
     console.log(data);
     const options = {
@@ -107,7 +118,7 @@ class WildDreamApi {
           console.log(err.message);
           throw err.message;
         }
-      });
+      });  
   }
 
   logout() {
@@ -115,7 +126,17 @@ class WildDreamApi {
     this.username = null;
     this.password = null;
     delete this.headers.Authorization;
-    this.requestUrl(`${WD_BASE_URL}/logout`);
+    const data = qs.stringify({
+      firebase_token: this.firebaseToken
+    });
+    const options = {
+      method: 'POST',
+      headers: Object.assign(this.getDefaultHeaders(), {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      }),
+      data,
+    };
+    this.requestUrl(`${WD_BASE_URL}/logout`, options);
     return Promise.resolve();
   }
 
@@ -128,12 +149,8 @@ class WildDreamApi {
       return Promise.reject(new Error('refresh_token required'));
     }
     const data = qs.stringify({
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
-      get_secure_url: true,
-      include_policy: true,
-      grant_type: 'refresh_token',
       refresh_token: refreshToken || this.auth.refresh_token,
+      firebase_token: this.firebaseToken
     });
     const options = {
       method: 'POST',
@@ -513,7 +530,7 @@ class WildDreamApi {
     let url = `${WD_BASE_URL}/illustranking/mode/year/ratingfilter/1`;
     const f = () => {return axios(url)
       .then(res => {
-        console.log(JSON.stringify(res.data));
+        console.log(JSON.stringify(res.data).substring(0, 100));
         return res.data;
       })
       .catch(err => {

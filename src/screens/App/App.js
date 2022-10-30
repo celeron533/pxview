@@ -25,6 +25,7 @@ import PXSnackbar from '../../components/PXSnackbar';
 import { THEME_TYPES, SCREENS } from '../../common/constants';
 import { globalStyleVariables } from '../../styles';
 import usePrevious from '../../common/hooks/usePrevious';
+import messaging from '@react-native-firebase/messaging';
 
 const styles = StyleSheet.create({
   container: {
@@ -42,6 +43,12 @@ const getActiveRouteName = (state) => {
 
   return route.name;
 };
+
+// messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+//   //  await notifee.displayNotification(...);
+//    // Increment the count by 1
+//    await notifee.incrementBadgeCount();
+// })
 
 const App = () => {
   const [initialState, setInitialState] = useState();
@@ -147,6 +154,28 @@ const App = () => {
     }
   }, [prevRehydrated, rehydrated]);
 
+  useEffect(() => {
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      alert(
+        'Notification caused app to open from background state:' 
+        + JSON.stringify(remoteMessage.notification)
+        + JSON.stringify(remoteMessage.data)       
+      );
+    }); 
+    messaging()
+      .getInitialNotification()
+      .then(remoteMessage => {
+        if (remoteMessage) {
+          alert(
+            'Notification caused app to open from quit state:',
+            + JSON.stringify(remoteMessage.notification)
+            + JSON.stringify(remoteMessage.data)
+          );
+        }
+        setLoading(false);
+      });    
+  });
+
   const handleOnNavigationStateChange = (state) => {
     const previousRouteName = routeNameRef.current;
     const currentRouteName = getActiveRouteName(state);
@@ -199,6 +228,7 @@ const App = () => {
       },
     };
   }
+  
   if (!rehydrated || !navigationIsReady) {
     renderComponent = <Loader />;
   } else if (user) {
