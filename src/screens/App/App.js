@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, StatusBar, Platform } from 'react-native';
+import { View, StyleSheet, StatusBar, Platform, Linking } from 'react-native';
 import { useSelector } from 'react-redux';
 import {
   NavigationContainer,
@@ -65,25 +65,17 @@ const App = () => {
 
   const { getInitialState } = useLinking(navigationRef, {
     prefixes: [
-      'https://www.pixiv.net/en',
-      'https://www.pixiv.net',
-      'http://www.pixiv.net',
-      'http://www.pixiv.net/en',
-      'https://touch.pixiv.net',
-      'pixiv://',
+      'https://www.wilddream.net',
+      'http://www.wilddream.net',
+      'wilddream://',
     ],
     config: {
-      [SCREENS.Detail]: 'artworks/:illustId',
-      [SCREENS.NovelDetail]: 'novel/show.php',
-      [SCREENS.UserDetail]: 'users/:uid',
-      // workaround to handle deep link to one screen with multiple path
-      [`${SCREENS.Detail}-1`]: 'illusts/:illustId',
-      [`${SCREENS.Detail}-2`]: 'member_illust.php',
-      [`${SCREENS.NovelDetail}-1`]: 'novels/:novelId',
-      [`${SCREENS.UserDetail}-1`]: 'member.php',
-      [SCREENS.Login]: 'account/login',
+      [SCREENS.Detail]: 'art/view/:illustId',
+      [SCREENS.NovelDetail]: 'journal/view/:novelId',
+      [SCREENS.UserDetail]: 'user/:uid'
     },
     getStateFromPath: (path, options) => {
+      console.log(path, options);
       const state = getStateFromPath(path, options);
       const newRoutes = [...state.routes];
       // eslint-disable-next-line prefer-destructuring
@@ -104,6 +96,43 @@ const App = () => {
         routes,
       };
     },
+  });
+
+  useEffect(() => {
+    messaging().onNotificationOpenedApp(remoteMessage => {
+      // alert(
+      //   'Notification caused app to open from background state:' 
+      //   + JSON.stringify(remoteMessage.notification)
+      //   + JSON.stringify(remoteMessage.data)       
+      // );
+      // const contentid = remoteMessage.data.contentid;
+      // const type = remoteMessage.data.type;
+      // if (type === 'artwork') {
+      //   push(SCREENS.Detail, {
+      //     items: maxItems ? items.slice(0, maxItems) : items,
+      //     index,
+      //     parentListKey: listKey,
+      //   });
+      // }
+      // if (type === 'journal') {
+
+      // }
+      if ('link' in remoteMessage.data) {
+        Linking.openURL(remoteMessage.data.link);
+      }
+    }); 
+    // messaging()
+    //   .getInitialNotification()
+    //   .then(remoteMessage => {
+    //     if (remoteMessage) {
+    //       alert(
+    //         'Notification caused app to open from quit state:',
+    //         + JSON.stringify(remoteMessage.notification)
+    //         + JSON.stringify(remoteMessage.data)
+    //       );
+    //     }
+    //     setLoading(false);
+    //   });    
   });
 
   useEffect(() => {
@@ -152,29 +181,7 @@ const App = () => {
     if (!prevRehydrated && rehydrated) {
       SplashScreen.hide();
     }
-  }, [prevRehydrated, rehydrated]);
-
-  useEffect(() => {
-    messaging().onNotificationOpenedApp(remoteMessage => {
-      alert(
-        'Notification caused app to open from background state:' 
-        + JSON.stringify(remoteMessage.notification)
-        + JSON.stringify(remoteMessage.data)       
-      );
-    }); 
-    messaging()
-      .getInitialNotification()
-      .then(remoteMessage => {
-        if (remoteMessage) {
-          alert(
-            'Notification caused app to open from quit state:',
-            + JSON.stringify(remoteMessage.notification)
-            + JSON.stringify(remoteMessage.data)
-          );
-        }
-        setLoading(false);
-      });    
-  });
+  }, [prevRehydrated, rehydrated]);  
 
   const handleOnNavigationStateChange = (state) => {
     const previousRouteName = routeNameRef.current;

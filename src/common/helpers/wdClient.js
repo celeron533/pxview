@@ -57,6 +57,18 @@ class WildDreamApi {
         messaging().getToken().then(token => {
           console.log("Firebase token: ", token);
           this.firebaseToken = token;
+          const data = qs.stringify({
+            refresh_token: "",
+            firebase_token: this.firebaseToken
+          });
+          const options = {
+            method: 'POST',
+            headers: Object.assign(this.getDefaultHeaders(), {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            }),
+            data,
+          };
+          axios(`${WD_BASE_URL}/refreshAccessToken`, options);
         });       
       })
       .catch(error => {
@@ -639,7 +651,7 @@ class WildDreamApi {
         options
       )
     );
-    return this.requestUrl(`/v1/illust/detail?${queryString}`);
+    return this.requestUrl(`${WD_BASE_URL}/illustdetail?${queryString}`);
   }
 
   illustNew(options) {
@@ -989,7 +1001,7 @@ class WildDreamApi {
     }
 
     const queryString = qs.stringify({ novel_id: id });
-    return this.requestUrl(`/v2/novel/detail?${queryString}`);
+    return this.requestUrl(`${WD_BASE_URL}/noveldetail?${queryString}`);
   }
 
   novelText(id) {

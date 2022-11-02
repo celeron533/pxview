@@ -29,7 +29,7 @@
 			<string>org.furcoder.wilddream</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>pixiv</string>
+				<string>wilddream</string>
 			</array>
 		</dict>
 	</array>
