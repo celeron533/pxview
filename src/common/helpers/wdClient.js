@@ -49,36 +49,41 @@ class WildDreamApi {
       'App-OS-Version': DeviceInfo.getSystemVersion(),
       'App-Version': DeviceInfo.getVersion(),
       'User-Agent': 'WildDream App for ' + DeviceInfo.getSystemName() + ' ' + DeviceInfo.getVersion()
+        + ' (Build ' + DeviceInfo.getBuildNumber() + ')'
     };    
-    this.firebaseToken = '';
-    messaging().requestPermission()
-      .then(() => {
-        console.log("User Now Has Permission");
-        messaging().getToken().then(token => {
-          console.log("Firebase token: ", token);
-          this.firebaseToken = token;
-          const data = qs.stringify({
-            refresh_token: "",
-            firebase_token: this.firebaseToken
-          });
-          const options = {
-            method: 'POST',
-            headers: Object.assign(this.getDefaultHeaders(), {
-              'Content-Type': 'application/x-www-form-urlencoded',
-            }),
-            data,
-          };
-          axios(`${WD_BASE_URL}/refreshAccessToken`, options);
-        });       
-      })
-      .catch(error => {
-        console.log("Error", error)
-        // User has rejected permissions  
-      });    
+    // this.firebaseToken = '';
+    // this.refreshFirebaseToken();
     if (options && options.headers) {
       this.headers = Object.assign({}, this.headers, options.headers);
     }
   }
+
+  // refreshFirebaseToken() {
+  //   messaging().requestPermission()
+  //     .then(() => {
+  //       console.log("User Now Has Permission");
+  //       messaging().getToken().then(token => {
+  //         console.log("Firebase token: ", token);
+  //         this.firebaseToken = token;
+  //         const data = qs.stringify({
+  //           refresh_token: "",
+  //           firebase_token: this.firebaseToken
+  //         });
+  //         const options = {
+  //           method: 'POST',
+  //           headers: Object.assign(this.getDefaultHeaders(), {
+  //             'Content-Type': 'application/x-www-form-urlencoded',
+  //           }),
+  //           data,
+  //         };
+  //         axios(`${WD_BASE_URL}/refreshAccessToken`, options);
+  //       });       
+  //     })
+  //     .catch(error => {
+  //       console.log("Error", error)
+  //       // User has rejected permissions  
+  //     });
+  // }
 
   getDefaultHeaders() {
     const datetime = moment().format();
@@ -99,7 +104,7 @@ class WildDreamApi {
     const data = qs.stringify({
       username: username,
       password: password,
-      firebase_token: this.firebaseToken
+      // firebase_token: this.firebaseToken
     });
     console.log(data);
     const options = {
@@ -119,6 +124,7 @@ class WildDreamApi {
           this.password = password;
         }
         console.log(res.data);
+        // this.refreshFirebaseToken();
         return res.data;
       })
       .catch(err => {
