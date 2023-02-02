@@ -543,6 +543,9 @@ PODS:
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
   - SSZipArchive (2.2.2)
+  - TPNS-iOS-Extension (1.3.9.3)
+  - XgPushRN (1.1.6):
+    - React
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -626,6 +629,8 @@ DEPENDENCIES:
   - RNShare (from `../node_modules/react-native-share`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
+  - TPNS-iOS-Extension
+  - XgPushRN (from `../node_modules/tpns_rn_plugin`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -666,6 +671,7 @@ SPEC REPOS:
     - SDWebImage
     - SDWebImageWebPCoder
     - SSZipArchive
+    - TPNS-iOS-Extension
     - YogaKit
 
 EXTERNAL SOURCES:
@@ -781,6 +787,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-vector-icons"
   RNZipArchive:
     :path: "../node_modules/react-native-zip-archive"
+  XgPushRN:
+    :path: "../node_modules/tpns_rn_plugin"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -877,9 +885,11 @@ SPEC CHECKSUMS:
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: bbf46e29fb8d1980a78ad3d5e9b4123c77f10ebc
   SSZipArchive: fa16b8cc4cdeceb698e5e5d9f67e9558532fbf23
+  TPNS-iOS-Extension: ebe8cdbeb78af984e5296db0f07aee1943a3adb7
+  XgPushRN: 58ab5e2b09a2b79cbfcb78a3e74e2d4a1ab09f39
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 938c525d2ab4659a970f2133185d2b81e77f9704
+PODFILE CHECKSUM: 39a4942f5939c3017b8fcf9511ce108696db25b8
 
 COCOAPODS: 1.11.3

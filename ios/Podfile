@@ -40,3 +40,7 @@ end
 target 'ImageNotification' do
   pod 'Firebase/Messaging', '~> 7.11.0' # eg 6.31.0
 end
+
+target 'XGExtension' do
+  pod 'TPNS-iOS-Extension'
+end

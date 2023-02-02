@@ -25,7 +25,8 @@ import PXSnackbar from '../../components/PXSnackbar';
 import { THEME_TYPES, SCREENS } from '../../common/constants';
 import { globalStyleVariables } from '../../styles';
 import usePrevious from '../../common/hooks/usePrevious';
-import messaging from '@react-native-firebase/messaging';
+// import messaging from '@react-native-firebase/messaging';
+import XgPush from 'tpns_rn_plugin';
 
 const styles = StyleSheet.create({
   container: {
@@ -99,40 +100,20 @@ const App = () => {
   });
 
   useEffect(() => {
-    messaging().onNotificationOpenedApp(remoteMessage => {
-      // alert(
-      //   'Notification caused app to open from background state:' 
-      //   + JSON.stringify(remoteMessage.notification)
-      //   + JSON.stringify(remoteMessage.data)       
-      // );
-      // const contentid = remoteMessage.data.contentid;
-      // const type = remoteMessage.data.type;
-      // if (type === 'artwork') {
-      //   push(SCREENS.Detail, {
-      //     items: maxItems ? items.slice(0, maxItems) : items,
-      //     index,
-      //     parentListKey: listKey,
-      //   });
-      // }
-      // if (type === 'journal') {
-
-      // }
-      if ('link' in remoteMessage.data) {
-        Linking.openURL(remoteMessage.data.link);
+    XgPush.setEnableDebug(true);
+    if (Platform.OS === 'ios') {
+        /// 集群域名配置（非广州集群需要在startXg之前调用此函数）
+        /// 香港：tpns.hk.tencent.com, 新加坡：tpns.sgp.tencent.com, 上海：tpns.sh.tencent.com
+      XgPush.configureClusterDomainName("tpns.sh.tencent.com")
+    }     
+    this.xgPushClickAction = result => {
+      console.log("[TPNS RN] xgPushClickAction:" + JSON.stringify(result));
+      var data = JSON.parse(result.custom);
+      if ('link' in data) {
+        Linking.openURL(data.link);
       }
-    }); 
-    // messaging()
-    //   .getInitialNotification()
-    //   .then(remoteMessage => {
-    //     if (remoteMessage) {
-    //       alert(
-    //         'Notification caused app to open from quit state:',
-    //         + JSON.stringify(remoteMessage.notification)
-    //         + JSON.stringify(remoteMessage.data)
-    //       );
-    //     }
-    //     setLoading(false);
-    //   });    
+    };
+    XgPush.addXgPushClickActionListener(this.xgPushClickAction);
   });
 
   useEffect(() => {

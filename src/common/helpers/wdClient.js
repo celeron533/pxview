@@ -4,7 +4,9 @@
 
 import DeviceInfo from 'react-native-device-info';
 import * as RNLocalize from 'react-native-localize';
-import messaging from '@react-native-firebase/messaging';
+import { Alert } from 'react-native';
+// import messaging from '@react-native-firebase/messaging';
+import XgPush from 'tpns_rn_plugin';
 
 const axios = require('axios');
 const qs = require('qs');
@@ -55,7 +57,16 @@ class WildDreamApi {
     // this.refreshFirebaseToken();
     if (options && options.headers) {
       this.headers = Object.assign({}, this.headers, options.headers);
-    }
+    }    
+    this.token = null;
+    this.onRegisteredDone = result => {
+      console.log("[TPNS RN] onRegisteredDone:" + JSON.stringify(result));
+      if (this.token != result) {
+        this.token = result;
+        this.requestUrl(`${WD_BASE_URL}/updateTencentToken/token/` + result);
+      }    
+    };
+    XgPush.addOnRegisteredDoneListener(this.onRegisteredDone);
   }
 
   // refreshFirebaseToken() {
@@ -84,6 +95,14 @@ class WildDreamApi {
   //       // User has rejected permissions  
   //     });
   // }
+
+  enableTencentToken() {
+    XgPush.startXg("1680013712", "I7F3CRIMTADF");
+  }
+
+  disableTencentToken() {
+    XgPush.stopXg();
+  }
 
   getDefaultHeaders() {
     const datetime = moment().format();
@@ -124,6 +143,7 @@ class WildDreamApi {
           this.password = password;
         }
         console.log(res.data);
+        this.enableTencentToken();
         // this.refreshFirebaseToken();
         return res.data;
       })
@@ -155,6 +175,7 @@ class WildDreamApi {
       data,
     };
     this.requestUrl(`${WD_BASE_URL}/logout`, options);
+    this.disableTencentToken();
     return Promise.resolve();
   }
 
@@ -168,7 +189,7 @@ class WildDreamApi {
     }
     const data = qs.stringify({
       refresh_token: refreshToken || this.auth.refresh_token,
-      firebase_token: this.firebaseToken
+      // firebase_token: this.firebaseToken
     });
     const options = {
       method: 'POST',
@@ -182,7 +203,8 @@ class WildDreamApi {
     return axios(`${WD_BASE_URL}/refreshAccessToken`, options)
       .then(res => {
         console.log(res.data);
-        this.auth = res.data;        
+        this.auth = res.data; 
+        this.enableTencentToken();       
         return res.data;
       })
       .catch(err => {

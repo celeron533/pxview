@@ -6,6 +6,9 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   TouchableOpacity,
+  Modal,
+  Pressable,
+  Linking
 } from 'react-native';
 import { connect } from 'react-redux';
 import { withFormik, Field } from 'formik';
@@ -59,6 +62,52 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 15,
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    // borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+  },
+  modalTitle: {
+    marginBottom: 15,
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign: 'center',
+  },
 });
 
 const validate = (values, props) => {
@@ -103,6 +152,10 @@ class Auth extends Component {
   handleOnPressGuestMode = () => {  
     this.props.login("guest", "guest");
   }
+
+  state = {
+    modalVisible: true,
+  };
   
   render() {
     const {
@@ -113,12 +166,13 @@ class Auth extends Component {
       setFieldValue,
       setFieldTouched,
       theme,
-    } = this.props;       
+    } = this.props; 
+    const {modalVisible} = this.state;      
     return (
       <View style={styles.container}>
         <View style={styles.container}>
           <WalkthroughIllustList />
-        </View>
+        </View>        
         {modal.modalType !== MODAL_TYPES.SIGNUP && (
           <View
             style={[
@@ -192,6 +246,32 @@ class Auth extends Component {
             <OverlaySpinner visible={loading} />
           </View>
         )}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            this.setState({modalVisible: !modalVisible});
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>
+                <Text style={styles.modalTitle}>{i18n.privacyPolicySummary}</Text>
+                {'\n\n'}
+                {i18n.privacyPolicySummaryContent}
+                <Text style={{color: 'blue'}} onPress={() => 
+                  Linking.openURL('https://github.com/FurCoder/pxview/blob/master/privacy-policy/en.md')}>{i18n.privacyPolicy}</Text>
+              </Text>              
+              <Button
+                style={styles.buttonContainer}
+                mode="contained"
+                onPress={() => this.setState({modalVisible: !modalVisible})}>
+                {i18n.accept}
+              </Button>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }

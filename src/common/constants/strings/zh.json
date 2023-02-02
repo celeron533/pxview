@@ -243,5 +243,9 @@
   "userMuteSettings": "屏蔽用户设置",
   "userNovels": "小说",
   "viewMore": "查看更多",
-  "worksCount": "件作品"
+  "worksCount": "件作品",
+  "privacyPolicySummary": "用户隐私政策概要",
+  "privacyPolicySummaryContent": "本《隐私政策》将向您说明:\n1. 为了让您登录、浏览、收藏作品及获得新作品推送，我们需要收集您的部分必要信息;\n2. 未经您同意，我们不会从第三方获取、共享或提供你的信息;\n3. 您可以访问、更正、删除你的个人信息，我们也提供注销、投诉的方式。\n您需要接受此隐私政策以使用本应用。\n前往查看完整版 ",
+  "accept": "接受",
+  "exit": "退出"
 }
