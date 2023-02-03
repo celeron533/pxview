@@ -1,4 +1,4 @@
-package com.furcoder.wilddream;
+package org.furcoder.wilddream;
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity;

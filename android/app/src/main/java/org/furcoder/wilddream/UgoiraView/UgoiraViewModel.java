@@ -1,4 +1,4 @@
-package com.furcoder.wilddream.UgoiraView;
+package org.furcoder.wilddream.UgoiraView;
 
 import android.graphics.Bitmap;
 

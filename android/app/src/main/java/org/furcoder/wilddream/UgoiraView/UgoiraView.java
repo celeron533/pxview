@@ -1,10 +1,9 @@
-package com.furcoder.wilddream.UgoiraView;
+package org.furcoder.wilddream.UgoiraView;
 
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;

@@ -132,7 +132,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.furcoder.wilddream"
+        applicationId "org.furcoder.wilddream"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 407
