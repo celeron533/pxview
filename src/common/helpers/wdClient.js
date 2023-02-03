@@ -61,9 +61,15 @@ class WildDreamApi {
     this.token = null;
     this.onRegisteredDone = result => {
       console.log("[TPNS RN] onRegisteredDone:" + JSON.stringify(result));
-      if (this.token != result) {
-        this.token = result;
-        this.requestUrl(`${WD_BASE_URL}/updateTencentToken/token/` + result);
+      var token;
+      if ('xgToken' in result) {
+        token = result['xgToken'];
+      } else {
+        token = result;
+      }
+      if (this.token != token) {
+        this.token = token;
+        this.requestUrl(`${WD_BASE_URL}/updateTencentToken/token/` + token);
       }    
     };
     XgPush.addOnRegisteredDoneListener(this.onRegisteredDone);

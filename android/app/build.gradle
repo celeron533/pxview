@@ -135,8 +135,12 @@ android {
         applicationId "com.furcoder.wilddream"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 401
+        versionCode 407
         versionName "0.2.0"
+        manifestPlaceholders = [
+                XG_ACCESS_ID : "1580013712",
+                XG_ACCESS_KEY : "ADGDEW7MKR69",
+        ]
     }
     signingConfigs {
         release {

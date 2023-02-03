@@ -108,10 +108,18 @@ const App = () => {
     }     
     this.xgPushClickAction = result => {
       console.log("[TPNS RN] xgPushClickAction:" + JSON.stringify(result));
-      var data = JSON.parse(result.custom);
-      if ('link' in data) {
-        Linking.openURL(data.link);
-      }
+      if ('custom' in result) { // iOS
+        var data = JSON.parse(result.custom);
+        if ('link' in data) {
+          Linking.openURL(data.link);
+        }
+      }   
+      if ('customMessage' in result) {  // Android
+        var data = JSON.parse(result.customMessage);
+        if ('link' in data) {
+          Linking.openURL(data.link);
+        }
+      }    
     };
     XgPush.addXgPushClickActionListener(this.xgPushClickAction);
   });

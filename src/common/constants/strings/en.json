@@ -243,5 +243,9 @@
   "userMuteSettings": "Mute Users Settings",
   "userNovels": "Novel Works",
   "viewMore": "View More",
-  "worksCount": "Works"
+  "worksCount": "Works",
+  "privacyPolicySummary": "Privacy Policy Summary",
+  "privacyPolicySummaryContent": "This \"Privacy Policy\" will explain to you:\n1. In order to allow you to log in, browse, collect artworks and get push notifications, we need to collect some of your necessary information;\n2. We will not obtain, share or provide your information to third parties without your consent;\n3. You can access, modify and delete your personal information, and we also provide ways to remove accounts and provide feedback. \nYou need to accept this privacy policy to use this application. \nView the full version: ",
+  "accept": "Accept",
+  "exit": "Exit"
 }
