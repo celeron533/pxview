@@ -250,7 +250,9 @@
   "exit": "Exit",
   "version": "Version",
   "new_version_release": "New Version Release",
+  "version": "Version",
   "update": "Update",
   "download_apk": "Download APK",
-  "view_release_page": "Details"
+  "view_release_page": "Details",
+  "lang_code": "en"
 }

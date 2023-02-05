@@ -4,9 +4,10 @@
 
 import DeviceInfo from 'react-native-device-info';
 import * as RNLocalize from 'react-native-localize';
-import { Alert } from 'react-native';
+import { Alert, Linking } from 'react-native';
 // import messaging from '@react-native-firebase/messaging';
 import XgPush from 'tpns_rn_plugin';
+import i18n from './i18n';
 
 const axios = require('axios');
 const qs = require('qs');
@@ -62,7 +63,7 @@ class WildDreamApi {
     this.onRegisteredDone = result => {
       console.log("[TPNS RN] onRegisteredDone:" + JSON.stringify(result));
       var token;
-      if ('xgToken' in result) {
+      if (typeof result === 'object' && result !== null && 'xgToken' in result) {
         token = result['xgToken'];
       } else {
         token = result;
@@ -73,6 +74,23 @@ class WildDreamApi {
       }    
     };
     XgPush.addOnRegisteredDoneListener(this.onRegisteredDone);
+
+    if (DeviceInfo.getSystemName() == 'Android') {
+      this.requestUrl(`${WD_BASE_URL}/latestVersion/platform/` + DeviceInfo.getSystemName(), null).then(
+        latest_version => {
+          console.log("latest version: " + JSON.stringify(latest_version));
+          if (latest_version.name != DeviceInfo.getVersion()) {
+            Alert.alert(i18n.new_version_release, i18n.version + ' ' + latest_version.name + '\n' + latest_version.description, 
+            [
+              {text: i18n.download_apk, onPress: () => Linking.openURL(latest_version.apk_url)},
+              {text: i18n.view_release_page, onPress: () => Linking.openURL(latest_version.release_page)},
+              {text: i18n.cancel, onPress: () => {}, style: 'cancel'},
+            ])
+          }
+        },
+        () => {console.log('update check failed')}
+      )
+    }    
   }
 
   // refreshFirebaseToken() {
@@ -103,7 +121,12 @@ class WildDreamApi {
   // }
 
   enableTencentToken() {
-    XgPush.startXg("1680013712", "I7F3CRIMTADF");
+    console.log("Platform OS: " + Platform.OS);
+    if (Platform.OS === 'ios') {
+      XgPush.startXg("1680013712", "I7F3CRIMTADF");
+    } else {
+      XgPush.startXg("1580013712", "ADGDEW7MKR69");
+    }    
   }
 
   disableTencentToken() {
@@ -149,6 +172,9 @@ class WildDreamApi {
           this.password = password;
         }
         console.log(res.data);
+        if (this.token) {
+          this.requestUrl(`${WD_BASE_URL}/updateTencentToken/token/` + this.token);
+        }
         this.enableTencentToken();
         // this.refreshFirebaseToken();
         return res.data;
@@ -180,6 +206,10 @@ class WildDreamApi {
       }),
       data,
     };
+    if (this.token) {
+      this.requestUrl(`${WD_BASE_URL}/removeTencentToken/token/` + this.token);
+      this.token = null;
+    }
     this.requestUrl(`${WD_BASE_URL}/logout`, options);
     this.disableTencentToken();
     return Promise.resolve();

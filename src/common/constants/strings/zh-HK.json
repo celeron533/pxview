@@ -249,7 +249,9 @@
   "accept": "接受",
   "exit": "退出",
   "new_version_release": "新版本發布",
+  "version": "版本",
   "update": "更新",
   "download_apk": "下載安裝包",
-  "view_release_page": "詳細信息"
+  "view_release_page": "詳細信息",
+  "lang_code": "zh"
 }

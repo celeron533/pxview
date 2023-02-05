@@ -249,7 +249,9 @@
   "accept": "受け入れる",
   "exit": "終了",
   "new_version_release": "新しいバージョンのリリース",
+  "version": "Version",
   "update": "更新",
   "download_apk": "インストール パッケージをダウンロード",
-  "view_release_page": "詳細"
+  "view_release_page": "詳細",
+  "lang_code": "ja"
 }

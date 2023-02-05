@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
-  Linking
+  Linking,
+  Platform
 } from 'react-native';
 import { connect } from 'react-redux';
 import { withFormik, Field } from 'formik';
@@ -142,11 +143,15 @@ class Auth extends Component {
   };
 
   handleOnPressPrivacyPolicy = () => {
-    // const {
-    //   navigation: { navigate },
-    // } = this.props;
+    const {
+      i18n
+    } = this.props;
     // navigate(SCREENS.PrivacyPolicy);
-    openUrl("https://github.com/FurCoder/pxview/blob/master/privacy-policy/en.md");
+    if (i18n.lang_code == 'zh') {
+      Linking.openURL('https://github.com/FurCoder/pxview/blob/master/privacy-policy/zh.md')
+    } else {
+      Linking.openURL('https://github.com/FurCoder/pxview/blob/master/privacy-policy/en.md')
+    }  
   };    
 
   handleOnPressGuestMode = () => {  
@@ -260,8 +265,14 @@ class Auth extends Component {
                 <Text style={styles.modalTitle}>{i18n.privacyPolicySummary}</Text>
                 {'\n\n'}
                 {i18n.privacyPolicySummaryContent}
-                <Text style={{color: 'blue'}} onPress={() => 
-                  Linking.openURL('https://github.com/FurCoder/pxview/blob/master/privacy-policy/en.md')}>{i18n.privacyPolicy}</Text>
+                <Text style={{color: 'blue'}} onPress={() => {
+                  if (i18n.lang_code == 'zh') {
+                    Linking.openURL('https://github.com/FurCoder/pxview/blob/master/privacy-policy/zh.md')
+                  } else {
+                    Linking.openURL('https://github.com/FurCoder/pxview/blob/master/privacy-policy/en.md')
+                  }                  
+                }
+                  }>{i18n.privacyPolicy}</Text>
               </Text>              
               <Button
                 style={styles.buttonContainer}

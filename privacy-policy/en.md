@@ -38,7 +38,7 @@ We may disclose the Information:
 
 Some of the data collected is necessary for the app to function properly. You can opt-out of information collection in such cases by uninstalling the Application. You may use the standard uninstall processes as may be available as part of your mobile device or via the mobile application marketplace or network. 
 
-### Account and Personal Information Removal
+### Account and Personal Information Modification or Removal
 
 You can modify and delete your account and personal information at any time, by sending an email to admin@wilddream.net using the email address that you register the account. The content of the email should describe how you would like to modify or delete your information.
 
