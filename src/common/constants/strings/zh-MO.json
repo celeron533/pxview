@@ -241,5 +241,13 @@
   "userMuteSettings": "屏蔽用戶設置",
   "userNovels": "小說",
   "viewMore": "查看更多",
-  "worksCount": "件作品"
+  "worksCount": "件作品",
+  "privacyPolicySummary": "用戶隱私政策概要",
+  "privacyPolicySummaryContent": "本《隱私政策》將向您說明:\n1. 為了讓您登錄、瀏覽、收藏作品及獲得新作品推送，我們需要收集您的部分必要信息;\n2. 未經您同意，我們不會從第三方獲取、共享或提供你的信息;\n3. 您可以訪問、更正、刪除你的個人信息，我們也提供註銷、投訴的方式。\n您需要接受此隱私政策以使用本應用。\n前往查看完整版 ",
+  "accept": "接受",
+  "exit": "退出",
+  "new_version_release": "新版本發布",
+  "update": "更新",
+  "download_apk": "下載安裝包",
+  "view_release_page": "詳細信息"
 }

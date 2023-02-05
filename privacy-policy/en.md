@@ -13,19 +13,14 @@ The token is stored locally on your device.
 
 Some services used by the app process your data to provide their service. The following list shows how various services use and handle your data.  
 
-- **Service**: Fabric Crashlytics, https://firebase.google.com/products/remote-config/ 
-	- **Data**: Installation UUID. Installation UUID identify individual installations of an app. Since each Instance ID is unique to a particular app and device, they give Fabric services a way to refer to specific app instances. 
-	- **How data helps provide the service**: Helping a customer associate crash data with specific instances of their app.
-	- **Retention**: Crash traces and their associated identifiers are kept for 90 days. 
+- **Service**: Fabric Crashlytics, https://firebase.google.com/products/remote-config/ Shenzhen Tencent Computer System Co., Ltd. Mobile Push SDK https://cloud.tencent.com/product/tpns
+	- **Data**: Installation UUID. Installation UUID identify individual installations of an app. Since each Instance ID is unique to a particular app and device, they give Fabric services a way to refer to specific app instances. Device information (mobile phone model, system type, system version, etc.) is used for tagged push and identification of whether it is a real device, network information (network type) supports different types of push according to different network types, application data (delivery, click, exposure, etc. data generated during the push process) are used to push Push business data statistics.
+
 By using the app, you agree to terms of service and privacy policy of the service(s) mentioned above. 
-
-
 
 ### Does the Application collect precise real time location information of the device? 
 
 This Application does not collect precise information about the location of your mobile device. 
-
-
 
 ### Do third parties see and/or have access to information obtained by the Application? 
 
@@ -37,18 +32,19 @@ We may disclose the Information:
 - when we believe in good faith that disclosure is necessary to protect our rights, protect your safety or the safety of others, investigate fraud, or respond to a government request; 
 - with third party service providers to serve our legitimate interests. 
 - In case of a merger, acquisition or change of ownership of the Application, change in ownership or uses of this information may take place. The successor's use and disclosure of your personally-identifiable information will continue to be subject to this privacy policy unless (i) a court orders otherwise, for example a bankruptcy court; or (ii) the successor's gives you notice that your personally-identifiable information will be subject to the successor’s own privacy policy, along with an opportunity for you to opt out (which may cause you not to be able to continue to use the Application. If you submit personally-identifiable information after such a transfer, that information may be subject to the successor entity’s privacy policy. 
-- as necessary to enforce the Terms of Service.
- 
+- as necessary to enforce the Terms of Service. 
 
 ### What are my opt-out rights? 
 
 Some of the data collected is necessary for the app to function properly. You can opt-out of information collection in such cases by uninstalling the Application. You may use the standard uninstall processes as may be available as part of your mobile device or via the mobile application marketplace or network. 
 
+### Account and Personal Information Removal
+
+You can modify and delete your account and personal information at any time, by sending an email to admin@wilddream.net using the email address that you register the account. The content of the email should describe how you would like to modify or delete your information.
+
 ### Security 
 
 We are concerned about safeguarding the confidentiality of your information. We provide physical, electronic, and procedural safeguards to protect information we process and maintain. For example, we limit access to this information to authorized employees and contractors who need to know that information in order to operate, develop or improve our Application. Please be aware that, although we endeavour provide reasonable security for information we process and maintain, no security system can prevent all potential security breaches. 
-
-
 
 ### Links to Other Sites 
 
@@ -56,14 +52,11 @@ Since the app presents user generated content, some content may link to other si
 
 If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by the app. Therefore, I strongly advise you to review the Privacy Policy of these websites. I have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services. 
 
-Additionally, in order to provide some functionality, the content from the linked website(s) may be fetched automatically. 
-
- 
+Additionally, in order to provide some functionality, the content from the linked website(s) may be fetched automatically.  
 
 ### MISCELLANEOUS 
 
 If any part of this Privacy Policy is held invalid or unenforceable, that part will be construed to reflect the parties’ original intent, and the remaining portions will remain in full force and effect. 
-
 
 ### Changes 
 
@@ -71,15 +64,11 @@ This Privacy Policy may be updated from time to time for any reason. We will not
 
 Your continued use of the Application constitutes agreement to our revisions of the Privacy Policy and will be subject to the new Privacy Policy. 
 
-
-
 ### Your Consent 
 
 By using the Application, you are consenting to our processing of your information as set forth in this Privacy Policy.  
 
 By using the Application , you also agree to our Terms of Service. 
-
-
 
 ### Contact us 
 
