@@ -40,7 +40,7 @@ Some of the data collected is necessary for the app to function properly. You ca
 
 ### Account and Personal Information Modification or Removal
 
-You can modify and delete your account and personal information at any time, by sending an email to admin@wilddream.net using the email address that you register the account. The content of the email should describe how you would like to modify or delete your information.
+You can modify and delete your account and personal information at any time by visiting https://www.wilddream.net/Art/login After logging into your account, visit the account settings page https://www.wilddream.net/Art/my/profile , submit after modifying the corresponding information. The way to delete your account is to visit https://www.wilddream.net/Art/index/delete_account, the account will be deleted immediately after completing the authentication.
 
 ### Security 
 

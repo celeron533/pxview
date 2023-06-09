@@ -244,8 +244,10 @@
   "userNovels": "小说",
   "viewMore": "查看更多",
   "worksCount": "件作品",
-  "privacyPolicySummary": "用户隐私政策概要",
+  "privacyPolicySummary": "用户隐私政策与最终用户许可协议概要",
   "privacyPolicySummaryContent": "本《隐私政策》将向您说明:\n1. 为了让您登录、浏览、收藏作品及获得新作品推送，我们需要收集您的部分必要信息;\n2. 未经您同意，我们不会从第三方获取、共享或提供你的信息;\n3. 您可以访问、更正、删除你的个人信息，我们也提供注销、投诉的方式。\n您需要接受此隐私政策以使用本应用。\n前往查看完整版 ",
+  "EULASummaryContent": "本《最终用户许可协议》将向您说明我们在知识产权、原创性及作品分级相关的政策，以及我们不容忍令人反感的内容和出现滥用行为的用户。\n您需要接受此协议以使用本应用。\n前往查看完整版 ",
+  "EULA": "最终用户许可协议",
   "accept": "接受",
   "exit": "退出",
   "new_version_release": "新版本发布",
@@ -253,5 +255,7 @@
   "update": "更新",
   "download_apk": "下载安装包",
   "view_release_page": "详细信息",
+  "reportThisContent": "举报此内容",
+  "deleteAccount": "删除帐户",
   "lang_code": "zh"
 }

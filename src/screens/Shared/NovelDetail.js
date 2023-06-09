@@ -8,6 +8,7 @@ import {
   LayoutAnimation,
   UIManager,
   DeviceEventEmitter,
+  Linking
 } from 'react-native';
 import { connect } from 'react-redux';
 import { withTheme } from 'react-native-paper';
@@ -246,6 +247,11 @@ class NovelDetail extends Component {
     this.handleOnCancelMenuBottomSheet();
   };
 
+  handleOnPressReport = () => {
+    const { item } = this.props;
+    Linking.openURL(`https://www.wilddream.net/Art/index/report/typeid/2/contentid/${item.id}`)
+  };
+
   handleOnPressShareNovel = () => {
     const { item } = this.props;
     const shareOptions = {
@@ -473,6 +479,15 @@ class NovelDetail extends Component {
                 marginLeft: 28,
               }}
               text={isMuteUser ? i18n.userMuteRemove : i18n.userMuteAdd}
+            />
+            <PXBottomSheetButton
+              onPress={this.handleOnPressReport}
+              iconName="flag"
+              iconType="font-awesome"
+              textStyle={{
+                marginLeft: 31,
+              }}
+              text={i18n.reportThisContent}
             />
             <PXBottomSheetCancelButton
               onPress={this.handleOnCancelMenuBottomSheet}

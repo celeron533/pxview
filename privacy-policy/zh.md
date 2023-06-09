@@ -41,7 +41,7 @@ WildDream创作站的登录是通过 api 完成的。 密码直接发送到 Wild
 
 ### 账户和个人信息的修改或删除
 
-您可以随时修改和删除您的帐户和个人信息，方法是使用您注册帐户时使用的电子邮件地址发送电子邮件至 admin@wilddream.net。电子邮件的内容应描述您希望如何修改或删除您的信息。
+您可以随时修改和删除您的帐户和个人信息，修改信息的方法是访问 https://www.wilddream.net/Art/login 登录帐户后，访问帐户设置页 https://www.wilddream.net/Art/my/profile ，修改相应信息后提交。删除信息的方法是访问 https://www.wilddream.net/Art/index/delete_account ，完成身份验证后即会立即删除帐户。
 
 ### 安全
 

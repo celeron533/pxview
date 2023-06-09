@@ -78,6 +78,10 @@ const otherList = [
     title: 'privacyPolicy',
   },
   {
+    id: 'deleteAccount',
+    title: 'deleteAccount',
+  },
+  {
     id: 'about',
     title: 'about',
   },
@@ -195,6 +199,12 @@ class Settings extends Component {
       }
       case 'about': {
         navigate(SCREENS.About);
+        break;
+      }
+      case 'deleteAccount': {
+        Linking.openURL(
+          `https://www.wilddream.net/Art/index/delete_account`,
+        );
         break;
       }
       case 'visitWebsite': {

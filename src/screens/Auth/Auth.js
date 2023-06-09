@@ -154,6 +154,13 @@ class Auth extends Component {
     }  
   };    
 
+  handleOnPressEULA = () => {
+    const {
+      i18n
+    } = this.props;
+    Linking.openURL('https://www.wilddream.net/Art/index/term_of_service')
+  };   
+
   handleOnPressGuestMode = () => {  
     this.props.login("guest", "guest");
   }
@@ -246,6 +253,9 @@ class Auth extends Component {
                 <TouchableOpacity onPress={this.handleOnPressPrivacyPolicy}>
                   <Text style={styles.privacyPolicy}>{i18n.privacyPolicy}</Text>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={this.handleOnPressEULA}>
+                  <Text style={styles.privacyPolicy}>{i18n.EULA}</Text>
+                </TouchableOpacity>
               </View>
             </KeyboardAvoidingView>
             <OverlaySpinner visible={loading} />
@@ -273,6 +283,12 @@ class Auth extends Component {
                   }                  
                 }
                   }>{i18n.privacyPolicy}</Text>
+                {'\n\n'}
+                {i18n.EULASummaryContent}
+                <Text style={{color: 'blue'}} onPress={() => {
+                  Linking.openURL('https://www.wilddream.net/Art/index/term_of_service')          
+                }
+                  }>{i18n.EULA}</Text>
               </Text>              
               <Button
                 style={styles.buttonContainer}
